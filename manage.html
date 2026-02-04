@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Manage — Deliberate UX</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+
+<body class="page-manage">
+  <header class="site-header">
+	<div class="nav-inner">
+	  <a class="nav-brand" href="/">Deliberate UX</a>
+	  <ul class="nav-links">
+		<li><a href="/work/">Work</a></li>
+		<li><a href="/#writing">Writing</a></li>
+		<li><a href="/#about">About</a></li>
+	  </ul>
+	</div>
+  </header>
+
+  <main class="manage-wrap">
+	<section class="manage-paper">
+	  <div class="manage-head">
+		<div>
+		  <h1>Manage articles</h1>
+		  <p class="small">
+			Local “CMS-lite” view. Changes are stored in your browser (localStorage). Export JSON to persist or move machines.
+			<strong>Esc</strong> closes popovers/editing.
+		  </p>
+		</div>
+
+		<div class="manage-controls">
+		  <input class="input manage-search" type="search" placeholder="Search title / tags..." />
+		  <button class="btn manage-export" type="button">Export JSON</button>
+		  <button class="btn manage-reset" type="button">Reset</button>
+		</div>
+	  </div>
+
+	  <div class="manage-table-wrap">
+		<table id="manageTable">
+		  <thead>
+			<tr>
+			  <th style="width:32%">Article</th>
+			  <th>Brief</th>
+			  <th style="width:34%">Tags</th>
+			</tr>
+		  </thead>
+		  <tbody></tbody>
+		</table>
+	  </div>
+	</section>
+  </main>
+
+  <footer class="site-footer">
+	<div class="footer-inner">
+	  <div class="footer-mark" aria-hidden="true"></div>
+	  <div>
+		<p class="footer-title">Deliberate UX</p>
+		<p class="footer-sub">Local management view for tags + metadata. Not linked publicly.</p>
+		<p class="footer-meta">© 2026 — Manage.</p>
+	  </div>
+	</div>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>
