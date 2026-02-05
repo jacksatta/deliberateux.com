@@ -1,79 +1,112 @@
+<!-- /writing/adoption-is-a-design-problem.html -->
 <!doctype html>
 <html lang="en" data-article-id="adoption-is-a-design-problem">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Adoption is a design problem — Deliberate UX</title>
-  <meta name="description" content="Adoption is about time, trust, risk, switching costs — and fit." />
+  <head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="/styles.css" />
-  <script defer src="/app.js"></script>
-</head>
+	<title>Adoption is a design problem — Deliberate UX</title>
+	<meta
+	  name="description"
+	  content="Adoption is about time, trust, risk, switching costs — and fit."
+	/>
 
-<body class="page-article">
-  <header class="site-header">
-	<nav class="nav">
-	  <div class="nav-inner">
-		<a class="nav-brand" href="/">Deliberate UX</a>
-		<ul class="nav-links">
-		  <li><a href="/#work">Work</a></li>
-		  <li><a href="/#writing">Writing</a></li>
-		  <li><a href="/#about">About</a></li>
-		</ul>
-	  </div>
-	</nav>
-  </header>
+	<!-- Manager / metadata hooks -->
+	<meta name="dux:type" content="article" />
+	<meta name="dux:slug" content="adoption-is-a-design-problem" />
+	<meta name="dux:title" content="Adoption is a design problem" />
+	<meta name="dux:deck" content="Adoption is about time, trust, risk, switching costs — and fit." />
+	<meta name="dux:readtime" content="9 minute read" />
+	<meta name="dux:updated" content="2026" />
+	<meta name="dux:status" content="published" />
+	<meta name="dux:tags" content="adoption,trust,risk,switching-costs,operations" />
 
-  <main class="article-wrap">
-	<article class="paper">
-	  <div class="article-top">
-		<div class="meta-left">
-		  <!-- tag pill(s) injected by JS -->
+	<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+	<link rel="stylesheet" href="../styles.css" />
+	<script defer src="../app.js"></script>
+  </head>
+
+  <body class="page page-article" data-article-id="adoption-is-a-design-problem">
+	<main class="article-wrap">
+	  <article class="paper" data-paper="article">
+		<div class="article-top">
+		  <div class="meta-left">
+			<div class="readtime">9 minute read</div>
+		  </div>
+
+		  <div class="meta-right">
+			<div class="meta-kicker">Updated</div>
+			<div class="updated">2026</div>
+		  </div>
 		</div>
-		<div class="meta-right">
-		  <div>Updated</div>
-		  <div class="updated">2026</div>
+
+		<header class="article-head">
+		  <h1 class="article-title">Adoption is a design problem</h1>
+		  <p class="article-deck">
+			Adoption is about time, trust, risk, switching costs — and fit.
+		  </p>
+		</header>
+
+		<div class="callout">
+		  People don’t adopt “features.” They adopt a new way of working.
 		</div>
-	  </div>
 
-	  <div class="readtime">7–9 minute read</div>
-	  <h1 class="article-title">Adoption is a design problem</h1>
-	  <p class="article-dek">
-		Adoption is rarely about whether users “like” a product. It’s about time, trust, risk, switching costs — and whether the tool fits the job that already exists.
-	  </p>
+		<div class="article-body">
+		  <h2>Why “usable” isn’t enough</h2>
+		  <p>
+			Most adoption failures aren’t about whether the UI is clean. They’re about whether the tool
+			respects constraints: time, operational reality, risk tolerance, and social proof.
+		  </p>
 
-	  <div class="callout">
-		Adoption becomes likely when the first successful outcome is fast, safe, and repeatable.
-	  </div>
+		  <h2>The four forces that decide adoption</h2>
 
-	  <div class="article-body">
-		<h2>The adoption surface area</h2>
+		  <h3>1) Time</h3>
+		  <p>
+			If a new flow costs more minutes than it saves, it loses—especially for high-throughput roles.
+		  </p>
 
-		<h3>Time</h3>
-		<p>If the path to value takes longer than the path to “do it the old way,” you lose. Reduce setup, shorten the first loop, and make progress obvious.</p>
+		  <h3>2) Trust</h3>
+		  <p>
+			Users don’t trust outputs they can’t explain. They also don’t trust tools that fail silently.
+			Confidence comes from visibility, guardrails, and predictable recovery.
+		  </p>
 
-		<h3>Trust</h3>
-		<p>Users need to believe the tool won’t embarrass them. Preview, explain, and let them recover. A good undo is an adoption feature.</p>
+		  <h3>3) Risk</h3>
+		  <p>
+			Adoption is constrained by consequences. If errors are expensive or embarrassing, users will
+			prefer the old way—even if it’s slower.
+		  </p>
 
-		<h3>Risk</h3>
-		<p>If a wrong click causes a mess, users will avoid the feature. Sandbox the scary parts. Default to reversible actions.</p>
+		  <h3>4) Switching costs</h3>
+		  <p>
+			Every new tool competes with existing muscle memory, templates, spreadsheets, tribal knowledge,
+			and “how we do it here.”
+		  </p>
 
-		<h3>Switching cost</h3>
-		<p>Adoption fails when you ask users to migrate their brain. Keep old mental models where possible, and when you can’t, teach them inside the interface.</p>
-	  </div>
-	</article>
-  </main>
+		  <h2>A practical adoption design prompt</h2>
+		  <ul>
+			<li>What does success look like in <em>their</em> day, not ours?</li>
+			<li>What’s the smallest “try it once” path with a safe exit?</li>
+			<li>Where is the tool asking for trust it hasn’t earned?</li>
+			<li>What must be true operationally for this to stick?</li>
+		  </ul>
+		</div>
 
-  <footer class="site-footer">
-	<div class="footer-inner">
-	  <div class="footer-mark" aria-hidden="true"></div>
-	  <div>
-		<p class="footer-title">Deliberate UX</p>
-		<p class="footer-sub">If you want tag persistence across devices, export JSON from Manage and commit changes to the registry in app.js.</p>
-		<p class="footer-meta">© 2026 · <a href="/#writing">More writing</a></p>
-	  </div>
-	</div>
-  </footer>
-</body>
+		<footer class="article-footer">
+		  <div class="site-mark">
+			<div class="site-mark-badge" aria-hidden="true"></div>
+			<div class="site-mark-text">
+			  <div class="site-mark-title">Deliberate UX</div>
+			  <div class="site-mark-subtitle">
+				This site is intentionally small. The structure is designed to scale to hundreds of articles.
+			  </div>
+			  <div class="site-mark-meta">
+				© 2026 · <a class="more-writing" href="../#writing">More writing</a>
+			  </div>
+			</div>
+		  </div>
+		</footer>
+	  </article>
+	</main>
+  </body>
 </html>

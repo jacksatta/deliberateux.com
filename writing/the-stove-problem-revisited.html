@@ -1,72 +1,103 @@
+<!-- /writing/the-stove-problem-revisited.html -->
 <!doctype html>
 <html lang="en" data-article-id="the-stove-problem-revisited">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>The stove problem, revisited — Deliberate UX</title>
-  <meta name="description" content="Bad mapping teaches workarounds. Fixing mapping is a reliability and safety win." />
+  <head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="/styles.css" />
-  <script defer src="/app.js"></script>
-</head>
+	<title>The stove problem, revisited — Deliberate UX</title>
+	<meta
+	  name="description"
+	  content="Bad mapping teaches workarounds. Fixing mapping is a reliability and safety win."
+	/>
 
-<body class="page-article">
-  <header class="site-header">
-	<nav class="nav">
-	  <div class="nav-inner">
-		<a class="nav-brand" href="/">Deliberate UX</a>
-		<ul class="nav-links">
-		  <li><a href="/#work">Work</a></li>
-		  <li><a href="/#writing">Writing</a></li>
-		  <li><a href="/#about">About</a></li>
-		</ul>
-	  </div>
-	</nav>
-  </header>
+	<!-- Manager / metadata hooks -->
+	<meta name="dux:type" content="article" />
+	<meta name="dux:slug" content="the-stove-problem-revisited" />
+	<meta name="dux:title" content="The stove problem, revisited" />
+	<meta
+	  name="dux:deck"
+	  content="Bad mapping teaches workarounds. Fixing mapping is a reliability and safety win."
+	/>
+	<meta name="dux:readtime" content="8 minute read" />
+	<meta name="dux:updated" content="2026" />
+	<meta name="dux:status" content="published" />
+	<meta name="dux:tags" content="mapping,affordances,safety,reliability,systems" />
 
-  <main class="article-wrap">
-	<article class="paper">
-	  <div class="article-top">
-		<div class="meta-left"></div>
-		<div class="meta-right">
-		  <div>Updated</div>
-		  <div class="updated">2026</div>
+	<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+	<link rel="stylesheet" href="../styles.css" />
+	<script defer src="../app.js"></script>
+  </head>
+
+  <body class="page page-article" data-article-id="the-stove-problem-revisited">
+	<main class="article-wrap">
+	  <article class="paper" data-paper="article">
+		<div class="article-top">
+		  <div class="meta-left">
+			<div class="readtime">8 minute read</div>
+		  </div>
+
+		  <div class="meta-right">
+			<div class="meta-kicker">Updated</div>
+			<div class="updated">2026</div>
+		  </div>
 		</div>
-	  </div>
 
-	  <div class="readtime">6–8 minute read</div>
-	  <h1 class="article-title">The stove problem, revisited</h1>
-	  <p class="article-dek">People don’t learn the product — they learn workarounds. Bad mapping teaches the wrong habit every time.</p>
+		<header class="article-head">
+		  <h1 class="article-title">The stove problem, revisited</h1>
+		  <p class="article-deck">
+			Bad mapping teaches workarounds. Fixing mapping is a reliability and safety win.
+		  </p>
+		</header>
 
-	  <div class="callout">Mapping is the design. Help text is a confession.</div>
+		<div class="callout">
+		  When controls don’t map to outcomes, users invent a new interface: memory.
+		</div>
 
-	  <div class="article-body">
-		<h2>Why mapping matters</h2>
-		<p>When controls don’t match outcomes, users pay a tax: they hesitate, they double-check, they recover. Over time, they build superstition.</p>
+		<div class="article-body">
+		  <h2>What “bad mapping” actually costs</h2>
+		  <p>
+			Stove knobs are the canonical example because the consequence is visible: the wrong burner turns on.
+			But the pattern shows up everywhere—forms, admin consoles, agent tools, and “simple” settings screens.
+		  </p>
 
-		<h3>Safety and reliability</h3>
-		<p>Bad mapping turns a simple interaction into an error-prone system. Fixing mapping reduces the probability and cost of mistakes.</p>
+		  <h2>Why workarounds feel like competence</h2>
+		  <p>
+			People adapt. They learn the quirks, build muscle memory, and teach others. The system interprets this
+			as “good enough,” even though the product is quietly training users to compensate.
+		  </p>
 
-		<h3>What “good” looks like</h3>
-		<ul>
-		  <li>Spatial correspondence is obvious.</li>
-		  <li>States are visible.</li>
-		  <li>Recovery is fast.</li>
-		</ul>
-	  </div>
-	</article>
-  </main>
+		  <h2>Fixing mapping is a systems decision</h2>
+		  <p>
+			Mapping problems persist when incentives reward shipping more screens instead of removing ambiguity.
+			The fix is often small—but it requires someone to prioritize reduction, not addition.
+		  </p>
 
-  <footer class="site-footer">
-	<div class="footer-inner">
-	  <div class="footer-mark" aria-hidden="true"></div>
-	  <div>
-		<p class="footer-title">Deliberate UX</p>
-		<p class="footer-sub">Tags are editable locally via Manage. Export JSON to persist.</p>
-		<p class="footer-meta">© 2026 · <a href="/#writing">More writing</a></p>
-	  </div>
-	</div>
-  </footer>
-</body>
+		  <h2>A practical checklist</h2>
+		  <ul>
+			<li>Can a first-time user predict the outcome before acting?</li>
+			<li>Does the control layout match the real-world layout?</li>
+			<li>Are labels redundant with the visual structure?</li>
+			<li>Can mistakes be reversed safely?</li>
+			<li>Is the “correct” action the easiest action?</li>
+		  </ul>
+		</div>
+
+		<footer class="article-footer">
+		  <div class="site-mark">
+			<div class="site-mark-badge" aria-hidden="true"></div>
+			<div class="site-mark-text">
+			  <div class="site-mark-title">Deliberate UX</div>
+			  <div class="site-mark-subtitle">
+				This site is intentionally small. The structure is designed to scale to hundreds of articles.
+			  </div>
+			  <div class="site-mark-meta">
+				© 2026 · <a class="more-writing" href="../#writing">More writing</a>
+			  </div>
+			</div>
+		  </div>
+		</footer>
+	  </article>
+	</main>
+  </body>
 </html>
