@@ -1,0 +1,36 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Publish to GitHub Pages",
+      "type": "shell",
+      "command": "git add . && git commit -m 'Update site: $(date +\"%Y-%m-%d %H:%M\")' && git push origin main",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "focus": false,
+        "showReuseMessage": false
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Publish with Custom Message",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-c",
+        "read -p 'Commit message: ' msg && git add . && git commit -m \"$msg\" && git push origin main"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "focus": true
+      }
+    }
+  ]
+}
