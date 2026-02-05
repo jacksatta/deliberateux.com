@@ -1,7 +1,0 @@
-[
-  {
-    "key": "cmd+shift+u",
-    "command": "workbench.action.tasks.runTask",
-    "args": "Publish to GitHub Pages"
-  }
-]
