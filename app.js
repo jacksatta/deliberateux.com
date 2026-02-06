@@ -50,7 +50,7 @@
 		  <div class="nav-left">
 			<a class="brand" href="/">
 			  <span class="brand-icon" aria-hidden="true"></span>
-			  Deliberate UX
+			  <span class="brand-wordmark">Deliberate<span class="wordmark-ux">UX</span></span>
 			</a>
 		  </div>
 
@@ -92,9 +92,14 @@
 	  <div class="container">
 		<div class="footer-inner">
 		  <div class="footer-left">
-			<div class="brand-dot" aria-hidden="true"></div>
+			<div class="brand-dot" aria-hidden="true">
+			  <div class="brand-dot-sparkle">
+				<span></span><span></span><span></span>
+				<span></span><span></span><span></span>
+			  </div>
+			</div>
 			<div class="footer-blurb">
-			  <div class="footer-brand">Contact for deliberate UX</div>
+			  <div class="footer-wordmark">Deliberate<span class="wordmark-ux">UX</span></div>
 			  <div class="footer-tagline">© ${year} · <a href="/work/">Work</a> · <a href="/writing/writing.html">Writing</a> · <a href="/#about">About</a></div>
 			</div>
 		  </div>
@@ -191,7 +196,74 @@
   }
 
   function wireHeroBubbleZoom() {
-	// Fisheye effect removed - keeping function stub for potential future use
+	const heroMedia = document.querySelector(".hero-media");
+	if (!heroMedia) return;
+
+	const lensSize = 200;
+	const zoomFactor = 2.5;
+
+	// Create lens container (clips the zoomed content)
+	const lens = document.createElement("div");
+	lens.className = "hero-lens";
+
+	// Clone entire hero-media so image + text zoom together
+	const clone = heroMedia.cloneNode(true);
+	clone.className = "hero-lens-clone";
+	lens.appendChild(clone);
+	heroMedia.appendChild(lens);
+
+	heroMedia.addEventListener("mousemove", (e) => {
+	  const rect = heroMedia.getBoundingClientRect();
+	  const x = e.clientX - rect.left;
+	  const y = e.clientY - rect.top;
+
+	  // Position lens centered on cursor
+	  lens.style.left = `${x - lensSize / 2}px`;
+	  lens.style.top = `${y - lensSize / 2}px`;
+
+	  // Position the scaled clone so point under cursor appears at lens center
+	  const offsetX = -x * zoomFactor + lensSize / 2;
+	  const offsetY = -y * zoomFactor + lensSize / 2;
+
+	  clone.style.width = `${rect.width}px`;
+	  clone.style.height = `${rect.height}px`;
+	  clone.style.transform = `scale(${zoomFactor}) translate(${offsetX / zoomFactor}px, ${offsetY / zoomFactor}px)`;
+
+	  // Fade out as cursor approaches edges
+	  const edgeFade = 80; // pixels from edge to start fading
+	  const distFromLeft = x;
+	  const distFromRight = rect.width - x;
+	  const distFromTop = y;
+	  const distFromBottom = rect.height - y;
+	  const minDist = Math.min(distFromLeft, distFromRight, distFromTop, distFromBottom);
+	  const edgeOpacity = Math.min(1, minDist / edgeFade);
+
+	  lens.style.opacity = edgeOpacity.toString();
+	});
+
+	heroMedia.addEventListener("mouseleave", () => {
+	  lens.style.opacity = "0";
+	});
+  }
+
+  // Fade out hero section as user scrolls down
+  function wireScrollFade() {
+	const hero = document.querySelector(".hero");
+	if (!hero) return;
+
+	const fadeDistance = 300; // pixels to fully fade out
+
+	function updateFade() {
+	  const scrollY = window.scrollY;
+	  const opacity = Math.max(0, 1 - scrollY / fadeDistance);
+	  const translateY = scrollY * 0.3; // parallax effect
+
+	  hero.style.opacity = opacity.toString();
+	  hero.style.transform = `translateY(${translateY}px)`;
+	}
+
+	window.addEventListener("scroll", updateFade, { passive: true });
+	updateFade();
   }
 
   // Rotating intensity shimmer on Writing section
@@ -654,6 +726,7 @@
   injectFooter();
   wireCardMouseGradients();
   wireHeroBubbleZoom();
+  wireScrollFade();
   wireWritingShimmer();
   injectArticleTags();
   bootManagePage();
