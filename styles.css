@@ -1588,7 +1588,7 @@ html[data-theme="light"] .site-footer {
   cursor: pointer;
 }
 
-/* Circle ring - closed by default, opens and stays open after hover */
+/* Circle ring with gap on right side (matching header logo) */
 .brand-dot::before {
   content: "";
   position: absolute;
@@ -1597,7 +1597,9 @@ html[data-theme="light"] .site-footer {
   background: conic-gradient(
     from 150deg,
     var(--text) 0deg,
-    var(--text) 360deg
+    var(--text) 240deg,
+    transparent 240deg,
+    transparent 360deg
   );
   mask: radial-gradient(circle, transparent 58%, black 60%);
   -webkit-mask: radial-gradient(circle, transparent 58%, black 60%);
@@ -1688,38 +1690,31 @@ html[data-theme="light"] .site-footer {
   top: 50%;
 }
 
-/* Radial positioning - lines point outward from center */
-.brand-dot-sparkle span:nth-child(1) { transform: translate(-50%, -50%) rotate(0deg) translateY(-28px); }
-.brand-dot-sparkle span:nth-child(2) { transform: translate(-50%, -50%) rotate(60deg) translateY(-28px); }
-.brand-dot-sparkle span:nth-child(3) { transform: translate(-50%, -50%) rotate(120deg) translateY(-28px); }
-.brand-dot-sparkle span:nth-child(4) { transform: translate(-50%, -50%) rotate(180deg) translateY(-28px); }
-.brand-dot-sparkle span:nth-child(5) { transform: translate(-50%, -50%) rotate(240deg) translateY(-28px); }
-.brand-dot-sparkle span:nth-child(6) { transform: translate(-50%, -50%) rotate(300deg) translateY(-28px); }
+/* Radial positioning with custom property for animation */
+.brand-dot-sparkle span:nth-child(1) { --r: 0deg; transform: translate(-50%, -50%) rotate(0deg) translateY(-28px); }
+.brand-dot-sparkle span:nth-child(2) { --r: 60deg; transform: translate(-50%, -50%) rotate(60deg) translateY(-28px); }
+.brand-dot-sparkle span:nth-child(3) { --r: 120deg; transform: translate(-50%, -50%) rotate(120deg) translateY(-28px); }
+.brand-dot-sparkle span:nth-child(4) { --r: 180deg; transform: translate(-50%, -50%) rotate(180deg) translateY(-28px); }
+.brand-dot-sparkle span:nth-child(5) { --r: 240deg; transform: translate(-50%, -50%) rotate(240deg) translateY(-28px); }
+.brand-dot-sparkle span:nth-child(6) { --r: 300deg; transform: translate(-50%, -50%) rotate(300deg) translateY(-28px); }
 
-/* Sparks fire immediately on hover */
+/* All sparks fire simultaneously on hover */
 .brand-dot:hover .brand-dot-sparkle span {
   animation: sparkBurst 400ms ease-out forwards;
 }
 
-.brand-dot:hover .brand-dot-sparkle span:nth-child(1) { animation-delay: 0ms; }
-.brand-dot:hover .brand-dot-sparkle span:nth-child(2) { animation-delay: 30ms; }
-.brand-dot:hover .brand-dot-sparkle span:nth-child(3) { animation-delay: 60ms; }
-.brand-dot:hover .brand-dot-sparkle span:nth-child(4) { animation-delay: 20ms; }
-.brand-dot:hover .brand-dot-sparkle span:nth-child(5) { animation-delay: 50ms; }
-.brand-dot:hover .brand-dot-sparkle span:nth-child(6) { animation-delay: 40ms; }
-
 @keyframes sparkBurst {
   0% {
     opacity: 0;
-    transform: translate(-50%, -50%) rotate(var(--r, 0deg)) translateY(-20px) scaleY(0.5);
+    transform: translate(-50%, -50%) rotate(var(--r)) translateY(-20px) scaleY(0.5);
   }
   30% {
     opacity: 1;
-    transform: translate(-50%, -50%) rotate(var(--r, 0deg)) translateY(-32px) scaleY(1);
+    transform: translate(-50%, -50%) rotate(var(--r)) translateY(-32px) scaleY(1);
   }
   100% {
     opacity: 0;
-    transform: translate(-50%, -50%) rotate(var(--r, 0deg)) translateY(-38px) scaleY(0.3);
+    transform: translate(-50%, -50%) rotate(var(--r)) translateY(-38px) scaleY(0.3);
   }
 }
 
