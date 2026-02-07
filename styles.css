@@ -2203,7 +2203,7 @@ html[data-theme="light"] .panel--work::before {
   }
 
   .panel--work .card {
-    background: rgba(0, 0, 0, 0.92);
+    background: rgba(0, 0, 0, 0.96);
   }
 }
 
