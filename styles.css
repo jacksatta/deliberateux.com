@@ -294,6 +294,38 @@ html[data-theme="light"] .panel.panel-soft {
   position: relative;
 }
 
+/* Hero entrance animations */
+.hero.hero-intro {
+  opacity: 0;
+  animation: heroCardFadeIn 400ms ease-out forwards;
+}
+
+.hero.hero-intro .hero-content {
+  opacity: 0;
+  transform: translateX(calc(50vw - 50% - 28px));
+  animation: heroContentSlideIn 600ms ease-out 200ms forwards;
+}
+
+@keyframes heroCardFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes heroContentSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(calc(50vw - 50% - 28px));
+  }
+  40% {
+    opacity: 1;
+    transform: translateX(calc(50vw - 50% - 28px));
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 .hero-media {
   position: relative;
   height: 420px;
@@ -2122,50 +2154,114 @@ html[data-theme="light"] .modal-overlay {
   border: none;
   box-shadow: var(--shadow);
   overflow: hidden;
-  background:
-    /* Top fade */
-    linear-gradient(180deg,
-      rgba(0, 0, 0, 0.95) 0%,
-      rgba(0, 0, 0, 0.7) 30%,
-      transparent 70%),
-    /* Bottom fade */
-    linear-gradient(0deg,
-      rgba(0, 0, 0, 0.95) 0%,
-      rgba(0, 0, 0, 0.7) 30%,
-      transparent 70%),
-    /* Image */
-    url('/assets/work/finance-hero.png');
-  background-size: 100% 80%, 100% 80%, cover;
-  background-position: top, bottom, center 35%;
-  background-repeat: no-repeat;
+  background: #000;
+  perspective: 350px;
 }
 
-/* Blur overlay for moire/depth effect */
-.panel--work::before {
+/* Gradient overlay - ABOVE image, BELOW content (not rotated) */
+.panel--work::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(1.5px);
-  z-index: 0;
-  border-radius: inherit;
   pointer-events: none;
+  z-index: 1;
+  background:
+    /* Left edge vignette for title contrast */
+    linear-gradient(to right, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 8%, transparent 20%),
+    /* Right fade to black */
+    linear-gradient(to right, transparent 0%, transparent 40%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.75) 60%, #000 75%);
+}
+
+html[data-theme="light"] .panel--work {
+  background: var(--bg);
+}
+
+html[data-theme="light"] .panel--work::after {
+  background:
+    linear-gradient(to right, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.15) 8%, transparent 20%),
+    linear-gradient(to right, transparent 0%, transparent 60%, rgba(255,255,255,0.5) 75%, var(--bg) 90%);
+}
+
+/* Extreme trapezoid perspective image - BEHIND all content */
+.work-backdrop {
+  position: absolute;
+  top: -25%;
+  left: -5%;
+  width: 160%;
+  height: 150%;
+  transform: rotateY(-55deg);
+  transform-origin: left center;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.work-backdrop img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  filter: contrast(1.15) saturate(1.2) blur(1.5px);
+}
+
+/* Heavy moiré scanline effect - strongest on left */
+.work-backdrop-moire {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.7;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      rgba(0, 0, 0, 0.8) 1px,
+      transparent 2px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 80, 80, 0.2) 0px,
+      rgba(80, 255, 80, 0.2) 1px,
+      rgba(80, 80, 255, 0.2) 2px,
+      transparent 3px
+    );
+  background-size: 100% 2px, 3px 100%;
+  /* Moiré strongest on left, fades to right */
+  mask-image: linear-gradient(to right, black 0%, rgba(0,0,0,0.4) 25%, transparent 60%);
+  -webkit-mask-image: linear-gradient(to right, black 0%, rgba(0,0,0,0.4) 25%, transparent 60%);
+}
+
+/* Fade overlay kept for HTML structure but emptied - gradient now on panel::after */
+.work-backdrop-fade {
+  display: none;
 }
 
 .panel--work .section-head {
   padding: 56px 28px 0;
   margin-bottom: 56px;
+  position: relative;
+  z-index: 2;
 }
 
-html[data-theme="light"] .panel--work::before {
-  opacity: 0.28;
-  filter: saturate(0.7) blur(1px) brightness(0.9);
+html[data-theme="light"] .work-backdrop img {
+  filter: saturate(0.85) brightness(1);
+}
+
+/* Light mode work-backdrop-fade - now handled by panel::after */
+
+/* Light mode: white headlines for contrast over image */
+html[data-theme="light"] .panel--work .section-title {
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 4px 20px rgba(0,0,0,0.3);
+}
+
+html[data-theme="light"] .panel--work .section-kicker {
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
 }
 
 .panel--work .section-head,
 .panel--work .cards {
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .panel--work .card {
@@ -2230,34 +2326,16 @@ html[data-theme="light"] .panel--work::before {
 /* === END EXPERIMENT === */
 
 @media (max-width: 720px) {
-  .panel--work {
-    background:
-      /* Top fade */
-      linear-gradient(180deg,
-        rgba(0, 0, 0, 0.98) 0%,
-        rgba(0, 0, 0, 0.9) 6%,
-        rgba(0, 0, 0, 0.7) 10%,
-        rgba(0, 0, 0, 0.4) 14%,
-        rgba(0, 0, 0, 0.5) 18%,
-        rgba(0, 0, 0, 0.75) 22%,
-        rgba(0, 0, 0, 0.92) 26%,
-        black 30%),
-      /* Bottom fade - darken from bottom up */
-      linear-gradient(0deg,
-        rgba(0, 0, 0, 1) 0%,
-        rgba(0, 0, 0, 0.95) 15%,
-        rgba(0, 0, 0, 0.8) 30%,
-        rgba(0, 0, 0, 0.5) 50%,
-        transparent 70%),
-      radial-gradient(ellipse 100% 70% at 50% 10%,
-        transparent 10%,
-        rgba(0, 0, 0, 0.5) 30%,
-        rgba(0, 0, 0, 0.8) 50%,
-        black 70%),
-      url('/assets/work/finance-hero.png');
-    background-size: 100% 200px, 100% 100%, 100% 200px, cover;
-    background-position: top, bottom, top, center 35%;
-    background-repeat: no-repeat;
+  .work-backdrop {
+    top: -5%;
+    left: -5%;
+    width: 120%;
+    height: 50%;
+    transform: rotateY(-35deg);
+  }
+
+  .panel--work::after {
+    background: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.7) 60%, #000 90%);
   }
 
   .panel--work .card {
@@ -2265,10 +2343,94 @@ html[data-theme="light"] .panel--work::before {
   }
 }
 
-/* Work page hero (work landing page - text version) */
+/* Work page hero with perspective monitor effect */
 .work-hero {
-  padding: 80px 0 60px;
-  text-align: center;
+  padding: 60px 0 40px;
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  perspective: 1200px;
+}
+
+.work-hero-monitor {
+  position: relative;
+  flex: 1;
+  max-width: 60%;
+  transform: rotateY(-25deg) rotateX(3deg);
+  transform-style: preserve-3d;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow:
+    -30px 35px 80px rgba(0, 0, 0, 0.6),
+    -8px 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.work-hero-monitor img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: contrast(1.05) saturate(1.1);
+}
+
+/* Moiré scanline effect - like monitor pixels up close */
+.work-hero-moire {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.15;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 2px,
+      rgba(0, 0, 0, 0.3) 2px,
+      rgba(0, 0, 0, 0.3) 3px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 0, 0, 0.03) 0px,
+      rgba(0, 255, 0, 0.03) 1px,
+      rgba(0, 0, 255, 0.03) 2px,
+      transparent 3px
+    );
+  background-size: 100% 3px, 3px 100%;
+  mix-blend-mode: overlay;
+}
+
+/* Right-side fade: dramatic fade to black */
+.work-hero-fade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    transparent 15%,
+    rgba(0, 0, 0, 0.3) 35%,
+    rgba(0, 0, 0, 0.6) 55%,
+    rgba(0, 0, 0, 0.9) 75%,
+    #000 100%
+  );
+}
+
+/* Blur increases toward right edge */
+.work-hero-monitor::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 50%;
+  pointer-events: none;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  mask-image: linear-gradient(to right, transparent, black);
+  -webkit-mask-image: linear-gradient(to right, transparent, black);
+}
+
+.work-hero-text {
+  flex: 1;
+  text-align: left;
 }
 
 .work-hero-title {
@@ -2282,8 +2444,28 @@ html[data-theme="light"] .panel--work::before {
   font-size: 18px;
   color: var(--muted);
   margin: 0;
-  max-width: 48ch;
-  margin: 0 auto;
+  max-width: 36ch;
+}
+
+@media (max-width: 900px) {
+  .work-hero {
+    flex-direction: column;
+    gap: 32px;
+    padding: 40px 0 32px;
+  }
+
+  .work-hero-monitor {
+    max-width: 100%;
+    transform: rotateY(-8deg) rotateX(1deg);
+  }
+
+  .work-hero-text {
+    text-align: center;
+  }
+
+  .work-hero-subtitle {
+    margin: 0 auto;
+  }
 }
 
 /* ================================

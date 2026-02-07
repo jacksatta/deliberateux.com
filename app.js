@@ -278,12 +278,33 @@
 	  lens.style.opacity = edgeOpacity.toString();
 	}
 
-	heroMedia.addEventListener("touchstart", handleTouch, { passive: true });
+	let fadeTimeout = null;
+	const fadeDelay = 1500; // ms before lens fades after touch ends
+
+	heroMedia.addEventListener("touchstart", (e) => {
+	  // Cancel any pending fade when user touches again
+	  if (fadeTimeout) {
+		clearTimeout(fadeTimeout);
+		fadeTimeout = null;
+	  }
+	  handleTouch(e);
+	}, { passive: true });
+
 	heroMedia.addEventListener("touchmove", handleTouch, { passive: true });
+
 	heroMedia.addEventListener("touchend", () => {
-	  lens.style.opacity = "0";
+	  // Fade away after delay
+	  fadeTimeout = setTimeout(() => {
+		lens.style.opacity = "0";
+		fadeTimeout = null;
+	  }, fadeDelay);
 	});
+
 	heroMedia.addEventListener("touchcancel", () => {
+	  if (fadeTimeout) {
+		clearTimeout(fadeTimeout);
+		fadeTimeout = null;
+	  }
 	  lens.style.opacity = "0";
 	});
   }
@@ -824,9 +845,34 @@
 	});
   }
 
+  // Hero entrance animation on page load
+  function wireHeroIntro() {
+	const hero = document.querySelector(".hero");
+	if (!hero) return;
+
+	// Add intro class to trigger CSS animations
+	hero.classList.add("hero-intro");
+
+	// Clean up class after animation completes
+	hero.addEventListener("animationend", (e) => {
+	  if (e.target === hero) {
+		// Keep class until content animation also finishes
+		const content = hero.querySelector(".hero-content");
+		if (content) {
+		  content.addEventListener("animationend", () => {
+			hero.classList.remove("hero-intro");
+		  }, { once: true });
+		} else {
+		  hero.classList.remove("hero-intro");
+		}
+	  }
+	}, { once: true });
+  }
+
   // ---------- boot ----------
   setTheme(getInitialTheme());
 
+  wireHeroIntro();
   injectHeader();
   injectFooter();
   wireCardMouseGradients();
