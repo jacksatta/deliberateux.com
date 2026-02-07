@@ -2126,14 +2126,14 @@ html[data-theme="light"] .modal-overlay {
     /* Top edge darken - strong for text contrast */
     linear-gradient(180deg,
       rgba(0, 0, 0, 0.98) 0%,
-      rgba(0, 0, 0, 0.9) 6%,
-      rgba(0, 0, 0, 0.7) 12%,
-      rgba(0, 0, 0, 0.4) 20%,
-      rgba(0, 0, 0, 0.25) 30%,
-      rgba(0, 0, 0, 0.35) 45%,
-      rgba(0, 0, 0, 0.7) 55%,
-      rgba(0, 0, 0, 0.95) 65%,
-      black 75%),
+      rgba(0, 0, 0, 0.95) 8%,
+      rgba(0, 0, 0, 0.85) 14%,
+      rgba(0, 0, 0, 0.6) 22%,
+      rgba(0, 0, 0, 0.4) 30%,
+      rgba(0, 0, 0, 0.6) 38%,
+      rgba(0, 0, 0, 0.85) 46%,
+      rgba(0, 0, 0, 0.98) 54%,
+      black 60%),
     /* Vignette */
     radial-gradient(ellipse 100% 70% at 50% 18%,
       transparent 15%,
@@ -2142,7 +2142,7 @@ html[data-theme="light"] .modal-overlay {
       rgba(0, 0, 0, 0.9) 100%),
     /* Image */
     url('/assets/work/finance-hero.png');
-  background-size: 100% 420px, 100% 420px, cover;
+  background-size: 100% 320px, 100% 320px, cover;
   background-position: top, top, center 35%;
   background-repeat: no-repeat;
 }
@@ -2172,6 +2172,11 @@ html[data-theme="light"] .panel--work::before {
 .panel--work .cards {
   position: relative;
   z-index: 1;
+}
+
+.panel--work .card {
+  background: rgba(0, 0, 0, 0.7);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Work page hero (work landing page - text version) */
