@@ -2182,6 +2182,7 @@ html[data-theme="light"] .panel--work::before {
 @media (max-width: 720px) {
   .panel--work {
     background:
+      /* Top fade */
       linear-gradient(180deg,
         rgba(0, 0, 0, 0.98) 0%,
         rgba(0, 0, 0, 0.9) 6%,
@@ -2191,14 +2192,21 @@ html[data-theme="light"] .panel--work::before {
         rgba(0, 0, 0, 0.75) 22%,
         rgba(0, 0, 0, 0.92) 26%,
         black 30%),
+      /* Bottom fade - darken from bottom up */
+      linear-gradient(0deg,
+        rgba(0, 0, 0, 1) 0%,
+        rgba(0, 0, 0, 0.95) 15%,
+        rgba(0, 0, 0, 0.8) 30%,
+        rgba(0, 0, 0, 0.5) 50%,
+        transparent 70%),
       radial-gradient(ellipse 100% 70% at 50% 10%,
         transparent 10%,
         rgba(0, 0, 0, 0.5) 30%,
         rgba(0, 0, 0, 0.8) 50%,
         black 70%),
       url('/assets/work/finance-hero.png');
-    background-size: 100% 200px, 100% 200px, cover;
-    background-position: top, top, center 35%;
+    background-size: 100% 200px, 100% 100%, 100% 200px, cover;
+    background-position: top, bottom, top, center 35%;
     background-repeat: no-repeat;
   }
 
@@ -2307,6 +2315,8 @@ html[data-theme="light"] .panel--work::before {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  --zoom: 1;
+  transform: scale(var(--zoom));
   transition: transform 400ms var(--ease);
 }
 
@@ -2441,9 +2451,12 @@ html[data-theme="light"] .panel--work::before {
   100% { opacity: 0; object-position: center 30%; }
 }
 
-.work-card:hover .work-card-placeholder,
-.work-card:hover .work-card-image img {
+.work-card:hover .work-card-placeholder {
   transform: scale(1.03);
+}
+
+.work-card:hover .work-card-image img {
+  transform: scale(calc(var(--zoom) * 1.03));
 }
 
 .work-card-content {
@@ -2475,10 +2488,52 @@ html[data-theme="light"] .panel--work::before {
   letter-spacing: -0.02em;
   color: #fff;
   text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  transition: color 300ms var(--ease), text-shadow 300ms var(--ease);
 }
 
 .work-card:first-child .work-card-title {
   font-size: 32px;
+}
+
+/* Colored card titles - pulled from imagery */
+.work-card[data-case="technology"] .work-card-title {
+  color: #7DD3FC; /* sky blue */
+}
+.work-card[data-case="technology"]:hover .work-card-title {
+  color: #38BDF8;
+  text-shadow: 0 4px 24px rgba(56, 189, 248, 0.5);
+}
+
+.work-card[data-case="telecom"] .work-card-title {
+  color: #5EEAD4; /* teal */
+}
+.work-card[data-case="telecom"]:hover .work-card-title {
+  color: #2DD4BF;
+  text-shadow: 0 4px 24px rgba(45, 212, 191, 0.5);
+}
+
+.work-card[data-case="nike"] .work-card-title {
+  color: #FDBA74; /* orange/coral */
+}
+.work-card[data-case="nike"]:hover .work-card-title {
+  color: #FB923C;
+  text-shadow: 0 4px 24px rgba(251, 146, 60, 0.5);
+}
+
+.work-card[data-case="fintech"] .work-card-title {
+  color: #93C5FD; /* Salesforce blue */
+}
+.work-card[data-case="fintech"]:hover .work-card-title {
+  color: #60A5FA;
+  text-shadow: 0 4px 24px rgba(96, 165, 250, 0.5);
+}
+
+.work-card[data-case="retail"] .work-card-title {
+  color: #A78BFA; /* purple/violet */
+}
+.work-card[data-case="retail"]:hover .work-card-title {
+  color: #8B5CF6;
+  text-shadow: 0 4px 24px rgba(139, 92, 246, 0.5);
 }
 
 .work-card-excerpt {
