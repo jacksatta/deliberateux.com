@@ -2175,8 +2175,36 @@ html[data-theme="light"] .panel--work::before {
 }
 
 .panel--work .card {
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.85);
   border-color: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 720px) {
+  .panel--work {
+    background:
+      linear-gradient(180deg,
+        rgba(0, 0, 0, 0.98) 0%,
+        rgba(0, 0, 0, 0.9) 6%,
+        rgba(0, 0, 0, 0.7) 10%,
+        rgba(0, 0, 0, 0.4) 14%,
+        rgba(0, 0, 0, 0.5) 18%,
+        rgba(0, 0, 0, 0.75) 22%,
+        rgba(0, 0, 0, 0.92) 26%,
+        black 30%),
+      radial-gradient(ellipse 100% 70% at 50% 10%,
+        transparent 10%,
+        rgba(0, 0, 0, 0.5) 30%,
+        rgba(0, 0, 0, 0.8) 50%,
+        black 70%),
+      url('/assets/work/finance-hero.png');
+    background-size: 100% 200px, 100% 200px, cover;
+    background-position: top, top, center 35%;
+    background-repeat: no-repeat;
+  }
+
+  .panel--work .card {
+    background: rgba(0, 0, 0, 0.92);
+  }
 }
 
 /* Work page hero (work landing page - text version) */
