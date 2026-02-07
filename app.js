@@ -199,7 +199,7 @@
 	const heroMedia = document.querySelector(".hero-media");
 	if (!heroMedia) return;
 
-	const lensSize = 200;
+	const lensSize = 220;
 	const zoomFactor = 2.5;
 
 	// Create lens container (clips the zoomed content)
@@ -244,6 +244,48 @@
 	heroMedia.addEventListener("mouseleave", () => {
 	  lens.style.opacity = "0";
 	});
+
+	// Touch support - same behavior but fade on touch end
+	function handleTouch(e) {
+	  const touch = e.touches[0];
+	  if (!touch) return;
+
+	  const rect = heroMedia.getBoundingClientRect();
+	  const x = touch.clientX - rect.left;
+	  const y = touch.clientY - rect.top;
+
+	  // Position lens centered on touch
+	  lens.style.left = `${x - lensSize / 2}px`;
+	  lens.style.top = `${y - lensSize / 2}px`;
+
+	  // Position the scaled clone
+	  const offsetX = -x * zoomFactor + lensSize / 2;
+	  const offsetY = -y * zoomFactor + lensSize / 2;
+
+	  clone.style.width = `${rect.width}px`;
+	  clone.style.height = `${rect.height}px`;
+	  clone.style.transform = `scale(${zoomFactor}) translate(${offsetX / zoomFactor}px, ${offsetY / zoomFactor}px)`;
+
+	  // Fade out near edges
+	  const edgeFade = 80;
+	  const distFromLeft = x;
+	  const distFromRight = rect.width - x;
+	  const distFromTop = y;
+	  const distFromBottom = rect.height - y;
+	  const minDist = Math.min(distFromLeft, distFromRight, distFromTop, distFromBottom);
+	  const edgeOpacity = Math.min(1, minDist / edgeFade);
+
+	  lens.style.opacity = edgeOpacity.toString();
+	}
+
+	heroMedia.addEventListener("touchstart", handleTouch, { passive: true });
+	heroMedia.addEventListener("touchmove", handleTouch, { passive: true });
+	heroMedia.addEventListener("touchend", () => {
+	  lens.style.opacity = "0";
+	});
+	heroMedia.addEventListener("touchcancel", () => {
+	  lens.style.opacity = "0";
+	});
   }
 
   // Fade out hero section as user scrolls down
@@ -266,56 +308,22 @@
 	updateFade();
   }
 
-  // Rotating intensity shimmer on Writing section
+  // Glint effect on Writing section - tracks mouse position
   function wireWritingShimmer() {
 	const writingSection = document.querySelector(".panel--writing");
 	if (!writingSection) return;
 
-	let lastY = 0;
-	let rotation = 0;
-
 	writingSection.addEventListener("mousemove", (e) => {
-	  const currentY = e.clientY;
-	  const deltaY = currentY - lastY;
-
-	  // Mouse up (-y) = clockwise, Mouse down (+y) = counter-clockwise
-	  if (deltaY < 0) {
-		rotation += 2; // clockwise
-	  } else if (deltaY > 0) {
-		rotation -= 2; // counter-clockwise
-	  }
-
-	  lastY = currentY;
-
-	  writingSection.style.setProperty("--shimmer-rotation", `${rotation}deg`);
-	  writingSection.classList.add("shimmer-active");
+	  const rect = writingSection.getBoundingClientRect();
+	  const x = ((e.clientX - rect.left) / rect.width) * 100;
+	  const y = ((e.clientY - rect.top) / rect.height) * 100;
+	  writingSection.style.setProperty("--mx", `${x}%`);
+	  writingSection.style.setProperty("--my", `${y}%`);
 	});
 
 	writingSection.addEventListener("mouseleave", () => {
-	  writingSection.classList.remove("shimmer-active");
-	});
-  }
-
-  // Subtle directional glint on Writing section border
-  function wireWritingShimmer() {
-	const writingSection = document.querySelector(".panel--writing");
-	if (!writingSection) return;
-
-	let lastY = 0;
-
-	writingSection.addEventListener("mousemove", (e) => {
-	  const currentY = e.clientY;
-
-	  // Direction: mouse UP = clockwise, mouse DOWN = counter-clockwise
-	  const direction = currentY < lastY ? 1 : -1;
-	  lastY = currentY;
-
-	  writingSection.style.setProperty("--shimmer-direction", direction);
-	  writingSection.classList.add("shimmer-active");
-	});
-
-	writingSection.addEventListener("mouseleave", () => {
-	  writingSection.classList.remove("shimmer-active");
+	  writingSection.style.removeProperty("--mx");
+	  writingSection.style.removeProperty("--my");
 	});
   }
 
@@ -403,13 +411,45 @@
 	}
   }
 
+  // ---------------- Article back link ----------------
+
+  function injectArticleBackLink() {
+	const isArticle = document.body.classList.contains("page-article");
+	if (!isArticle) return;
+
+	const articleWrap = document.querySelector(".article-wrap");
+	if (!articleWrap) return;
+
+	// Determine parent section from path
+	const path = location.pathname;
+	let backHref = "/";
+	let backText = "Home";
+
+	if (path.startsWith("/writing/")) {
+	  backHref = "/writing/writing.html";
+	  backText = "Writing";
+	} else if (path.startsWith("/work/")) {
+	  backHref = "/work/";
+	  backText = "Work";
+	}
+
+	const backLink = document.createElement("a");
+	backLink.href = backHref;
+	backLink.className = "article-back-link";
+	backLink.innerHTML = `<span class="back-arrow">←</span> ${backText}`;
+
+	articleWrap.insertBefore(backLink, articleWrap.firstChild);
+  }
+
   // ---------------- Manage page ----------------
 
   function defaultManifestFallback() {
 	return [
 	  { title: "Why good UX still fails", slug: "why-good-ux-still-fails", path: "/writing/why-good-ux-still-fails.html" },
 	  { title: "The stove problem, revisited", slug: "the-stove-problem-revisited", path: "/writing/the-stove-problem-revisited.html" },
-	  { title: "Adoption is a design problem", slug: "adoption-is-a-design-problem", path: "/writing/adoption-is-a-design-problem.html" }
+	  { title: "Adoption is a design problem", slug: "adoption-is-a-design-problem", path: "/writing/adoption-is-a-design-problem.html" },
+	  { title: "The hidden cost of \"just one more field\"", slug: "the-hidden-cost-of-one-more-field", path: "/writing/the-hidden-cost-of-one-more-field.html" },
+	  { title: "Design systems don't fix culture", slug: "design-systems-dont-fix-culture", path: "/writing/design-systems-dont-fix-culture.html" }
 	];
   }
 
@@ -719,6 +759,71 @@
 	});
   }
 
+  // ---------------- Work page case study modals ----------------
+
+  function wireWorkCards() {
+	const workCards = document.querySelectorAll(".work-card[data-case]");
+	if (!workCards.length) return;
+
+	workCards.forEach((card) => {
+	  // Mouse gradient tracking
+	  card.addEventListener("mousemove", (e) => {
+		const rect = card.getBoundingClientRect();
+		const x = ((e.clientX - rect.left) / rect.width) * 100;
+		const y = ((e.clientY - rect.top) / rect.height) * 100;
+		card.style.setProperty("--mx", `${x}%`);
+		card.style.setProperty("--my", `${y}%`);
+	  });
+
+	  card.addEventListener("mouseleave", () => {
+		card.style.removeProperty("--mx");
+		card.style.removeProperty("--my");
+	  });
+
+	  // Click to open modal
+	  card.addEventListener("click", () => {
+		const caseId = card.getAttribute("data-case");
+		const modal = document.getElementById(`modal-${caseId}`);
+		if (modal) {
+		  modal.classList.add("is-open");
+		  document.body.style.overflow = "hidden";
+		}
+	  });
+	});
+  }
+
+  function wireCaseModals() {
+	const overlays = document.querySelectorAll(".case-modal-overlay");
+	if (!overlays.length) return;
+
+	overlays.forEach((overlay) => {
+	  const closeBtn = overlay.querySelector(".case-modal-close");
+
+	  function closeModal() {
+		overlay.classList.remove("is-open");
+		document.body.style.overflow = "";
+	  }
+
+	  if (closeBtn) {
+		closeBtn.addEventListener("click", closeModal);
+	  }
+
+	  // Close on overlay click (not modal content)
+	  overlay.addEventListener("click", (e) => {
+		if (e.target === overlay) {
+		  closeModal();
+		}
+	  });
+
+	  // Escape key to close
+	  document.addEventListener("keydown", (e) => {
+		if (e.key === "Escape" && overlay.classList.contains("is-open")) {
+		  closeModal();
+		}
+	  });
+	});
+  }
+
   // ---------- boot ----------
   setTheme(getInitialTheme());
 
@@ -729,7 +834,10 @@
   wireScrollFade();
   wireWritingShimmer();
   injectArticleTags();
+  injectArticleBackLink();
   bootManagePage();
   wireModalTriggers();
   wireScrollAnimations();
+  wireWorkCards();
+  wireCaseModals();
 })();

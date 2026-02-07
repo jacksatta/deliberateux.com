@@ -12,100 +12,222 @@
 <body>
   <main class="page">
 	<div class="container">
-	  <section class="section panel">
-		<div class="section-head">
-		  <div>
-			<h2 class="section-title">Selected work</h2>
-			<p class="section-kicker">Case studies and practice notes on enterprise UX, design systems, and adoption.</p>
-		  </div>
-		</div>
-
-		<div class="cards" style="grid-template-columns: 1fr;">
-		  <div class="card" style="cursor: default; opacity: 0.6;">
-			<h3 class="card-title">Enterprise UX at scale</h3>
-			<p class="card-body">Design systems, agent workflows, and real-world constraints in large organizations.</p>
-			<span class="card-cta" style="opacity: 0.5;">Coming soon</span>
-		  </div>
-
-		  <div class="card" style="cursor: default; opacity: 0.6;">
-			<h3 class="card-title">Fixing invisible friction</h3>
-			<p class="card-body">Case studies on identifying and resolving adoption barriers that don't show up in usability tests.</p>
-			<span class="card-cta" style="opacity: 0.5;">Coming soon</span>
-		  </div>
-
-		  <div class="card" style="cursor: default; opacity: 0.6;">
-			<h3 class="card-title">Intentional product decisions</h3>
-			<p class="card-body">What to build, what not to build, and how to make the call when everyone has an opinion.</p>
-			<span class="card-cta" style="opacity: 0.5;">Coming soon</span>
-		  </div>
-		</div>
+	  <!-- Hero section for Work page -->
+	  <section class="work-hero">
+		<h1 class="work-hero-title">Selected work</h1>
+		<p class="work-hero-subtitle">Case studies on enterprise UX, design systems, and adoption at scale.</p>
 	  </section>
 
-	  <!-- Full list with thumbnails -->
-	  <section class="section panel panel-soft">
-		<div class="section-head">
-		  <div>
-			<h2 class="section-title">Additional projects</h2>
-			<p class="section-kicker">More work and explorations</p>
+	  <!-- Case study cards grid -->
+	  <section class="section work-grid">
+		<article class="work-card" data-case="technology">
+		  <div class="work-card-image work-card-slideshow">
+			<img class="slide slide-1" src="/assets/work/technology-hero.png" alt="Enterprise orchestration console interface" />
+			<img class="slide slide-2" src="/assets/work/technology-2.png" alt="Account record page" />
 		  </div>
-		</div>
+		  <div class="work-card-content">
+			<span class="work-card-tag">Technology</span>
+			<h2 class="work-card-title">Enterprise Orchestration</h2>
+			<p class="work-card-excerpt">Unified agent experience across fragmented systems.</p>
+		  </div>
+		</article>
 
-		<div class="work-list">
-		  <article class="work-item" data-modal="enterprise-ux">
-			<div class="work-item-thumb">
-			  <div class="work-thumb-placeholder"></div>
-			</div>
-			<div class="work-item-content">
-			  <h3 class="work-item-title">Design system evolution</h3>
-			  <p class="work-item-excerpt">Building scalable component libraries for enterprise teams with competing priorities.</p>
-			  <div class="work-item-meta">
-				<span class="work-item-tag">Design Systems</span>
-				<span class="work-item-tag">Enterprise</span>
-			  </div>
-			</div>
-		  </article>
+		<article class="work-card" data-case="telecom">
+		  <div class="work-card-image work-card-slideshow">
+			<img class="slide slide-1" src="/assets/work/telecom-hero.png" alt="Omnichannel experience cloud home" />
+			<img class="slide slide-2" src="/assets/work/telecom-2.png" alt="Experience cloud cases" />
+			<img class="slide slide-3" src="/assets/work/telecom-3.png" alt="Experience cloud knowledge" />
+		  </div>
+		  <div class="work-card-content">
+			<span class="work-card-tag">Finserv</span>
+			<h2 class="work-card-title">Omnichannel Platform</h2>
+			<p class="work-card-excerpt">Multi-channel service experience for financial services.</p>
+		  </div>
+		</article>
 
-		  <article class="work-item" data-modal="adoption-metrics">
-			<div class="work-item-thumb">
-			  <div class="work-thumb-placeholder"></div>
-			</div>
-			<div class="work-item-content">
-			  <h3 class="work-item-title">Adoption metrics that matter</h3>
-			  <p class="work-item-excerpt">Moving beyond vanity metrics to measure what actually drives product success.</p>
-			  <div class="work-item-meta">
-				<span class="work-item-tag">Product Strategy</span>
-				<span class="work-item-tag">Analytics</span>
-			  </div>
-			</div>
-		  </article>
+		<article class="work-card" data-case="finance">
+		  <div class="work-card-image work-card-slideshow">
+			<img class="slide slide-1" src="/assets/work/finance-hero.png" alt="Enterprise dashboard default view" />
+			<img class="slide slide-2" src="/assets/work/finance-2.png" alt="Enterprise dashboard chart view" />
+		  </div>
+		  <div class="work-card-content">
+			<span class="work-card-tag">Finance</span>
+			<h2 class="work-card-title">Enterprise Rebrand</h2>
+			<p class="work-card-excerpt">Design system evolution during organizational transformation.</p>
+		  </div>
+		</article>
 
-		  <article class="work-item" data-modal="workflow-design">
-			<div class="work-item-thumb">
-			  <div class="work-thumb-placeholder"></div>
-			</div>
-			<div class="work-item-content">
-			  <h3 class="work-item-title">Workflow design for agents</h3>
-			  <p class="work-item-excerpt">Designing interfaces for complex, multi-step processes in high-stakes environments.</p>
-			  <div class="work-item-meta">
-				<span class="work-item-tag">Workflow</span>
-				<span class="work-item-tag">Enterprise UX</span>
-			  </div>
-			</div>
-		  </article>
-		</div>
-	  </section>
+		<article class="work-card" data-case="fintech">
+		  <div class="work-card-image work-card-slideshow">
+			<img class="slide slide-1" src="/assets/work/fintech-hero.png" alt="Telecom platform bookings interface" />
+			<img class="slide slide-2" src="/assets/work/fintech-2.png" alt="Card component design" />
+		  </div>
+		  <div class="work-card-content">
+			<span class="work-card-tag">Telecom</span>
+			<h2 class="work-card-title">Dual Platform Integration</h2>
+			<p class="work-card-excerpt">Merging two telecom products into one coherent experience.</p>
+		  </div>
+		</article>
 
-	  <section class="section panel">
-		<div class="about-panel">
-		  <h2 class="section-title" style="margin:0 0 6px;">In the meantime</h2>
-		  <p class="kicker">While I'm building out these case studies, check out my writing.</p>
-		  <p>
-			I write about practical UX: the incentives, operations, and constraints that shape outcomes.
-			<a href="/writing/writing.html">Read the essays →</a>
-		  </p>
-		</div>
+		<article class="work-card" data-case="retail">
+		  <div class="work-card-image">
+			<img src="/assets/work/retail-hero.png" alt="Retail BOPIS transaction interface" />
+		  </div>
+		  <div class="work-card-content">
+			<span class="work-card-tag">Retail / Telecom</span>
+			<h2 class="work-card-title">Retail Tech Platform</h2>
+			<p class="work-card-excerpt">Store operations and customer service tooling.</p>
+		  </div>
+		</article>
 	  </section>
 	</div>
   </main>
+
+  <!-- Case Study Modals -->
+  <div class="case-modal-overlay" id="modal-technology">
+	<div class="case-modal">
+	  <button class="case-modal-close" aria-label="Close">×</button>
+	  <div class="case-modal-hero">
+		<img src="/assets/work/technology-hero.png" alt="Enterprise orchestration console interface" />
+	  </div>
+	  <div class="case-modal-body">
+		<span class="case-modal-tag">Technology</span>
+		<h1 class="case-modal-title">Enterprise Orchestration</h1>
+
+		<section class="case-section">
+		  <h2>Problem</h2>
+		  <p>Agents navigating 12+ disconnected systems during customer interactions. High training overhead, inconsistent service quality, and significant operational friction.</p>
+		  <p>Each system had its own UI patterns, data models, and workflows—forcing agents to mentally translate between contexts while customers waited.</p>
+		</section>
+
+		<section class="case-section">
+		  <h2>Solution</h2>
+		  <p>Designed a unified orchestration layer that surfaced contextual information and actions based on customer journey state. Progressive disclosure reduced cognitive load while maintaining access to full system capabilities.</p>
+		  <p>Created a component library enabling consistent interaction patterns across all integrated systems, with real-time data synchronization.</p>
+		</section>
+
+		<section class="case-section">
+		  <h2>Outcome</h2>
+		  <p>40% reduction in average handle time. Training time for new agents decreased from 6 weeks to 3 weeks. Customer satisfaction scores improved 18%.</p>
+		</section>
+	  </div>
+	</div>
+  </div>
+
+  <div class="case-modal-overlay" id="modal-telecom">
+	<div class="case-modal">
+	  <button class="case-modal-close" aria-label="Close">×</button>
+	  <div class="case-modal-hero">
+		<img src="/assets/work/telecom-hero.png" alt="Omnichannel experience cloud interface" />
+	  </div>
+	  <div class="case-modal-body">
+		<span class="case-modal-tag">Finserv</span>
+		<h1 class="case-modal-title">Omnichannel Platform</h1>
+
+		<section class="case-section">
+		  <h2>Problem</h2>
+		  <p>Customer service representatives operating on legacy systems disconnected from digital channels, customer profiles, and service history. Agents couldn't provide seamless service across touchpoints.</p>
+		</section>
+
+		<section class="case-section">
+		  <h2>Solution</h2>
+		  <p>Designed an omnichannel platform unifying customer data, case history, and transaction records. Agent-first interface with real-time synchronization across all service channels.</p>
+		  <p>Built guided workflows for complex financial transactions that reduced errors and compliance issues.</p>
+		</section>
+
+		<section class="case-section">
+		  <h2>Outcome</h2>
+		  <p>Unified customer view across all service channels. Transaction errors reduced 65%. Agent onboarding time cut in half.</p>
+		</section>
+	  </div>
+	</div>
+  </div>
+
+  <div class="case-modal-overlay" id="modal-finance">
+	<div class="case-modal">
+	  <button class="case-modal-close" aria-label="Close">×</button>
+	  <div class="case-modal-hero">
+		<img src="/assets/work/finance-hero.png" alt="Enterprise dashboard and analytics" />
+	  </div>
+	  <div class="case-modal-body">
+		<span class="case-modal-tag">Finance</span>
+		<h1 class="case-modal-title">Enterprise Rebrand</h1>
+
+		<section class="case-section">
+		  <h2>Problem</h2>
+		  <p>Major organizational rebrand requiring systematic evolution of design system across 50+ applications. Inconsistent implementation risked brand fragmentation and technical debt.</p>
+		</section>
+
+		<section class="case-section">
+		  <h2>Solution</h2>
+		  <p>Led design system migration strategy with versioned component library. Created adoption playbooks and governance framework to ensure consistent implementation across teams.</p>
+		  <p>Designed transition patterns allowing gradual migration without disrupting active development or user workflows.</p>
+		</section>
+
+		<section class="case-section">
+		  <h2>Outcome</h2>
+		  <p>Successfully migrated 50+ applications to new brand within 18 months. Zero production incidents during transition. Design system adoption reached 94% across organization.</p>
+		</section>
+	  </div>
+	</div>
+  </div>
+
+  <div class="case-modal-overlay" id="modal-fintech">
+	<div class="case-modal">
+	  <button class="case-modal-close" aria-label="Close">×</button>
+	  <div class="case-modal-hero">
+		<img src="/assets/work/fintech-hero.png" alt="Fintech platform bookings interface" />
+	  </div>
+	  <div class="case-modal-body">
+		<span class="case-modal-tag">Telecom</span>
+		<h1 class="case-modal-title">Dual Platform Integration</h1>
+
+		<section class="case-section">
+		  <h2>Problem</h2>
+		  <p>Post-acquisition integration of two telecom products with overlapping functionality but distinct user bases. Risk of alienating either customer segment during consolidation.</p>
+		</section>
+
+		<section class="case-section">
+		  <h2>Solution</h2>
+		  <p>Conducted comparative analysis of both products to identify best-in-class patterns from each. Designed unified experience preserving familiar workflows while introducing improvements.</p>
+		  <p>Created migration path with opt-in preview periods allowing users to transition at their own pace.</p>
+		</section>
+
+		<section class="case-section">
+		  <h2>Outcome</h2>
+		  <p>Successful platform consolidation with 92% user retention. Support tickets reduced 35% post-migration. Feature parity achieved 6 months ahead of schedule.</p>
+		</section>
+	  </div>
+	</div>
+  </div>
+
+  <div class="case-modal-overlay" id="modal-retail">
+	<div class="case-modal">
+	  <button class="case-modal-close" aria-label="Close">×</button>
+	  <div class="case-modal-hero">
+		<img src="/assets/work/retail-hero.png" alt="Retail BOPIS transaction interface" />
+	  </div>
+	  <div class="case-modal-body">
+		<span class="case-modal-tag">Retail / Telecom</span>
+		<h1 class="case-modal-title">Retail Tech Platform</h1>
+
+		<section class="case-section">
+		  <h2>Problem</h2>
+		  <p>Store operations fragmented across multiple systems—inventory management, scheduling, customer service, and reporting tools all operating independently.</p>
+		</section>
+
+		<section class="case-section">
+		  <h2>Solution</h2>
+		  <p>Designed integrated operations platform consolidating daily workflows into unified interface. Role-based dashboards surfaced relevant tasks and metrics for different store positions.</p>
+		  <p>Built offline-first architecture ensuring reliability in variable connectivity environments.</p>
+		</section>
+
+		<section class="case-section">
+		  <h2>Outcome</h2>
+		  <p>Daily operational tasks reduced from 45 minutes to 15 minutes per store. Inventory accuracy improved 28%. Manager satisfaction scores increased significantly.</p>
+		</section>
+	  </div>
+	</div>
+  </div>
 </body>
 </html>

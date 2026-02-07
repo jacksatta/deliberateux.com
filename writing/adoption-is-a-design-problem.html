@@ -1,6 +1,6 @@
 <!-- /writing/adoption-is-a-design-problem.html -->
 <!doctype html>
-<html lang="en" data-article-id="adoption-is-a-design-problem">
+<html lang="en" data-theme="dark" data-article-id="adoption-is-a-design-problem">
   <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -11,24 +11,21 @@
 	  content="Adoption is about time, trust, risk, switching costs — and fit."
 	/>
 
-	<!-- Manager / metadata hooks -->
-	<meta name="dux:type" content="article" />
-	<meta name="dux:slug" content="adoption-is-a-design-problem" />
-	<meta name="dux:title" content="Adoption is a design problem" />
-	<meta name="dux:deck" content="Adoption is about time, trust, risk, switching costs — and fit." />
-	<meta name="dux:readtime" content="9 minute read" />
-	<meta name="dux:updated" content="2026" />
-	<meta name="dux:status" content="published" />
-	<meta name="dux:tags" content="adoption,trust,risk,switching-costs,operations" />
-
-	<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
-	<link rel="stylesheet" href="../styles.css" />
-	<script defer src="../app.js"></script>
+	<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+	<link rel="stylesheet" href="/styles.css" />
+	<script defer src="/app.js"></script>
   </head>
 
   <body class="page page-article" data-article-id="adoption-is-a-design-problem">
 	<main class="article-wrap">
 	  <article class="paper" data-paper="article">
+		<div class="tag-row">
+		  <span class="tag-pill">Adoption</span>
+		  <span class="tag-pill">Trust</span>
+		  <span class="tag-pill">Risk</span>
+		  <span class="tag-pill">Operations</span>
+		</div>
+
 		<div class="article-top">
 		  <div class="meta-left">
 			<div class="readtime">9 minute read</div>
@@ -47,65 +44,105 @@
 		  </p>
 		</header>
 
+		<!-- Illustration: Four forces -->
+		<div class="article-illustration">
+		  <div class="illustration-forces">
+			<div class="force force-time">
+			  <div class="force-icon">⏱</div>
+			  <div class="force-label">Time</div>
+			</div>
+			<div class="force force-trust">
+			  <div class="force-icon">🤝</div>
+			  <div class="force-label">Trust</div>
+			</div>
+			<div class="force force-risk">
+			  <div class="force-icon">⚠</div>
+			  <div class="force-label">Risk</div>
+			</div>
+			<div class="force force-switch">
+			  <div class="force-icon">↔</div>
+			  <div class="force-label">Switching</div>
+			</div>
+		  </div>
+		  <p class="illustration-caption">The four forces that determine whether a tool gets adopted, often invisible in usability testing.</p>
+		</div>
+
 		<div class="callout">
-		  People don’t adopt “features.” They adopt a new way of working.
+		  People don't adopt "features." They adopt a new way of working.
 		</div>
 
 		<div class="article-body">
-		  <h2>Why “usable” isn’t enough</h2>
+		  <h2>Why "usable" isn't enough</h2>
 		  <p>
-			Most adoption failures aren’t about whether the UI is clean. They’re about whether the tool
+			Most adoption failures aren't about whether the UI is clean. They're about whether the tool
 			respects constraints: time, operational reality, risk tolerance, and social proof.
+		  </p>
+		  <p>
+			A tool can pass every usability test and still fail in the field. Usability testing measures
+			whether someone <em>can</em> use a tool. Adoption depends on whether they <em>will</em>, repeatedly,
+			under real conditions, when no one's watching.
 		  </p>
 
 		  <h2>The four forces that decide adoption</h2>
 
 		  <h3>1) Time</h3>
 		  <p>
-			If a new flow costs more minutes than it saves, it loses—especially for high-throughput roles.
+			If a new flow costs more minutes than it saves, it loses. Especially for high-throughput roles.
+			The math is brutal: a tool that saves 10 seconds but adds 30 seconds of learning friction
+			is a net loss for months.
+		  </p>
+		  <p>
+			<strong>Design implication:</strong> The fastest path should be the correct path. Efficiency
+			isn't a nice-to-have; it's a prerequisite for adoption.
 		  </p>
 
 		  <h3>2) Trust</h3>
 		  <p>
-			Users don’t trust outputs they can’t explain. They also don’t trust tools that fail silently.
+			Users don't trust outputs they can't explain. They also don't trust tools that fail silently.
 			Confidence comes from visibility, guardrails, and predictable recovery.
+		  </p>
+		  <p>
+			<strong>Design implication:</strong> Show your work. Make errors recoverable. Never hide
+			what the system did.
 		  </p>
 
 		  <h3>3) Risk</h3>
 		  <p>
 			Adoption is constrained by consequences. If errors are expensive or embarrassing, users will
-			prefer the old way—even if it’s slower.
+			prefer the old way—even if it's slower. The old way is <em>known</em>; the new way is a gamble.
+		  </p>
+		  <p>
+			<strong>Design implication:</strong> Reduce the cost of trying. Make the first interaction
+			low-stakes. Provide clear undo and confirmation for high-stakes actions.
 		  </p>
 
 		  <h3>4) Switching costs</h3>
 		  <p>
 			Every new tool competes with existing muscle memory, templates, spreadsheets, tribal knowledge,
-			and “how we do it here.”
+			and "how we do it here." The new tool isn't competing with nothing; it's competing with
+			everything users have already built.
+		  </p>
+		  <p>
+			<strong>Design implication:</strong> Meet users where they are. Import existing data.
+			Support existing terminology. Don't force a clean break.
+		  </p>
+
+		  <h2>Why pilots succeed and rollouts fail</h2>
+		  <p>
+			Pilots create artificial conditions: dedicated time, motivated participants, extra support.
+			The real test is what happens when those conditions disappear. A tool that "worked in pilot"
+			but fails at scale was never tested for adoption—only for usability.
 		  </p>
 
 		  <h2>A practical adoption design prompt</h2>
 		  <ul>
 			<li>What does success look like in <em>their</em> day, not ours?</li>
-			<li>What’s the smallest “try it once” path with a safe exit?</li>
-			<li>Where is the tool asking for trust it hasn’t earned?</li>
+			<li>What's the smallest "try it once" path with a safe exit?</li>
+			<li>Where is the tool asking for trust it hasn't earned?</li>
 			<li>What must be true operationally for this to stick?</li>
+			<li>What are users giving up to use this? Is that trade-off worth it to them?</li>
 		  </ul>
 		</div>
-
-		<footer class="article-footer">
-		  <div class="site-mark">
-			<div class="site-mark-badge" aria-hidden="true"></div>
-			<div class="site-mark-text">
-			  <div class="site-mark-title">Deliberate UX</div>
-			  <div class="site-mark-subtitle">
-				This site is intentionally small. The structure is designed to scale to hundreds of articles.
-			  </div>
-			  <div class="site-mark-meta">
-				© 2026 · <a class="more-writing" href="../#writing">More writing</a>
-			  </div>
-			</div>
-		  </div>
-		</footer>
 	  </article>
 	</main>
   </body>

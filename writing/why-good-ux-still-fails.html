@@ -1,6 +1,6 @@
 <!-- /writing/why-good-ux-still-fails.html -->
 <!doctype html>
-<html lang="en" data-article-id="why-good-ux-still-fails">
+<html lang="en" data-theme="dark" data-article-id="why-good-ux-still-fails">
   <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,30 +8,23 @@
 	<title>Why good UX still fails — Deliberate UX</title>
 	<meta
 	  name="description"
-	  content="Great interaction design can still lose to incentives, operations, and time. Most product “UX failures” are system failures."
+	  content="Great interaction design can still lose to incentives, operations, and time. Most product "UX failures" are system failures."
 	/>
 
-	<!-- Manager / metadata hooks -->
-	<meta name="dux:type" content="article" />
-	<meta name="dux:slug" content="why-good-ux-still-fails" />
-	<meta name="dux:title" content="Why good UX still fails" />
-	<meta
-	  name="dux:deck"
-	  content="Great interaction design can still lose to incentives, operations, and time. Most product “UX failures” are system failures."
-	/>
-	<meta name="dux:readtime" content="8–10 minute read" />
-	<meta name="dux:updated" content="2026" />
-	<meta name="dux:status" content="published" />
-	<meta name="dux:tags" content="adoption,systems,incentives,operations,time" />
-
-	<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
-	<link rel="stylesheet" href="../styles.css" />
-	<script defer src="../app.js"></script>
+	<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+	<link rel="stylesheet" href="/styles.css" />
+	<script defer src="/app.js"></script>
   </head>
 
   <body class="page page-article" data-article-id="why-good-ux-still-fails">
 	<main class="article-wrap">
 	  <article class="paper" data-paper="article">
+		<div class="tag-row">
+		  <span class="tag-pill">Adoption</span>
+		  <span class="tag-pill">Systems</span>
+		  <span class="tag-pill">Incentives</span>
+		</div>
+
 		<div class="article-top">
 		  <div class="meta-left">
 			<div class="readtime">8–10 minute read</div>
@@ -47,49 +40,81 @@
 		  <h1 class="article-title">Why good UX still fails</h1>
 		  <p class="article-deck">
 			Great interaction design can still lose to incentives, operations, and time. Most product
-			“UX failures” are system failures.
+			"UX failures" are system failures.
 		  </p>
 		</header>
 
+		<!-- Illustration: System layers -->
+		<div class="article-illustration">
+		  <div class="illustration-layers">
+			<div class="layer layer-ui">UI Layer</div>
+			<div class="layer layer-ops">Operations</div>
+			<div class="layer layer-incentives">Incentives</div>
+			<div class="layer layer-time">Time</div>
+		  </div>
+		  <p class="illustration-caption">The four layers that determine whether a product gets adopted, regardless of how polished the interface is.</p>
+		</div>
+
 		<div class="callout">
-		  When adoption fails, the UI gets blamed — but the system decides.
+		  When adoption fails, the UI gets blamed. But the system decides.
 		</div>
 
 		<div class="article-body">
-		  <h2>The three layers UX can’t out-design</h2>
+		  <h2>The three layers UX can't out-design</h2>
+		  <p>
+			Designers often focus on the interaction layer: buttons, flows, visual hierarchy. But adoption
+			happens at deeper layers that the UI can't reach. A beautifully designed tool will still fail
+			if it's fighting the system it lives in.
+		  </p>
 
 		  <h3>1) Incentives</h3>
 		  <p>
 			If leadership celebrates speed-to-launch, teams optimize for shipping, not learning. If sales promises
-			“one-click magic,” the product absorbs complexity until it breaks.
+			"one-click magic," the product absorbs complexity until it breaks. The incentive structure determines
+			what gets built, how it gets maintained, and whether anyone has time to fix what's broken.
+		  </p>
+		  <p>
+			<strong>The symptom:</strong> Features ship fast but don't stick. Users complain, but roadmaps
+			stay focused on "new" over "better."
 		  </p>
 
 		  <h3>2) Operations</h3>
 		  <p>
-			UX fails when the operational reality isn’t designed. Workarounds become the real interface.
+			UX fails when the operational reality isn't designed. Workarounds become the real interface.
+			The tool assumes a clean workflow; the actual workflow involves three spreadsheets, a Slack channel,
+			and tribal knowledge about which fields to skip.
+		  </p>
+		  <p>
+			<strong>The symptom:</strong> Users technically "use" the tool but route around it constantly.
+			Time-on-task stays high. Training doesn't help.
 		  </p>
 
 		  <h3>3) Time</h3>
 		  <p>
-			Time is the universal constraint. If your tool asks for time people don’t have, they’ll rationally decline —
-			even if it’s “better.”
+			Time is the universal constraint. If your tool asks for time people don't have, they'll rationally decline,
+			even if it's "better." A 30-second improvement per task sounds small until you multiply it by
+			200 tasks per day across 5,000 agents.
 		  </p>
-		</div>
+		  <p>
+			<strong>The symptom:</strong> Pilots succeed (people have time to learn), but rollout fails
+			(people don't have time to change).
+		  </p>
 
-		<footer class="article-footer">
-		  <div class="site-mark">
-			<div class="site-mark-badge" aria-hidden="true"></div>
-			<div class="site-mark-text">
-			  <div class="site-mark-title">Deliberate UX</div>
-			  <div class="site-mark-subtitle">
-				This site is intentionally small. The structure is designed to scale to hundreds of articles.
-			  </div>
-			  <div class="site-mark-meta">
-				© 2026 · <a class="more-writing" href="../#writing">More writing</a>
-			  </div>
-			</div>
-		  </div>
-		</footer>
+		  <h2>What this means for design practice</h2>
+		  <p>
+			Understanding these layers doesn't mean giving up on craft. It means expanding the definition
+			of the problem. The question isn't just "Is this usable?" but "Is this adoptable given the
+			system it lives in?"
+		  </p>
+
+		  <h2>A diagnostic prompt</h2>
+		  <ul>
+			<li>What gets measured and rewarded in this organization?</li>
+			<li>What does the actual workflow look like, not the documented one?</li>
+			<li>How much time does the target user actually have?</li>
+			<li>What would have to be true for this tool to stick?</li>
+		  </ul>
+		</div>
 	  </article>
 	</main>
   </body>

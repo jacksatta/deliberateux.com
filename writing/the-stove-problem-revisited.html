@@ -1,6 +1,6 @@
 <!-- /writing/the-stove-problem-revisited.html -->
 <!doctype html>
-<html lang="en" data-article-id="the-stove-problem-revisited">
+<html lang="en" data-theme="dark" data-article-id="the-stove-problem-revisited">
   <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -11,27 +11,20 @@
 	  content="Bad mapping teaches workarounds. Fixing mapping is a reliability and safety win."
 	/>
 
-	<!-- Manager / metadata hooks -->
-	<meta name="dux:type" content="article" />
-	<meta name="dux:slug" content="the-stove-problem-revisited" />
-	<meta name="dux:title" content="The stove problem, revisited" />
-	<meta
-	  name="dux:deck"
-	  content="Bad mapping teaches workarounds. Fixing mapping is a reliability and safety win."
-	/>
-	<meta name="dux:readtime" content="8 minute read" />
-	<meta name="dux:updated" content="2026" />
-	<meta name="dux:status" content="published" />
-	<meta name="dux:tags" content="mapping,affordances,safety,reliability,systems" />
-
-	<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
-	<link rel="stylesheet" href="../styles.css" />
-	<script defer src="../app.js"></script>
+	<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+	<link rel="stylesheet" href="/styles.css" />
+	<script defer src="/app.js"></script>
   </head>
 
   <body class="page page-article" data-article-id="the-stove-problem-revisited">
 	<main class="article-wrap">
 	  <article class="paper" data-paper="article">
+		<div class="tag-row">
+		  <span class="tag-pill">Mapping</span>
+		  <span class="tag-pill">Affordances</span>
+		  <span class="tag-pill">Safety</span>
+		</div>
+
 		<div class="article-top">
 		  <div class="meta-left">
 			<div class="readtime">8 minute read</div>
@@ -50,53 +43,105 @@
 		  </p>
 		</header>
 
+		<!-- Illustration: Stove mapping -->
+		<div class="article-illustration">
+		  <div class="illustration-stove">
+			<div class="stove-row">
+			  <div class="burner"></div>
+			  <div class="burner"></div>
+			</div>
+			<div class="stove-row">
+			  <div class="burner"></div>
+			  <div class="burner"></div>
+			</div>
+			<div class="knob-row">
+			  <div class="knob">1</div>
+			  <div class="knob">2</div>
+			  <div class="knob">3</div>
+			  <div class="knob">4</div>
+			</div>
+		  </div>
+		  <p class="illustration-caption">Classic stove mapping problem: linear knobs controlling a 2×2 grid. Which knob controls which burner?</p>
+		</div>
+
+		<!-- Illustration: Knob confusion -->
+		<div class="article-illustration">
+		  <div class="illustration-knob-confusion">
+			<div class="knob-zoom">
+			  <div class="knob-large">2</div>
+			</div>
+			<div class="confusion-arrows">
+			  <div class="arrow-target arrow-tl">
+				<span class="target-dot"></span>
+				<span class="target-label">?</span>
+			  </div>
+			  <div class="arrow-target arrow-tr">
+				<span class="target-dot"></span>
+				<span class="target-label">?</span>
+			  </div>
+			  <div class="arrow-target arrow-bl">
+				<span class="target-dot"></span>
+				<span class="target-label">?</span>
+			  </div>
+			</div>
+		  </div>
+		  <p class="illustration-caption">Which burner? The knob doesn't tell you.</p>
+		</div>
+
 		<div class="callout">
-		  When controls don’t map to outcomes, users invent a new interface: memory.
+		  When controls don't map to outcomes, users invent a new interface: memory.
 		</div>
 
 		<div class="article-body">
-		  <h2>What “bad mapping” actually costs</h2>
+		  <h2>What "bad mapping" actually costs</h2>
 		  <p>
 			Stove knobs are the canonical example because the consequence is visible: the wrong burner turns on.
-			But the pattern shows up everywhere—forms, admin consoles, agent tools, and “simple” settings screens.
+			But the pattern shows up everywhere: forms, admin consoles, agent tools, and "simple" settings screens.
+		  </p>
+		  <p>
+			The cost isn't just errors. It's the cognitive overhead of translating between what you see
+			and what you want. Every time a user has to think "wait, which one is it?" the interface has
+			failed, even if they get it right.
 		  </p>
 
 		  <h2>Why workarounds feel like competence</h2>
 		  <p>
 			People adapt. They learn the quirks, build muscle memory, and teach others. The system interprets this
-			as “good enough,” even though the product is quietly training users to compensate.
+			as "good enough," even though the product is quietly training users to compensate.
+		  </p>
+		  <p>
+			This is why bad mapping persists: once users have learned to work around it, fixing it feels
+			like disruption rather than improvement. "Everyone knows how it works" becomes a reason not
+			to make it work better.
 		  </p>
 
 		  <h2>Fixing mapping is a systems decision</h2>
 		  <p>
 			Mapping problems persist when incentives reward shipping more screens instead of removing ambiguity.
-			The fix is often small—but it requires someone to prioritize reduction, not addition.
+			The fix is often small, but it requires someone to prioritize reduction over addition.
+		  </p>
+		  <p>
+			Good mapping isn't about labels or tooltips. It's about spatial correspondence: the control
+			should be where you expect it, doing what you expect, with feedback that confirms.
+		  </p>
+
+		  <h2>The cost of "good enough"</h2>
+		  <p>
+			Every mapping problem is a small tax on attention. In low-stakes contexts, people pay it without
+			noticing. In high-stakes contexts (medical devices, industrial controls, financial systems) the
+			same pattern becomes dangerous.
 		  </p>
 
 		  <h2>A practical checklist</h2>
 		  <ul>
 			<li>Can a first-time user predict the outcome before acting?</li>
 			<li>Does the control layout match the real-world layout?</li>
-			<li>Are labels redundant with the visual structure?</li>
+			<li>Are labels redundant with the visual structure (or compensating for bad structure)?</li>
 			<li>Can mistakes be reversed safely?</li>
-			<li>Is the “correct” action the easiest action?</li>
+			<li>Is the "correct" action the easiest action?</li>
+			<li>Would removing something make the mapping clearer?</li>
 		  </ul>
 		</div>
-
-		<footer class="article-footer">
-		  <div class="site-mark">
-			<div class="site-mark-badge" aria-hidden="true"></div>
-			<div class="site-mark-text">
-			  <div class="site-mark-title">Deliberate UX</div>
-			  <div class="site-mark-subtitle">
-				This site is intentionally small. The structure is designed to scale to hundreds of articles.
-			  </div>
-			  <div class="site-mark-meta">
-				© 2026 · <a class="more-writing" href="../#writing">More writing</a>
-			  </div>
-			</div>
-		  </div>
-		</footer>
 	  </article>
 	</main>
   </body>
