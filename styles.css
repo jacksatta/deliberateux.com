@@ -325,7 +325,7 @@ html[data-theme="light"] .panel.panel-soft {
 .hero.hero-intro .hero-content {
   opacity: 0;
   transform: translateX(calc(50vw - 50% - 28px));
-  animation: heroContentSlideIn 600ms ease-out 200ms forwards;
+  animation: heroContentSlideIn 1200ms ease-out 300ms forwards;
 }
 
 @keyframes heroCardFadeIn {
@@ -547,7 +547,7 @@ html[data-theme="light"] .chip {
 .cards {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  gap: 28px;
   padding: 28px 24px 36px;
 }
 
@@ -564,7 +564,12 @@ html[data-theme="light"] .chip {
   border: 1px solid var(--border);
   background: rgba(0,0,0,0.10);
   overflow: hidden;
-  transition: transform 180ms var(--ease), border-color 180ms var(--ease), background 180ms var(--ease);
+  transition: transform 180ms var(--ease), border-color 180ms var(--ease), background 180ms var(--ease), opacity 400ms var(--ease);
+}
+
+/* Scroll fade for cards */
+.card.scroll-faded {
+  opacity: 0.3;
 }
 
 html[data-theme="light"] .card {
@@ -868,6 +873,48 @@ html[data-theme="light"] .panel--about {
   color: var(--faint);
   font-size: 15px;
   font-style: italic;
+}
+
+/* Design flowchart illustration */
+.about-illustration {
+  padding: 40px 32px 32px;
+}
+.design-flowchart {
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  margin: 0 auto;
+  display: block;
+}
+.flow-node {
+  opacity: 0;
+  animation: nodeAppear 0.7s ease-out forwards;
+}
+.flow-node.node-1 { animation-delay: 0.15s; }
+.flow-node.node-2 { animation-delay: 0.35s; }
+.flow-node.node-3 { animation-delay: 0.55s; }
+.flow-node.node-4 { animation-delay: 0.75s; }
+.flow-node.node-5 { animation-delay: 0.95s; }
+
+.flow-arrow {
+  opacity: 0;
+  stroke-dasharray: 30;
+  stroke-dashoffset: 30;
+  animation: arrowDraw 0.5s ease-out forwards;
+}
+.flow-arrow.arrow-1 { animation-delay: 0.3s; }
+.flow-arrow.arrow-2 { animation-delay: 0.5s; }
+.flow-arrow.arrow-3 { animation-delay: 0.7s; }
+.flow-arrow.arrow-4 { animation-delay: 0.9s; }
+
+@keyframes nodeAppear {
+  0% { opacity: 0; transform: translateX(-15px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+@keyframes arrowDraw {
+  0% { opacity: 0; stroke-dashoffset: 30; }
+  50% { opacity: 1; }
+  100% { opacity: 1; stroke-dashoffset: 0; }
 }
 
 /* ================================
@@ -2185,8 +2232,8 @@ html[data-theme="light"] .modal-overlay {
   background:
     /* Left edge vignette for title contrast */
     linear-gradient(to right, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 8%, transparent 20%),
-    /* Right fade to black */
-    linear-gradient(to right, transparent 0%, transparent 40%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.75) 60%, #000 75%);
+    /* Right fade to black - darker */
+    linear-gradient(to right, transparent 0%, transparent 35%, rgba(0,0,0,0.5) 45%, rgba(0,0,0,0.85) 55%, #000 68%);
 }
 
 html[data-theme="light"] .panel--work {
@@ -2225,25 +2272,25 @@ html[data-theme="light"] .panel--work::after {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.7;
+  opacity: 0.85;
   background:
     repeating-linear-gradient(
       0deg,
       transparent 0px,
-      rgba(0, 0, 0, 0.8) 1px,
+      rgba(0, 0, 0, 0.9) 1px,
       transparent 2px
     ),
     repeating-linear-gradient(
       90deg,
-      rgba(255, 80, 80, 0.2) 0px,
-      rgba(80, 255, 80, 0.2) 1px,
-      rgba(80, 80, 255, 0.2) 2px,
+      rgba(255, 80, 80, 0.25) 0px,
+      rgba(80, 255, 80, 0.25) 1px,
+      rgba(80, 80, 255, 0.25) 2px,
       transparent 3px
     );
   background-size: 100% 2px, 3px 100%;
   /* Moiré strongest on left, fades to right */
-  mask-image: linear-gradient(to right, black 0%, rgba(0,0,0,0.4) 25%, transparent 60%);
-  -webkit-mask-image: linear-gradient(to right, black 0%, rgba(0,0,0,0.4) 25%, transparent 60%);
+  mask-image: linear-gradient(to right, black 0%, rgba(0,0,0,0.5) 30%, transparent 70%);
+  -webkit-mask-image: linear-gradient(to right, black 0%, rgba(0,0,0,0.5) 30%, transparent 70%);
 }
 
 /* Fade overlay kept for HTML structure but emptied - gradient now on panel::after */
@@ -2610,14 +2657,61 @@ html[data-theme="light"] .panel--work .section-kicker {
   100% { opacity: 0; object-position: center 35%; }
 }
 
-/* Static positioning for telecom card slides */
+/* Telecom card - animated slideshow */
+.work-card[data-case="telecom"] .slide-1 {
+  animation: telecomCardFade-1 15s ease-in-out infinite;
+}
+.work-card[data-case="telecom"] .slide-2 {
+  animation: telecomCardFade-2 15s ease-in-out infinite;
+}
 .work-card[data-case="telecom"] .slide-3 {
-  opacity: 0;
+  animation: telecomCardFade-3 15s ease-in-out infinite;
 }
 
-/* Static positioning for fintech card - start below logo */
+@keyframes telecomCardFade-1 {
+  0%, 30% { opacity: 1; }
+  33%, 96% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes telecomCardFade-2 {
+  0%, 30% { opacity: 0; }
+  33%, 63% { opacity: 1; }
+  66%, 100% { opacity: 0; }
+}
+@keyframes telecomCardFade-3 {
+  0%, 63% { opacity: 0; }
+  66%, 96% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Fintech card - animated slideshow */
 .work-card[data-case="fintech"] .slide-1 {
   object-position: center 15%;
+  animation: fintechCardFade-1 15s ease-in-out infinite;
+}
+.work-card[data-case="fintech"] .slide-2 {
+  object-position: center 15%;
+  animation: fintechCardFade-2 15s ease-in-out infinite;
+}
+.work-card[data-case="fintech"] .slide-3 {
+  object-position: center 15%;
+  animation: fintechCardFade-3 15s ease-in-out infinite;
+}
+
+@keyframes fintechCardFade-1 {
+  0%, 30% { opacity: 1; }
+  33%, 96% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes fintechCardFade-2 {
+  0%, 30% { opacity: 0; }
+  33%, 63% { opacity: 1; }
+  66%, 100% { opacity: 0; }
+}
+@keyframes fintechCardFade-3 {
+  0%, 63% { opacity: 0; }
+  66%, 96% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 /* ================================
@@ -2783,6 +2877,16 @@ html[data-theme="light"] .panel--work .section-kicker {
 .work-card[data-case="retail"]:hover .work-card-title {
   color: #8B5CF6;
   text-shadow: 0 4px 24px rgba(139, 92, 246, 0.5);
+}
+
+/* Retail card gradient background */
+.work-card[data-case="retail"] .work-card-image {
+  background: url('/assets/work/Color@2x.jpg') no-repeat;
+  background-size: 200%;
+  background-position: center bottom;
+}
+.work-card[data-case="retail"] .work-card-image img {
+  display: none;
 }
 
 .work-card-excerpt {

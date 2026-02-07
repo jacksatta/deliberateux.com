@@ -17,7 +17,7 @@
   const THEME_KEY = "dux-theme";
   const TAGS_LOCAL_KEY = "dux-tags";
   const TAGS_REMOTE_URL = "/tags.json";
-  const MANIFEST_URL = "/writing/manifest.json";
+  const MANIFEST_URL = "/work/writing/manifest.json";
 
   function getInitialTheme() {
 	const saved = localStorage.getItem(THEME_KEY);
@@ -57,7 +57,7 @@
 		  <div class="nav-right">
 			<ul class="nav-links">
 			  <li><a href="/work/">Work</a></li>
-			  <li><a href="/writing/writing.html">Writing</a></li>
+			  <li><a href="/work/writing/">Writing</a></li>
 			  <li><a href="/#about">About</a></li>
 			</ul>
 
@@ -100,7 +100,7 @@
 			</div>
 			<div class="footer-blurb">
 			  <div class="footer-wordmark">Deliberate<span class="wordmark-ux">UX</span></div>
-			  <div class="footer-tagline">© ${year} · <a href="/work/">Work</a> · <a href="/writing/writing.html">Writing</a> · <a href="/#about">About</a></div>
+			  <div class="footer-tagline">© ${year} · <a href="/work/">Work</a> · <a href="/work/writing/">Writing</a> · <a href="/#about">About</a></div>
 			</div>
 		  </div>
 
@@ -312,17 +312,46 @@
   // Fade out hero section as user scrolls down
   function wireScrollFade() {
 	const hero = document.querySelector(".hero");
-	if (!hero) return;
+	const cards = document.querySelectorAll(".cards .card");
+	const workSection = document.querySelector(".panel--work");
+	const writingSection = document.querySelector(".panel--writing");
 
-	const fadeDistance = 300; // pixels to fully fade out
+	const fadeDistance = 300; // pixels to fully fade out hero
 
 	function updateFade() {
 	  const scrollY = window.scrollY;
-	  const opacity = Math.max(0, 1 - scrollY / fadeDistance);
-	  const translateY = scrollY * 0.3; // parallax effect
+	  const viewportHeight = window.innerHeight;
 
-	  hero.style.opacity = opacity.toString();
-	  hero.style.transform = `translateY(${translateY}px)`;
+	  // Hero fade
+	  if (hero) {
+		const opacity = Math.max(0, 1 - scrollY / fadeDistance);
+		const translateY = scrollY * 0.3; // parallax effect
+		hero.style.opacity = opacity.toString();
+		hero.style.transform = `translateY(${translateY}px)`;
+	  }
+
+	  // Work section fade when writing section comes into view
+	  if (workSection && writingSection) {
+		const writingRect = writingSection.getBoundingClientRect();
+		// Start fading when writing section enters bottom half of viewport
+		if (writingRect.top < viewportHeight * 0.7) {
+		  const fadeProgress = Math.min(1, (viewportHeight * 0.7 - writingRect.top) / 300);
+		  workSection.style.opacity = Math.max(0.15, 1 - fadeProgress).toString();
+		} else {
+		  workSection.style.opacity = "1";
+		}
+	  }
+
+	  // Card scroll fade - fade cards as they scroll up
+	  cards.forEach((card) => {
+		const rect = card.getBoundingClientRect();
+		// Fade when card is in top 20% of viewport
+		if (rect.top < viewportHeight * 0.2 && rect.bottom > 0) {
+		  card.classList.add("scroll-faded");
+		} else {
+		  card.classList.remove("scroll-faded");
+		}
+	  });
 	}
 
 	window.addEventListener("scroll", updateFade, { passive: true });
@@ -446,8 +475,8 @@
 	let backHref = "/";
 	let backText = "Home";
 
-	if (path.startsWith("/writing/")) {
-	  backHref = "/writing/writing.html";
+	if (path.startsWith("/work/writing/")) {
+	  backHref = "/work/writing/";
 	  backText = "Writing";
 	} else if (path.startsWith("/work/")) {
 	  backHref = "/work/";
@@ -466,11 +495,11 @@
 
   function defaultManifestFallback() {
 	return [
-	  { title: "Why good UX still fails", slug: "why-good-ux-still-fails", path: "/writing/why-good-ux-still-fails.html" },
-	  { title: "The stove problem, revisited", slug: "the-stove-problem-revisited", path: "/writing/the-stove-problem-revisited.html" },
-	  { title: "Adoption is a design problem", slug: "adoption-is-a-design-problem", path: "/writing/adoption-is-a-design-problem.html" },
-	  { title: "The hidden cost of \"just one more field\"", slug: "the-hidden-cost-of-one-more-field", path: "/writing/the-hidden-cost-of-one-more-field.html" },
-	  { title: "Design systems don't fix culture", slug: "design-systems-dont-fix-culture", path: "/writing/design-systems-dont-fix-culture.html" }
+	  { title: "Why good UX still fails", slug: "why-good-ux-still-fails", path: "/work/writing/why-good-ux-still-fails.html" },
+	  { title: "The stove problem, revisited", slug: "the-stove-problem-revisited", path: "/work/writing/the-stove-problem-revisited.html" },
+	  { title: "Adoption is a design problem", slug: "adoption-is-a-design-problem", path: "/work/writing/adoption-is-a-design-problem.html" },
+	  { title: "The hidden cost of \"just one more field\"", slug: "the-hidden-cost-of-one-more-field", path: "/work/writing/the-hidden-cost-of-one-more-field.html" },
+	  { title: "Design systems don't fix culture", slug: "design-systems-dont-fix-culture", path: "/work/writing/design-systems-dont-fix-culture.html" }
 	];
   }
 
@@ -515,7 +544,7 @@
   }
 
   function isManagePage() {
-	return location.pathname.endsWith("/manage.html") || location.pathname.endsWith("/writing/manage.html");
+	return location.pathname.endsWith("/manage.html") || location.pathname.endsWith("/work/writing/manage.html");
   }
 
   async function bootManagePage() {
