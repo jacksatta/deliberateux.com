@@ -2123,36 +2123,30 @@ html[data-theme="light"] .modal-overlay {
   box-shadow: var(--shadow);
   overflow: hidden;
   background:
-    /* Top edge darken - strong for text contrast */
+    /* Top fade */
     linear-gradient(180deg,
-      rgba(0, 0, 0, 0.98) 0%,
-      rgba(0, 0, 0, 0.95) 8%,
-      rgba(0, 0, 0, 0.85) 14%,
-      rgba(0, 0, 0, 0.6) 22%,
-      rgba(0, 0, 0, 0.4) 30%,
-      rgba(0, 0, 0, 0.6) 38%,
-      rgba(0, 0, 0, 0.85) 46%,
-      rgba(0, 0, 0, 0.98) 54%,
-      black 60%),
-    /* Vignette */
-    radial-gradient(ellipse 100% 70% at 50% 18%,
-      transparent 15%,
-      rgba(0, 0, 0, 0.4) 40%,
-      rgba(0, 0, 0, 0.7) 60%,
-      rgba(0, 0, 0, 0.9) 100%),
+      rgba(0, 0, 0, 0.95) 0%,
+      rgba(0, 0, 0, 0.7) 30%,
+      transparent 70%),
+    /* Bottom fade */
+    linear-gradient(0deg,
+      rgba(0, 0, 0, 0.95) 0%,
+      rgba(0, 0, 0, 0.7) 30%,
+      transparent 70%),
     /* Image */
     url('/assets/work/finance-hero.png');
-  background-size: 100% 320px, 100% 320px, cover;
-  background-position: top, top, center 35%;
+  background-size: 100% 80%, 100% 80%, cover;
+  background-position: top, bottom, center 35%;
   background-repeat: no-repeat;
 }
 
-/* Dark overlay for better contrast */
+/* Blur overlay for moire/depth effect */
 .panel--work::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(1.5px);
   z-index: 0;
   border-radius: inherit;
   pointer-events: none;
