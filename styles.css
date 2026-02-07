@@ -2121,6 +2121,7 @@ html[data-theme="light"] .modal-overlay {
   position: relative;
   border: none;
   box-shadow: var(--shadow);
+  overflow: hidden;
   background:
     /* Top edge darken - strong for text contrast */
     linear-gradient(180deg,
