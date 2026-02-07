@@ -2173,6 +2173,62 @@ html[data-theme="light"] .panel--work::before {
   border-color: rgba(255, 255, 255, 0.1);
 }
 
+/* === EXPERIMENT: Card hover thumbnail backgrounds === */
+/* To revert: remove this block and data-thumb attributes from index.html cards */
+.card--has-thumb {
+  position: relative;
+  overflow: hidden;
+}
+
+.card--has-thumb::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background-size: cover;
+  background-position: center;
+  filter: blur(3px) brightness(0.5);
+  border-radius: var(--radius-md);
+  z-index: 0;
+  clip-path: inset(0 round var(--radius-md));
+}
+
+.card--has-thumb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.8) 100%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  border-radius: var(--radius-md);
+  z-index: 1;
+}
+
+.card--has-thumb:hover::before,
+.card--has-thumb:hover::after {
+  opacity: 1;
+}
+
+.card--has-thumb .card-title,
+.card--has-thumb .card-body,
+.card--has-thumb .card-cta {
+  position: relative;
+  z-index: 2;
+}
+
+/* Thumbnail images for each card */
+.card--has-thumb[data-thumb="technology"]::before {
+  background-image: url('/assets/work/technology-hero.png');
+}
+.card--has-thumb[data-thumb="telecom"]::before {
+  background-image: url('/assets/work/telecom-hero.png');
+}
+.card--has-thumb[data-thumb="fintech"]::before {
+  background-image: url('/assets/work/Account Record Page - CS trailblazers.png');
+}
+/* === END EXPERIMENT === */
+
 @media (max-width: 720px) {
   .panel--work {
     background:
