@@ -2241,8 +2241,6 @@ html[data-theme="light"] .modal-overlay {
   box-shadow: var(--shadow);
   overflow: hidden;
   background: #000;
-  perspective: 180px;
-  transform-style: preserve-3d;
 }
 
 /* Gradient overlay - ABOVE image, BELOW content (not rotated) */
@@ -2254,9 +2252,9 @@ html[data-theme="light"] .modal-overlay {
   z-index: 1;
   background:
     /* Left edge vignette for title contrast */
-    linear-gradient(to right, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 8%, transparent 20%),
-    /* Right fade to black - darker */
-    linear-gradient(to right, transparent 0%, transparent 35%, rgba(0,0,0,0.5) 45%, rgba(0,0,0,0.85) 55%, #000 68%);
+    linear-gradient(to right, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.15) 8%, transparent 20%),
+    /* Right fade - lighter, starts later */
+    linear-gradient(to right, transparent 0%, transparent 55%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.8) 85%, #000 95%);
 }
 
 html[data-theme="light"] .panel--work {
@@ -2270,14 +2268,16 @@ html[data-theme="light"] .panel--work::after {
 }
 
 /* Extreme trapezoid perspective image - BEHIND all content */
+/* Left edge 150% taller: rotate positive, origin at right */
 .work-backdrop {
   position: absolute;
-  top: -25%;
-  left: -10%;
-  width: 180%;
-  height: 150%;
-  transform: rotateY(-65deg);
-  transform-origin: left center;
+  top: -15%;
+  left: -30%;
+  width: 130%;
+  height: 130%;
+  /* Flip direction: positive rotation + right origin = left side larger */
+  transform: perspective(1200px) rotateY(30deg);
+  transform-origin: right center;
   pointer-events: none;
   z-index: 0;
 }
