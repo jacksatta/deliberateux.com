@@ -2274,7 +2274,7 @@ html[data-theme="light"] .panel--work::after {
   top: -15%;
   left: -30%;
   width: 130%;
-  height: 130%;
+  aspect-ratio: 16 / 9;
   /* Flip direction: positive rotation + right origin = left side larger */
   transform: perspective(1200px) rotateY(30deg);
   transform-origin: right center;
