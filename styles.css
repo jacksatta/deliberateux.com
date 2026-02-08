@@ -888,24 +888,30 @@ html[data-theme="light"] .panel--about {
 }
 .flow-node {
   opacity: 0;
-  animation: nodeAppear 0.7s ease-out forwards;
 }
-.flow-node.node-1 { animation-delay: 0.15s; }
-.flow-node.node-2 { animation-delay: 0.35s; }
-.flow-node.node-3 { animation-delay: 0.55s; }
-.flow-node.node-4 { animation-delay: 0.75s; }
-.flow-node.node-5 { animation-delay: 0.95s; }
-
 .flow-arrow {
   opacity: 0;
   stroke-dasharray: 30;
   stroke-dashoffset: 30;
+}
+
+/* Animate only when visible */
+.about-illustration.is-visible .flow-node {
+  animation: nodeAppear 0.7s ease-out forwards;
+}
+.about-illustration.is-visible .flow-node.node-1 { animation-delay: 0.15s; }
+.about-illustration.is-visible .flow-node.node-2 { animation-delay: 0.35s; }
+.about-illustration.is-visible .flow-node.node-3 { animation-delay: 0.55s; }
+.about-illustration.is-visible .flow-node.node-4 { animation-delay: 0.75s; }
+.about-illustration.is-visible .flow-node.node-5 { animation-delay: 0.95s; }
+
+.about-illustration.is-visible .flow-arrow {
   animation: arrowDraw 0.5s ease-out forwards;
 }
-.flow-arrow.arrow-1 { animation-delay: 0.3s; }
-.flow-arrow.arrow-2 { animation-delay: 0.5s; }
-.flow-arrow.arrow-3 { animation-delay: 0.7s; }
-.flow-arrow.arrow-4 { animation-delay: 0.9s; }
+.about-illustration.is-visible .flow-arrow.arrow-1 { animation-delay: 0.3s; }
+.about-illustration.is-visible .flow-arrow.arrow-2 { animation-delay: 0.5s; }
+.about-illustration.is-visible .flow-arrow.arrow-3 { animation-delay: 0.7s; }
+.about-illustration.is-visible .flow-arrow.arrow-4 { animation-delay: 0.9s; }
 
 @keyframes nodeAppear {
   0% { opacity: 0; transform: translateX(-15px); }

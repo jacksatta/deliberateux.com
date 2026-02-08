@@ -358,6 +358,26 @@
 	updateFade();
   }
 
+  // About flowchart animation on scroll into view
+  function wireAboutAnimation() {
+	const illustration = document.querySelector(".about-illustration");
+	if (!illustration) return;
+
+	const observer = new IntersectionObserver(
+	  (entries) => {
+		entries.forEach((entry) => {
+		  if (entry.isIntersecting) {
+			illustration.classList.add("is-visible");
+			observer.disconnect(); // Only animate once
+		  }
+		});
+	  },
+	  { threshold: 0.3 }
+	);
+
+	observer.observe(illustration);
+  }
+
   // Glint effect on Writing section - tracks mouse position
   function wireWritingShimmer() {
 	const writingSection = document.querySelector(".panel--writing");
@@ -872,6 +892,18 @@
 		}
 	  });
 	});
+
+	// Open modal from URL hash (e.g., /work/#technology)
+	const hash = window.location.hash.slice(1);
+	if (hash) {
+	  const modal = document.getElementById(`modal-${hash}`);
+	  if (modal) {
+		setTimeout(() => {
+		  modal.classList.add("is-open");
+		  document.body.style.overflow = "hidden";
+		}, 300);
+	  }
+	}
   }
 
   // Hero entrance animation on page load
@@ -908,6 +940,7 @@
   wireHeroBubbleZoom();
   wireScrollFade();
   wireWritingShimmer();
+  wireAboutAnimation();
   injectArticleTags();
   injectArticleBackLink();
   bootManagePage();
