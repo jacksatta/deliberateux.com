@@ -8,8 +8,17 @@
 	<title>Adoption is a design problem — Deliberate UX</title>
 	<meta
 	  name="description"
-	  content="Adoption is about time, trust, risk, switching costs — and fit."
+	  content="Adoption depends on time, trust, risk, and switching costs. A tool can pass every usability test and still fail in the field if it ignores these forces."
 	/>
+	<meta name="author" content="Deliberate UX" />
+	<meta property="og:title" content="Adoption is a design problem — Deliberate UX" />
+	<meta property="og:description" content="Adoption depends on time, trust, risk, and switching costs. Usability testing can't measure whether people will actually use a tool under real conditions." />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://deliberateux.com/work/writing/adoption-is-a-design-problem.html" />
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content="Adoption is a design problem — Deliberate UX" />
+	<meta name="twitter:description" content="Adoption depends on time, trust, risk, and switching costs. Usability testing can't measure whether people will actually use a tool under real conditions." />
+	<link rel="canonical" href="https://deliberateux.com/work/writing/adoption-is-a-design-problem.html" />
 
 	<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
 	<link rel="stylesheet" href="/styles.css" />
@@ -40,7 +49,7 @@
 		<header class="article-head">
 		  <h1 class="article-title">Adoption is a design problem</h1>
 		  <p class="article-deck">
-			Adoption is about time, trust, risk, switching costs — and fit.
+			Adoption is about time, trust, risk, switching costs, and fit.
 		  </p>
 		</header>
 
@@ -74,22 +83,33 @@
 		<div class="article-body">
 		  <h2>Why "usable" isn't enough</h2>
 		  <p>
-			Most adoption failures aren't about whether the UI is clean. They're about whether the tool
-			respects constraints: time, operational reality, risk tolerance, and social proof.
+			Most adoption failures aren't about whether the UI is clean. They're about whether the
+			tool respects the constraints its users operate under: time, operational reality, risk
+			tolerance, and social proof.<sup><a href="#fn1" class="fn-ref">1</a></sup>
 		  </p>
 		  <p>
-			A tool can pass every usability test and still fail in the field. Usability testing measures
-			whether someone <em>can</em> use a tool. Adoption depends on whether they <em>will</em>, repeatedly,
-			under real conditions, when no one's watching.
+			A tool can pass every usability test and still fail in the field. Usability testing
+			measures whether someone <em>can</em> use a tool. Adoption depends on whether they
+			<em>will</em>, repeatedly, under real conditions, when no one is watching. That
+			distinction matters because lab conditions strip away exactly the forces that determine
+			real-world use: time pressure, competing priorities, organizational politics, and the
+			simple human preference for what's already familiar.
 		  </p>
 
 		  <h2>The four forces that decide adoption</h2>
 
 		  <h3>1) Time</h3>
 		  <p>
-			If a new flow costs more minutes than it saves, it loses. Especially for high-throughput roles.
-			The math is brutal: a tool that saves 10 seconds but adds 30 seconds of learning friction
-			is a net loss for months.
+			If a new flow costs more minutes than it saves, it loses. Especially for high-throughput
+			roles where every interaction is multiplied across hundreds of repetitions per day. The
+			math is straightforward: a tool that saves 10 seconds per task but adds 30 seconds of
+			learning friction is a net loss for months.
+		  </p>
+		  <p>
+			Time pressure also distorts evaluation. Under ideal conditions, people can see that a
+			new tool is better. Under production conditions, they can only see that it's different.
+			"Different" means slower. "Slower" means risk. And the person making that calculation
+			is the one whose performance is being measured, not the person who chose the tool.
 		  </p>
 		  <p>
 			<strong>Design implication:</strong> The fastest path should be the correct path. Efficiency
@@ -98,18 +118,41 @@
 
 		  <h3>2) Trust</h3>
 		  <p>
-			Users don't trust outputs they can't explain. They also don't trust tools that fail silently.
-			Confidence comes from visibility, guardrails, and predictable recovery.
+			Users don't trust outputs they can't explain. They also don't trust tools that fail
+			silently. Confidence comes from visibility, guardrails, and predictable recovery. This
+			is especially true for tools that automate decisions or recommend actions. If a user
+			can't understand why the tool suggested something, they'll override it by default,
+			regardless of whether the suggestion was correct.
+		  </p>
+		  <p>
+			Trust also builds unevenly. A single visible failure can undo weeks of correct behavior.
+			The asymmetry is extreme: users remember the time the tool got it wrong far more than
+			the hundred times it got it right. Designing for trust means designing for the moment
+			things go wrong, not just the happy path.
 		  </p>
 		  <p>
 			<strong>Design implication:</strong> Show your work. Make errors recoverable. Never hide
 			what the system did.
 		  </p>
 
+		  <p class="pullquote">
+			A single visible failure can undo weeks of correct behavior. Users remember
+			the time the tool got it wrong far more than the hundred times it got it right.
+		  </p>
+
 		  <h3>3) Risk</h3>
 		  <p>
-			Adoption is constrained by consequences. If errors are expensive or embarrassing, users will
-			prefer the old way—even if it's slower. The old way is <em>known</em>; the new way is a gamble.
+			Adoption is constrained by consequences. If errors are expensive or embarrassing, users
+			will prefer the old way, even if it's slower. The old way is <em>known</em>; the new
+			way is a gamble.<sup><a href="#fn2" class="fn-ref">2</a></sup> This is rational behavior.
+			Loss aversion isn't a bug in human cognition. It's a feature that protects people from
+			downside scenarios that matter more than upside ones.
+		  </p>
+		  <p>
+			In practice, this means that the perceived risk of a new tool matters more than its
+			actual risk. If the tool looks unfamiliar, if the confirmation dialogs feel insufficient,
+			if there's no clear undo, users will assume the worst and act accordingly. The tool
+			doesn't need to be risky to fail. It just needs to feel risky.
 		  </p>
 		  <p>
 			<strong>Design implication:</strong> Reduce the cost of trying. Make the first interaction
@@ -118,9 +161,17 @@
 
 		  <h3>4) Switching costs</h3>
 		  <p>
-			Every new tool competes with existing muscle memory, templates, spreadsheets, tribal knowledge,
-			and "how we do it here." The new tool isn't competing with nothing; it's competing with
-			everything users have already built.
+			Every new tool competes with existing muscle memory, templates, spreadsheets, tribal
+			knowledge, and "how we do it here." The new tool isn't competing with nothing; it's
+			competing with everything users have already
+			built.<sup><a href="#fn3" class="fn-ref">3</a></sup>
+		  </p>
+		  <p>
+			Switching costs are often invisible to the people choosing the tool because they're
+			not the ones paying the cost. The executive who approves the purchase doesn't have
+			to rebuild their workflow. The manager who mandates adoption doesn't have to relearn
+			keyboard shortcuts. The gap between who decides and who absorbs the friction is one
+			of the most common reasons enterprise tools fail to stick.
 		  </p>
 		  <p>
 			<strong>Design implication:</strong> Meet users where they are. Import existing data.
@@ -129,9 +180,16 @@
 
 		  <h2>Why pilots succeed and rollouts fail</h2>
 		  <p>
-			Pilots create artificial conditions: dedicated time, motivated participants, extra support.
-			The real test is what happens when those conditions disappear. A tool that "worked in pilot"
-			but fails at scale was never tested for adoption—only for usability.
+			Pilots create artificial conditions: dedicated time, motivated participants, extra
+			support, and a smaller audience that's often self-selected for enthusiasm. The real
+			test is what happens when those conditions disappear. A tool that "worked in pilot"
+			but fails at scale was never tested for adoption. It was tested for usability under
+			favorable conditions, which is a very different thing.
+		  </p>
+		  <p>
+			The gap between pilot and production is the gap between ability and willingness. Pilots
+			prove that people <em>can</em> use the tool. Rollout reveals whether they <em>will</em>.
+			Designing for adoption means designing for the second question, not just the first.
 		  </p>
 
 		  <h2>A practical adoption design prompt</h2>
@@ -143,7 +201,34 @@
 			<li>What are users giving up to use this? Is that trade-off worth it to them?</li>
 		  </ul>
 		</div>
+
+		<footer class="article-footnotes" role="doc-endnotes">
+		  <ol>
+			<li id="fn1">
+			  Rogers identified five attributes that predict adoption rate: relative advantage,
+			  compatibility, complexity, trialability, and observability.
+			  <span class="fn-source">Rogers, E. M. (2003). Diffusion of Innovations, 5th Edition. Free Press, pp. 221–258.</span>
+			  <a href="#fn1" class="fn-back" aria-label="Back to text">&uarr;</a>
+			</li>
+			<li id="fn2">
+			  Kahneman and Tversky's prospect theory shows that losses loom roughly twice as large
+			  as equivalent gains, explaining why the risk of a new tool feels disproportionately large.
+			  <span class="fn-source">Kahneman, D. & Tversky, A. (1979). Prospect Theory: An Analysis of Decision under Risk. Econometrica, 47(2), 263–291.</span>
+			  <a href="#fn2" class="fn-back" aria-label="Back to text">&uarr;</a>
+			</li>
+			<li id="fn3">
+			  Switching costs in technology adoption are well-documented in organizational research.
+			  Burnham et al. identified procedural, financial, and relational dimensions of switching costs.
+			  <span class="fn-source">Burnham, T. A., Frels, J. K., & Mahajan, V. (2003). Consumer switching costs. Journal of the Academy of Marketing Science, 31(2), 109–126.</span>
+			  <a href="#fn3" class="fn-back" aria-label="Back to text">&uarr;</a>
+			</li>
+		  </ol>
+		</footer>
+
 	  </article>
+	  <a href="/work/writing/" class="article-back-link">
+		<span class="back-arrow">&larr;</span> Writing
+	  </a>
 	</main>
   </body>
 </html>

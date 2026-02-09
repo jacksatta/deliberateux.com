@@ -8,8 +8,17 @@
 	<title>The hidden cost of "just one more field" — Deliberate UX</title>
 	<meta
 	  name="description"
-	  content="Every field has a cost. The question isn't whether to add it, but who pays."
+	  content="Every form field has a cost. Fields compound into cognitive load, decision fatigue, and abandonment. The question isn't whether a field is useful, but who pays for it."
 	/>
+	<meta name="author" content="Deliberate UX" />
+	<meta property="og:title" content="The hidden cost of &quot;just one more field&quot; — Deliberate UX" />
+	<meta property="og:description" content="Every form field has a cost. The question isn't whether to add it, but who pays." />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://deliberateux.com/work/writing/the-hidden-cost-of-one-more-field.html" />
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content="The hidden cost of &quot;just one more field&quot; — Deliberate UX" />
+	<meta name="twitter:description" content="Every form field has a cost. The question isn't whether to add it, but who pays." />
+	<link rel="canonical" href="https://deliberateux.com/work/writing/the-hidden-cost-of-one-more-field.html" />
 
 	<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
 	<link rel="stylesheet" href="/styles.css" />
@@ -70,58 +79,123 @@
 		<div class="article-body">
 		  <h2>The request always sounds reasonable</h2>
 		  <p>
-			"Can we add a field for X?" It seems small. One more input. A few more seconds.
-			But fields compound. Each one asks for attention, demands a decision, and creates
-			an opportunity for error or abandonment.
+			"Can we add a field for X?" It seems small. One more input. A few more seconds. But
+			fields compound. Each one asks for attention, demands a decision, and creates an
+			opportunity for error or abandonment.<sup><a href="#fn1" class="fn-ref">1</a></sup>
 		  </p>
 		  <p>
-			The real question isn't "is this field useful?" The question is: useful to whom,
-			and at whose expense?
+			The request is always framed in terms of what the organization gets: more data, better
+			segmentation, a new dimension for reporting. It is rarely framed in terms of what the
+			user gives up: time, focus, and the willingness to complete the form at all. That
+			framing gap is where field bloat begins.
+		  </p>
+		  <p>
+			The real question isn't "is this field useful?" The question is: useful to whom, and
+			at whose expense?
 		  </p>
 
 		  <h2>Who pays for the field?</h2>
 		  <p>
-			Someone always pays for data collection. Usually it's the user, in the form of
-			time, cognitive load, and decision fatigue. Sometimes it's the support team,
-			handling confusion about what to enter. Often it's the data team, cleaning up
-			inconsistent entries that nobody uses.
+			Someone always pays for data collection. Usually it's the user, in the form of time,
+			cognitive load, and decision fatigue. Sometimes it's the support team, handling confusion
+			about what to enter. Often it's the data team, cleaning up inconsistent entries that
+			nobody uses.
 		  </p>
 		  <p>
-			The person requesting the field rarely bears the cost. That's why fields
-			accumulate. The incentive to add is stronger than the incentive to remove.
+			The distribution of cost matters because it's almost always unequal. The person
+			requesting the field (typically a stakeholder, analyst, or product manager) rarely
+			fills out the form themselves. They see the data after it's collected, stripped of the
+			friction that produced it. From their perspective, the field is free. From the user's
+			perspective, it's another tax on an already loaded workflow.
+		  </p>
+		  <p>
+			That's why fields accumulate. The incentive to add is stronger than the incentive to
+			remove.<sup><a href="#fn2" class="fn-ref">2</a></sup> Adding a field has a visible
+			champion. Removing one rarely does.
+		  </p>
+
+		  <p class="pullquote">
+			The person requesting the field rarely fills out the form themselves. They see
+			the data after it's collected, stripped of the friction that produced it.
 		  </p>
 
 		  <h2>The compound effect</h2>
 		  <p>
-			One field: minor friction. Ten fields: noticeable burden. Twenty fields: users
-			start gaming the system, entering garbage to get through, or abandoning entirely.
+			One field: minor friction. Ten fields: noticeable burden. Twenty fields: users start
+			gaming the system, entering garbage to get through, or abandoning entirely. The
+			relationship between field count and completion is not linear. There's a threshold
+			where users shift from "filling out the form" to "getting past the form," and the
+			quality of every field degrades once that threshold is crossed.
 		  </p>
 		  <p>
-			High-volume workflows feel this most acutely. If an agent fills out a form 200
-			times a day, every unnecessary field costs thousands of interactions per week.
+			High-volume workflows feel this most acutely. If an agent fills out a form 200 times
+			a day, every unnecessary field costs thousands of interactions per
+			week.<sup><a href="#fn3" class="fn-ref">3</a></sup> At that scale, a single
+			questionable field isn't a minor annoyance. It's an operational cost that ripples
+			through the entire system: slower throughput, more data entry errors, higher
+			frustration, and eventually, workarounds that bypass the form entirely.
 		  </p>
 
 		  <h2>When to push back</h2>
+		  <p>
+			Not every field request deserves resistance. Some fields are genuinely necessary.
+			The goal isn't to say no reflexively but to apply consistent scrutiny:
+		  </p>
 		  <ul>
-			<li>Is this data actually used, or just "nice to have"?</li>
+			<li>Is this data actually used in a decision, or just "nice to have"?</li>
 			<li>Could this be derived or defaulted instead of asked?</li>
 			<li>What happens if we collect this later, or not at all?</li>
 			<li>Who reviews this data, and how often?</li>
 			<li>What's the abandonment rate for this form?</li>
 		  </ul>
+		  <p>
+			If the answers to these questions are vague or uncertain, the field probably isn't
+			justified. The burden of proof should fall on the person requesting the addition,
+			not on the person defending the user's time.
+		  </p>
 
 		  <h2>The alternative to adding</h2>
 		  <p>
 			Before adding a field, try removing one. Audit what you already collect. Most
-			organizations discover fields that nobody reads, reports that nobody runs,
-			and requirements that outlived their purpose.
+			organizations discover fields that nobody reads, reports that nobody runs, and
+			requirements that outlived their purpose. A quarterly form audit is one of the
+			highest-leverage UX activities a team can do, and it almost never happens.
 		  </p>
 		  <p>
-			The goal isn't minimal forms. It's appropriate forms. Every field should
-			earn its place.
+			The goal isn't minimal forms. It's appropriate forms. Every field should earn its
+			place, and that place should be re-earned periodically. Data collection is easy to
+			start and hard to stop. Building a habit of subtraction is the only reliable
+			counterweight.
 		  </p>
 		</div>
+
+		<footer class="article-footnotes" role="doc-endnotes">
+		  <ol>
+			<li id="fn1">
+			  Hick's Law predicts that decision time increases logarithmically with the number of
+			  choices. Each additional field is another choice.
+			  <span class="fn-source">Hick, W. E. (1952). On the rate of gain of information. Quarterly Journal of Experimental Psychology, 4(1), 11–26.</span>
+			  <a href="#fn1" class="fn-back" aria-label="Back to text">&uarr;</a>
+			</li>
+			<li id="fn2">
+			  Adams et al. found that people systematically default to additive solutions even when
+			  subtractive ones are more effective, a cognitive bias that explains field accumulation.
+			  <span class="fn-source">Adams, G. S., Converse, B. A., Hales, A. H., & Klotz, L. E. (2021). People systematically overlook subtractive changes. Nature, 592, 258–261.</span>
+			  <a href="#fn2" class="fn-back" aria-label="Back to text">&uarr;</a>
+			</li>
+			<li id="fn3">
+			  Baymard Institute research on checkout usability found that the average checkout contains
+			  14.88 form fields, roughly twice as many as needed.
+			  <span class="fn-source">Baymard Institute. (2024). Checkout Usability research study.</span>
+			  <a href="#fn3" class="fn-back" aria-label="Back to text">&uarr;</a>
+			</li>
+		  </ol>
+		</footer>
+
 	  </article>
+	  <a href="/work/writing/" class="article-back-link">
+		<span class="back-arrow">&larr;</span> Writing
+	  </a>
 	</main>
   </body>
 </html>

@@ -8,8 +8,17 @@
 	<title>Design systems don't fix culture — Deliberate UX</title>
 	<meta
 	  name="description"
-	  content="A component library can't solve collaboration problems. Culture eats systems for breakfast."
+	  content="A component library can't solve collaboration problems. Design systems succeed or fail based on organizational culture, not component quality."
 	/>
+	<meta name="author" content="Deliberate UX" />
+	<meta property="og:title" content="Design systems don't fix culture — Deliberate UX" />
+	<meta property="og:description" content="A component library can't solve collaboration problems. Culture eats systems for breakfast." />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://deliberateux.com/work/writing/design-systems-dont-fix-culture.html" />
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content="Design systems don't fix culture — Deliberate UX" />
+	<meta name="twitter:description" content="A component library can't solve collaboration problems. Culture eats systems for breakfast." />
+	<link rel="canonical" href="https://deliberateux.com/work/writing/design-systems-dont-fix-culture.html" />
 
 	<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
 	<link rel="stylesheet" href="/styles.css" />
@@ -76,33 +85,57 @@
 		<div class="article-body">
 		  <h2>The promise and the reality</h2>
 		  <p>
-			Design systems promise consistency, efficiency, and quality. They deliver
-			components. The gap between promise and reality is filled by organizational
-			culture: how decisions get made, who has authority, and what actually gets
-			rewarded.
+			Design systems promise consistency, efficiency, and quality. They deliver components.
+			The gap between promise and reality is filled by organizational culture: how decisions
+			get made, who has authority, and what actually gets rewarded.
 		  </p>
 		  <p>
-			A design system is infrastructure. Like any infrastructure, it only works
-			if people choose to use it, and if the organization makes that choice easy.
+			A design system is infrastructure. Like any infrastructure, it only works if people
+			choose to use it, and if the organization makes that choice
+			easy.<sup><a href="#fn1" class="fn-ref">1</a></sup> A well-maintained highway is
+			useless if the zoning laws send traffic somewhere else. A design system with beautiful
+			components is useless if the sprint cycle doesn't leave time to learn them, or if the
+			team building the feature has never heard of the system at all.
+		  </p>
+		  <p>
+			This is why so many design system initiatives start with energy and end with
+			abandonment. The system itself was never the constraint. The constraint was always
+			the organization around it.
 		  </p>
 
 		  <h2>Why systems get bypassed</h2>
 		  <p>
-			Teams skip the design system when using it is harder than not using it.
-			This happens when:
+			Teams skip the design system when using it is harder than not using it. That calculus
+			is made at the individual level, on every feature, in every sprint. It's not a
+			one-time decision. It's an ongoing evaluation: is the system worth the overhead
+			right now, in this context, under this deadline?
+		  </p>
+		  <p>
+			The answer is often no. Not because the system is bad, but because the conditions
+			don't support using it:
 		  </p>
 		  <ul>
 			<li>The system doesn't have what they need, and contributing is too slow</li>
 			<li>Deadlines reward shipping, not consistency</li>
 			<li>Nobody enforces usage, so deviation has no consequence</li>
 			<li>The system is owned by a team that doesn't understand their context</li>
-			<li>Politics make collaboration with the system team uncomfortable</li>
+			<li>Politics make collaboration with the system team uncomfortable<sup><a href="#fn2" class="fn-ref">2</a></sup></li>
 		  </ul>
+		  <p>
+			Each of these is a cultural problem wearing a systems costume. You can't fix them
+			with better documentation or more components. They require changes in how the
+			organization operates.
+		  </p>
+
+		  <p class="pullquote">
+			Each of these is a cultural problem wearing a systems costume. You can't fix
+			them with better documentation or more components.
+		  </p>
 
 		  <h2>Culture signals that predict system failure</h2>
 		  <p>
-			Watch for these patterns. They indicate that a design system will struggle,
-			regardless of how good the components are:
+			Watch for these patterns. They indicate that a design system will struggle, regardless
+			of how good the components are:
 		  </p>
 		  <ul>
 			<li>"That's not how we do things here" in response to system guidance</li>
@@ -111,11 +144,18 @@
 			<li>The system team is understaffed or treated as a cost center</li>
 			<li>Teams are rewarded for speed, never for reuse</li>
 		  </ul>
+		  <p>
+			These signals are often visible early. If you see them during the planning phase of a
+			design system initiative, addressing them first will save months of work on components
+			that nobody adopts. The difficult truth is that building the system is the easy part.
+			Building the organizational conditions for the system to succeed is the hard part,
+			and it's the part that rarely gets funded.
+		  </p>
 
 		  <h2>What actually helps</h2>
 		  <p>
-			The design system can't fix culture, but it can work with it. Systems that
-			succeed tend to share certain traits:
+			The design system can't fix culture, but it can work with it. Systems that succeed
+			tend to share certain traits:
 		  </p>
 		  <ul>
 			<li>They make the right thing the easy thing</li>
@@ -124,15 +164,56 @@
 			<li>They invest in contribution workflows, not just consumption</li>
 			<li>They measure outcomes (consistency, velocity) not just coverage</li>
 		  </ul>
+		  <p>
+			The common thread is that successful systems meet people where they are instead of
+			demanding they change. They reduce friction rather than adding process. They make
+			using the system feel like the path of least resistance, not an obligation.
+		  </p>
+		  <p>
+			This is an uncomfortable inversion for design system teams. It means that the quality
+			of your components matters less than the ease of adopting them. A mediocre component
+			that's easy to use will beat a perfect component that's hard to find, slow to
+			install, or poorly documented. The system team's job isn't to build the best
+			components. It's to make using the system easier than not using it.
+		  </p>
 
 		  <h2>A diagnostic question</h2>
 		  <p>
-			Before investing more in the system itself, ask: if we made it perfect
-			tomorrow, would teams actually use it? If the answer is uncertain, the
-			problem isn't the system.
+			Before investing more in the system itself, ask: if we made it perfect tomorrow,
+			would teams actually use it? If the answer is uncertain, the problem isn't the
+			system.<sup><a href="#fn3" class="fn-ref">3</a></sup> And no amount of component
+			work will change that.
 		  </p>
 		</div>
+
+		<footer class="article-footnotes" role="doc-endnotes">
+		  <ol>
+			<li id="fn1">
+			  Conway's Law states that organizations design systems that mirror their own
+			  communication structure, which means a design system's success depends on the
+			  org chart as much as the component API.
+			  <span class="fn-source">Conway, M. E. (1968). How do committees invent? Datamation, 14(4), 28–31.</span>
+			  <a href="#fn1" class="fn-back" aria-label="Back to text">&uarr;</a>
+			</li>
+			<li id="fn2">
+			  Frost's Atomic Design methodology provides a structural framework, but acknowledges
+			  that without organizational buy-in, the system becomes a library that nobody imports.
+			  <span class="fn-source">Frost, B. (2016). Atomic Design. Brad Frost, Ch. 5.</span>
+			  <a href="#fn2" class="fn-back" aria-label="Back to text">&uarr;</a>
+			</li>
+			<li id="fn3">
+			  Drucker's widely attributed observation that "culture eats strategy for breakfast"
+			  applies equally to design systems: they are strategic tools subject to cultural override.
+			  <span class="fn-source">Attributed to Peter Drucker; popularized by Mark Fields at Ford Motor Company, c. 2006.</span>
+			  <a href="#fn3" class="fn-back" aria-label="Back to text">&uarr;</a>
+			</li>
+		  </ol>
+		</footer>
+
 	  </article>
+	  <a href="/work/writing/" class="article-back-link">
+		<span class="back-arrow">&larr;</span> Writing
+	  </a>
 	</main>
   </body>
 </html>
