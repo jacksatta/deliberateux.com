@@ -553,8 +553,9 @@ html[data-theme="light"] .chip {
 
 @media (max-width: 720px) {
   .cards { grid-template-columns: 1fr; }
-  .hero-content { left: 18px; right: 18px; top: 24%; }
+  .hero-content { left: 18px; right: 18px; top: 18%; }
   .hero-media { height: 420px; }
+  .hero-media::after { height: 80px; }
 }
 
 .card {
