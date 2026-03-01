@@ -19,6 +19,55 @@
   const TAGS_REMOTE_URL = "/tags.json";
   const MANIFEST_URL = "/work/writing/manifest.json";
 
+  // Article registry — update when adding new articles
+  const ARTICLE_REGISTRY = [
+    {
+      title: "Why good UX still fails",
+      slug: "why-good-ux-still-fails",
+      path: "/work/writing/why-good-ux-still-fails.html",
+      tags: ["Adoption", "Systems", "Incentives"],
+      excerpt: "Great interaction design can still lose to incentives, operations, and time.",
+      date: "2024",
+      readingTime: "8 min read"
+    },
+    {
+      title: "The stove problem, revisited",
+      slug: "the-stove-problem-revisited",
+      path: "/work/writing/the-stove-problem-revisited.html",
+      tags: ["Mapping", "Affordances", "Safety"],
+      excerpt: "When \"better design\" loses to learned behavior and environment.",
+      date: "2024",
+      readingTime: "6 min read"
+    },
+    {
+      title: "Adoption is a design problem",
+      slug: "adoption-is-a-design-problem",
+      path: "/work/writing/adoption-is-a-design-problem.html",
+      tags: ["Adoption", "Trust", "Risk", "Operations"],
+      excerpt: "Adoption is about time, trust, risk, switching costs, and fit.",
+      date: "2024",
+      readingTime: "10 min read"
+    },
+    {
+      title: "The hidden cost of \"just one more field\"",
+      slug: "the-hidden-cost-of-one-more-field",
+      path: "/work/writing/the-hidden-cost-of-one-more-field.html",
+      tags: ["Forms", "Cognitive Load", "Operations"],
+      excerpt: "Every field has a cost. The question isn't whether to add it, but who pays.",
+      date: "2026",
+      readingTime: "7 min read"
+    },
+    {
+      title: "Design systems don't fix culture",
+      slug: "design-systems-dont-fix-culture",
+      path: "/work/writing/design-systems-dont-fix-culture.html",
+      tags: ["Design Systems", "Culture", "Adoption"],
+      excerpt: "A component library can't solve collaboration problems. Culture eats systems for breakfast.",
+      date: "2026",
+      readingTime: "8 min read"
+    }
+  ];
+
   function getInitialTheme() {
 	const saved = localStorage.getItem(THEME_KEY);
 	if (saved === "light" || saved === "dark") return saved;
@@ -906,6 +955,160 @@
 	}
   }
 
+  // --- Tag results page ---
+
+  function renderArticleItem(article, highlightTag) {
+	const a = document.createElement("a");
+	a.href = article.path;
+	a.className = "article-item";
+
+	const content = document.createElement("div");
+	content.className = "article-item-content";
+
+	const title = document.createElement("h3");
+	title.className = "article-item-title";
+	title.textContent = article.title;
+
+	const excerpt = document.createElement("p");
+	excerpt.className = "article-item-excerpt";
+	excerpt.textContent = article.excerpt;
+
+	const meta = document.createElement("div");
+	meta.className = "article-item-meta";
+
+	const date = document.createElement("span");
+	date.className = "article-item-date";
+	date.textContent = article.date;
+
+	const reading = document.createElement("span");
+	reading.className = "article-item-reading";
+	reading.textContent = article.readingTime;
+
+	meta.appendChild(date);
+	meta.appendChild(reading);
+
+	const tagRow = document.createElement("div");
+	tagRow.className = "tag-row";
+	tagRow.style.marginTop = "8px";
+	article.tags.forEach((t) => {
+	  const pill = document.createElement("span");
+	  pill.className = "tag-pill";
+	  if (highlightTag && normalizeTag(t) === highlightTag) {
+		pill.classList.add("tag-pill--active");
+	  }
+	  pill.textContent = t;
+	  tagRow.appendChild(pill);
+	});
+
+	content.appendChild(title);
+	content.appendChild(excerpt);
+	content.appendChild(meta);
+	content.appendChild(tagRow);
+	a.appendChild(content);
+
+	return a;
+  }
+
+  function bootTagPage() {
+	const isTagPage = location.pathname.endsWith("/tag.html");
+	if (!isTagPage) return;
+
+	const params = new URLSearchParams(location.search);
+	const rawTag = params.get("tag");
+	if (!rawTag) {
+	  window.location.href = "/work/writing/";
+	  return;
+	}
+
+	const searchTag = normalizeTag(rawTag);
+	const displayName = rawTag.replace(/-/g, " ").replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+
+	document.title = "Tagged: " + displayName + " \u2014 Deliberate UX";
+
+	const titleEl = document.querySelector("[data-tag-title]");
+	const countEl = document.querySelector("[data-tag-count]");
+	const resultsEl = document.querySelector("[data-tag-results]");
+	const relatedSection = document.querySelector("[data-tag-related-section]");
+	const relatedEl = document.querySelector("[data-tag-related]");
+
+	if (!resultsEl) return;
+
+	// Exact matches
+	const matches = ARTICLE_REGISTRY.filter(function (article) {
+	  return article.tags.some(function (t) { return normalizeTag(t) === searchTag; });
+	});
+
+	// Related: articles sharing tags with matched articles, excluding the search tag
+	var matchTagSet = new Set();
+	matches.forEach(function (article) {
+	  article.tags.forEach(function (t) {
+		var norm = normalizeTag(t);
+		if (norm !== searchTag) matchTagSet.add(norm);
+	  });
+	});
+
+	var matchSlugs = new Set(matches.map(function (a) { return a.slug; }));
+	var related = ARTICLE_REGISTRY
+	  .filter(function (article) { return !matchSlugs.has(article.slug); })
+	  .map(function (article) {
+		var sharedCount = article.tags.filter(function (t) { return matchTagSet.has(normalizeTag(t)); }).length;
+		return { article: article, sharedCount: sharedCount };
+	  })
+	  .filter(function (r) { return r.sharedCount > 0; })
+	  .sort(function (a, b) { return b.sharedCount - a.sharedCount; })
+	  .map(function (r) { return r.article; });
+
+	// Update heading
+	if (titleEl) titleEl.textContent = "Tagged: " + displayName;
+	if (countEl) {
+	  countEl.textContent = matches.length === 1 ? "1 essay" : matches.length + " essays";
+	}
+
+	// Render matches
+	matches.forEach(function (article) {
+	  resultsEl.appendChild(renderArticleItem(article, searchTag));
+	});
+
+	// Render related
+	if (related.length > 0 && relatedSection && relatedEl) {
+	  relatedSection.style.display = "";
+	  related.forEach(function (article) {
+		relatedEl.appendChild(renderArticleItem(article, null));
+	  });
+	}
+  }
+
+  // --- Clickable tag pills ---
+
+  function wireTagPills() {
+	document.querySelectorAll(".tag-pill").forEach(function (pill) {
+	  if (pill.classList.contains("more")) return;
+
+	  pill.setAttribute("role", "link");
+	  pill.setAttribute("tabindex", "0");
+
+	  function navigate() {
+		var tag = normalizeTag(pill.textContent);
+		if (tag) {
+		  window.location.href = "/work/writing/tag.html?tag=" + encodeURIComponent(tag);
+		}
+	  }
+
+	  pill.addEventListener("click", function (e) {
+		e.preventDefault();
+		e.stopPropagation();
+		navigate();
+	  });
+
+	  pill.addEventListener("keydown", function (e) {
+		if (e.key === "Enter" || e.key === " ") {
+		  e.preventDefault();
+		  navigate();
+		}
+	  });
+	});
+  }
+
   // Hero entrance animation on page load
   function wireHeroIntro() {
 	const hero = document.querySelector(".hero");
@@ -944,6 +1147,8 @@
   injectArticleTags();
   injectArticleBackLink();
   bootManagePage();
+  bootTagPage();
+  wireTagPills();
   wireModalTriggers();
   wireScrollAnimations();
   wireWorkCards();

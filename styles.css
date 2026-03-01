@@ -1519,6 +1519,31 @@ html[data-theme="light"] .tag-pill {
   opacity: 0.9;
 }
 
+/* Clickable tag pills */
+.tag-pill:not(.more) {
+  cursor: pointer;
+  transition: background 160ms var(--ease), border-color 160ms var(--ease);
+}
+.tag-pill:not(.more):hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--link-muted);
+}
+html[data-theme="light"] .tag-pill:not(.more):hover {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: var(--link-muted);
+}
+
+.tag-pill--active {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--link-muted);
+  color: var(--text);
+}
+html[data-theme="light"] .tag-pill--active {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: var(--link-muted);
+  color: var(--text);
+}
+
 /* ================================
    Manage page
 ================================= */

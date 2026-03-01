@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-9MSXWF3TX3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-9MSXWF3TX3');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tagged — Deliberate UX</title>
+  <link rel="icon" href="/assets/favicon.svg" />
+  <link rel="stylesheet" href="/styles.css" />
+  <script defer src="/app.js"></script>
+</head>
+
+<body>
+  <main class="page">
+    <div class="container">
+      <section class="section panel">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title" data-tag-title>Tagged: …</h2>
+            <p class="section-kicker" data-tag-count></p>
+          </div>
+          <a class="card-cta-link" href="/work/writing/">← All writing</a>
+        </div>
+
+        <div class="article-list" data-tag-results>
+        </div>
+      </section>
+
+      <section class="section panel panel-soft" data-tag-related-section style="display:none;">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">Related</h2>
+            <p class="section-kicker">Essays on adjacent topics</p>
+          </div>
+        </div>
+
+        <div class="article-list" data-tag-related>
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
