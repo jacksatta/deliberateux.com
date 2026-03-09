@@ -324,7 +324,7 @@ html[data-theme="light"] .panel.panel-soft {
 
 .hero.hero-intro .hero-content {
   opacity: 0;
-  transform: translateX(calc(50vw - 50% - 28px));
+  transform: translateY(-50%) translateX(calc(50vw - 50% - 28px));
   animation: heroContentSlideIn 1200ms ease-out 300ms forwards;
 }
 
@@ -336,15 +336,15 @@ html[data-theme="light"] .panel.panel-soft {
 @keyframes heroContentSlideIn {
   0% {
     opacity: 0;
-    transform: translateX(calc(50vw - 50% - 28px));
+    transform: translateY(-50%) translateX(calc(50vw - 50% - 28px));
   }
   40% {
     opacity: 1;
-    transform: translateX(calc(50vw - 50% - 28px));
+    transform: translateY(-50%) translateX(calc(50vw - 50% - 28px));
   }
   100% {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(-50%) translateX(0);
   }
 }
 
@@ -439,7 +439,9 @@ html[data-theme="light"] .hero-media::after {
   position: absolute;
   left: 28px;
   right: 28px;
-  top: 42%;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
 }
 
 .hero-title {
@@ -457,7 +459,7 @@ html[data-theme="light"] .hero-title {
 }
 
 .hero-subtitle {
-  margin: 0 0 16px;
+  margin: 0 auto 16px;
   font-size: 17px;
   color: var(--muted);
   max-width: 58ch;
@@ -473,6 +475,7 @@ html[data-theme="light"] .hero-subtitle {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  justify-content: center;
 }
 
 .chip {
@@ -553,7 +556,7 @@ html[data-theme="light"] .chip {
 
 @media (max-width: 720px) {
   .cards { grid-template-columns: 1fr; }
-  .hero-content { left: 18px; right: 18px; top: 18%; }
+  .hero-content { left: 18px; right: 18px; top: 50%; }
   .hero-media { height: 420px; }
   .hero-media::after { height: 80px; }
 }
