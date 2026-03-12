@@ -10,8 +10,8 @@ html{scroll-behavior:smooth}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#070812;color:rgba(255,255,255,.92);min-height:100vh;background:radial-gradient(1200px 900px at 20% -10%,rgba(142,72,255,.22),transparent 55%),radial-gradient(900px 700px at 90% 0%,rgba(0,168,255,.15),transparent 55%),radial-gradient(600px 600px at 50% 100%,rgba(0,80,200,.08),transparent 60%),#070812}
 :root{--accent:#7c5cfc;--muted:rgba(255,255,255,.68);--faint:rgba(255,255,255,.52);--border:rgba(255,255,255,.10);--border2:rgba(255,255,255,.14);--ease:cubic-bezier(.2,.8,.2,1)}
 a{color:inherit;text-decoration:none}
-/* ── Standalone header ── */
-.site-header{padding:40px 80px 0;max-width:1360px;margin:0 auto;display:flex;align-items:flex-end;justify-content:space-between}
+/* ── Standalone header — sticky, full-bleed gradient ── */
+.site-header{position:sticky;top:0;z-index:200;padding:18px 80px 20px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to bottom,rgba(4,6,18,.97) 55%,rgba(4,6,18,0) 100%);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.06)}
 .site-logo{font-size:16px;font-weight:700;letter-spacing:-.01em;color:rgba(255,255,255,.95)}
 .site-tagline{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
 .header-logo{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5)}
@@ -22,28 +22,38 @@ a{color:inherit;text-decoration:none}
 .page-header h1{font-size:clamp(32px,4vw,52px);font-weight:700;line-height:1.1;letter-spacing:-.02em;margin-bottom:18px}
 .page-header p{font-size:17px;color:var(--muted);line-height:1.65;max-width:560px}
 /* ── Tag filter bar ── */
-.tag-filter{display:flex;flex-wrap:wrap;gap:10px;padding:48px 80px 0;max-width:1360px;margin:0 auto}
+.tag-section{max-width:1360px;margin:0 auto;padding:40px 80px 0}
+.tag-toggle{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);background:none;border:none;cursor:pointer;padding:0 0 14px;transition:color 200ms;font-family:inherit}
+.tag-toggle:hover{color:rgba(255,255,255,.8)}
+.tag-toggle-arrow{display:inline-block;transition:transform 300ms var(--ease);font-style:normal}
+.tag-section.open .tag-toggle-arrow{transform:rotate(180deg)}
+.tag-filter{display:flex;flex-wrap:wrap;gap:10px;max-height:0;overflow:hidden;opacity:0;transition:max-height 400ms var(--ease),opacity 300ms}
+.tag-section.open .tag-filter{max-height:200px;opacity:1}
 .filter-pill{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;padding:7px 16px;border-radius:24px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);color:var(--faint);cursor:pointer;transition:background 200ms,border-color 200ms,color 200ms;white-space:nowrap}
 .filter-pill:hover{background:rgba(255,255,255,.11);color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.20)}
 .filter-pill.active{background:rgba(124,92,252,.18);border-color:rgba(124,92,252,.4);color:rgba(200,185,255,.95)}
 /* ── Work section ── */
-.work-section{max-width:1360px;margin:0 auto;padding:48px 80px 120px;display:flex;flex-direction:column;gap:56px}
+.work-section{max-width:1360px;margin:0 auto;padding:48px 80px 120px;display:flex;flex-direction:column;gap:88px}
 /* ── Editorial work entry ── */
-.work-entry{display:grid;grid-template-columns:56% 44%;min-height:480px;border:1px solid var(--border);border-radius:20px;cursor:pointer;position:relative;overflow:hidden;transition:background 300ms var(--ease),border-color 300ms,box-shadow 300ms}
-.work-entry:hover{background:rgba(255,255,255,.025);border-color:rgba(255,255,255,.16);box-shadow:0 8px 40px rgba(0,0,0,.4)}
+.work-entry{display:grid;grid-template-columns:56% 44%;min-height:480px;border:1px solid hsla(var(--h,265),60%,65%,.18);border-radius:20px;cursor:pointer;position:relative;overflow:hidden;background:hsla(var(--h,265),70%,50%,.025);opacity:1;transform:translateY(0);transition:background 300ms var(--ease),border-color 300ms,box-shadow 300ms,opacity 650ms cubic-bezier(.2,.8,.2,1),transform 650ms cubic-bezier(.2,.8,.2,1)}
+.work-entry.in-view{opacity:1;transform:translateY(0)}
+.work-entry:hover{background:hsla(var(--h,265),70%,55%,.055);border-color:hsla(var(--h,265),65%,70%,.4);box-shadow:0 8px 48px hsla(var(--h,265),70%,40%,.18)}
 .work-entry.filtered-out{display:none}
 .work-entry--flip{grid-template-columns:44% 56%}
-.work-entry--flip .entry-visual{order:2;border-right:none;border-left:1px solid var(--border)}
+.work-entry--flip .entry-visual{order:2;border-right:none;border-left:1px solid hsla(var(--h,265),60%,65%,.18)}
 .work-entry--flip .entry-content{order:1}
-.entry-visual{position:relative;overflow:hidden;background:rgba(0,0,0,.25);border-right:1px solid var(--border)}
-.entry-visual svg.wf-card{width:100%;height:100%;display:block;transition:transform 700ms var(--ease),filter 500ms var(--ease)}
-.work-entry:hover .entry-visual svg.wf-card{transform:scale(1.03);filter:brightness(1.3)}
-.entry-visual::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(124,92,252,.09),rgba(0,168,255,.05));opacity:0;transition:opacity 400ms;pointer-events:none}
+.entry-visual{position:relative;overflow:hidden;background:rgba(0,0,0,.25);border-right:1px solid hsla(var(--h,265),60%,65%,.18);cursor:pointer !important;pointer-events:auto;will-change:contents}
+.img-card{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none;filter:grayscale(1);transition:filter 180ms;image-rendering:auto}
+.work-entry:hover .img-card{filter:grayscale(0.4)}
+.entry-visual svg.wf-card{width:100%;height:100%;display:block;transition:opacity 200ms;position:relative;z-index:1;pointer-events:none;filter:saturate(0)}
+.work-entry:hover .entry-visual svg.wf-card{opacity:0.55}
+.entry-visual::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,hsla(var(--h,265),70%,55%,.1),hsla(var(--h,265),80%,65%,.04));opacity:0;transition:opacity 150ms;pointer-events:none}
 .work-entry:hover .entry-visual::after{opacity:1}
-.entry-cta{position:absolute;bottom:20px;right:20px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.5);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);padding:6px 14px;border-radius:20px;opacity:0;transform:translateY(6px);transition:opacity 300ms,transform 300ms var(--ease);pointer-events:none}
+.entry-cta{position:absolute;bottom:20px;right:20px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:hsla(var(--h,265),85%,82%,1);background:hsla(var(--h,265),70%,45%,.22);border:1px solid hsla(var(--h,265),65%,62%,.38);padding:6px 14px;border-radius:20px;opacity:0;transform:translateY(6px);transition:opacity 120ms,transform 120ms,background 120ms,border-color 120ms;pointer-events:none;cursor:pointer}
 .work-entry:hover .entry-cta{opacity:1;transform:translateY(0)}
+.work-entry:hover .entry-cta:hover{background:hsla(var(--h,265),70%,50%,.35);border-color:hsla(var(--h,265),65%,70%,.6)}
 .entry-content{display:flex;flex-direction:column;justify-content:center;padding:56px 60px}
-.entry-eyebrow{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+.entry-eyebrow{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:hsla(var(--h,265),75%,72%,1);margin-bottom:14px}
 .entry-title{font-size:clamp(20px,2vw,28px);font-weight:700;line-height:1.2;letter-spacing:-.02em;margin-bottom:14px}
 .entry-desc{font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:24px}
 .entry-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
@@ -53,13 +63,13 @@ a{color:inherit;text-decoration:none}
 .entry-tags.expanded .tag-overflow{display:inline-flex}
 .tag-more{font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--faint);cursor:pointer;transition:background 200ms,color 200ms,border-color 200ms;font-family:inherit;line-height:1.4}
 .tag-more:hover{background:rgba(124,92,252,.12);border-color:rgba(124,92,252,.3);color:rgba(200,185,255,.85)}
-.entry-tags.expanded .tag-more{display:none}
-.entry-link{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--accent);transition:gap 200ms var(--ease)}
-.entry-link:hover{gap:12px}
+.entry-tags.expanded .tag-more{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14);color:rgba(255,255,255,.6)}
+.entry-link{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:hsla(var(--h,265),80%,74%,1);transition:gap 200ms var(--ease),color 200ms}
+.entry-link:hover{gap:12px;color:hsla(var(--h,265),85%,84%,1)}
 /* ── Modal overlay ── */
-.modal-overlay{position:fixed;inset:0;z-index:1000;background:rgba(4,5,14,.88);backdrop-filter:blur(14px);display:flex;align-items:flex-start;justify-content:center;padding:48px 24px 24px;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity 400ms var(--ease)}
+.modal-overlay{position:fixed;inset:0;z-index:1000;background:rgba(4,5,14,.88);display:flex;align-items:flex-start;justify-content:center;padding:48px 24px 24px;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity 200ms ease-out;will-change:opacity}
 .modal-overlay.is-open{opacity:1;pointer-events:auto}
-.modal-box{width:100%;max-width:960px;background:#0b1124;border:1px solid var(--border2);border-radius:24px;overflow:hidden;transform:translateY(24px);transition:transform 400ms var(--ease);position:relative}
+.modal-box{width:100%;max-width:960px;background:#0b1124;border:1px solid var(--border2);border-radius:24px;overflow:hidden;transform:translateY(20px);transition:transform 250ms ease-out;position:relative;will-change:transform}
 .modal-overlay.is-open .modal-box{transform:translateY(0)}
 /* ── Modal hero dissolve — pure-CSS, no JS state juggling ── */
 .modal-hero{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:#080f1c}
@@ -72,8 +82,27 @@ a{color:inherit;text-decoration:none}
 .dissolve-dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
 .modal-overlay.is-open .dissolve-dot{animation:pdot 1.5s ease-in-out .4s 4}
 @keyframes pdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.2;transform:scale(.5)}}
-.modal-close{position:absolute;top:16px;right:16px;z-index:20;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;line-height:1;transition:background 200ms,color 200ms}
-.modal-close:hover{background:rgba(255,255,255,.15);color:#fff}
+@keyframes zoom-out{from{transform:scale(1.4)}to{transform:scale(1)}}
+@keyframes zoom-pan{0%{transform:scale(1.15) translate(-8%, -5%)}40%{transform:scale(1.2) translate(5%, 10%)}100%{transform:scale(1.05) translate(15%, 0%)}}
+.modal--zoom-out.is-open .modal-hero .img-design{animation:zoom-out 8s cubic-bezier(.4,0,.2,1) 0.5s both !important;transition:none !important}
+.modal--zoom-pan.is-open .modal-hero .img-design{animation:zoom-pan 9s cubic-bezier(.4,0,.2,1) 0.5s both !important;transition:none !important}
+/* ── Image carousel ── */
+.img-carousel{position:relative;width:100%;height:100%}
+.img-carousel .img-design{opacity:0;pointer-events:none;transition:opacity 300ms ease-out}
+.img-carousel .img-design.active{opacity:1;pointer-events:auto}
+.img-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:6;width:52px;height:52px;border-radius:50%;background:rgba(0,0,0,.7);border:1.5px solid rgba(255,255,255,.4);color:#fff;font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity 80ms,transform 80ms;font-weight:300;line-height:1;opacity:0.9;padding:0;will-change:transform}
+.img-nav:hover{opacity:1;transform:translateY(-50%) scale(1.06)}
+.img-nav:active{transform:translateY(-50%) scale(0.94)}
+.img-carousel:hover .img-nav{opacity:1}
+.img-prev{left:14px}
+.img-next{right:14px}
+.img-dots{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);z-index:5;display:flex;gap:8px;align-items:center}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.4);cursor:pointer;transition:background 100ms,opacity 100ms}
+.dot:hover{background:rgba(255,255,255,.7)}
+.dot.active{background:#fff}
+.modal-close{position:absolute;top:16px;right:16px;z-index:20;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.6);border:1.5px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;line-height:1;transition:opacity 80ms,transform 80ms;will-change:transform;padding:0}
+.modal-close:hover{opacity:1;color:#fff;transform:scale(1.1)}
+.modal-close:active{transform:scale(0.92)}
 .modal-body{padding:40px 48px 48px}
 .modal-client{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
 .modal-title{font-size:clamp(20px,2.5vw,32px);font-weight:700;line-height:1.15;letter-spacing:-.02em;margin-bottom:20px}
@@ -92,7 +121,19 @@ a{color:inherit;text-decoration:none}
 .filter-banner strong{color:rgba(255,255,255,.9)}
 .filter-clear{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);cursor:pointer;padding:4px 10px;border-radius:12px;border:1px solid rgba(124,92,252,.3);transition:background 200ms}
 .filter-clear:hover{background:rgba(124,92,252,.15)}
-@media(max-width:900px){.site-header,.work-section,.page-header,.tag-filter,.filter-banner{padding-left:24px;padding-right:24px}.work-entry,.work-entry--flip{grid-template-columns:1fr;min-height:auto}.work-entry--flip .entry-visual{order:0;border-left:none;border-bottom:1px solid var(--border)}.entry-visual,.work-entry--flip .entry-visual{aspect-ratio:16/9;border-right:none;border-bottom:1px solid var(--border)}.entry-content{padding:32px 24px}.modal-body{padding:28px 24px 32px}}
+/* ── More case studies section ── */
+.more-section{margin-top:120px;text-align:center}
+.more-toggle{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:transparent;border:1px solid var(--border);padding:12px 24px;border-radius:6px;cursor:pointer;transition:color 300ms,border-color 300ms,background 300ms;display:inline-flex;align-items:center;gap:8px}
+.more-toggle:hover{color:rgba(255,255,255,.9);border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.05)}
+.more-arrow{display:inline-block;transition:transform 300ms var(--ease);font-size:18px;font-weight:300;line-height:1}
+.more-toggle[aria-expanded="true"] .more-arrow{transform:rotate(45deg)}
+.more-entries{display:grid;gap:1px;background:linear-gradient(180deg,var(--border),transparent);overflow:hidden;max-height:0;opacity:0;transition:max-height 500ms var(--ease),opacity 500ms var(--ease),margin-top 500ms var(--ease)}
+.more-entries.open{max-height:8000px;opacity:1;margin-top:80px}
+.more-entries .work-entry{opacity:0;transform:translateY(20px);animation:fade-in 600ms var(--ease) forwards}
+.more-entries .work-entry:nth-child(1){animation-delay:100ms}
+.more-entries .work-entry:nth-child(2){animation-delay:200ms}
+.more-entries .work-entry:nth-child(3){animation-delay:300ms}
+@media(max-width:900px){.site-header,.work-section,.page-header,.tag-section,.filter-banner{padding-left:24px;padding-right:24px}.work-entry,.work-entry--flip{grid-template-columns:1fr;min-height:auto}.work-entry--flip .entry-visual{order:0;border-left:none;border-bottom:1px solid var(--border)}.entry-visual,.work-entry--flip .entry-visual{aspect-ratio:16/9;border-right:none;border-bottom:1px solid var(--border)}.entry-content{padding:32px 24px}.entry-cta{font-size:9px;padding:4px 10px}.modal-body{padding:28px 24px 32px}}
 </style>
 </head>
 <body>
@@ -108,7 +149,14 @@ a{color:inherit;text-decoration:none}
   <p>Enterprise UX across CRM, ITSM, retail, fintech, and design systems — from research through shipped product.</p>
 </header>
 
-<div id="tag-filter-bar" class="tag-filter"></div>
+<div class="tag-section" id="tag-section">
+  <button class="tag-toggle" id="tag-toggle">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 3h10M3 6h6M5 9h2"/></svg>
+    Filter
+    <em class="tag-toggle-arrow">↓</em>
+  </button>
+  <div id="tag-filter-bar" class="tag-filter"></div>
+</div>
 
 <div id="filter-banner" class="filter-banner">
   Showing work tagged <strong id="filter-label"></strong>
@@ -117,8 +165,77 @@ a{color:inherit;text-decoration:none}
 
 <section class="work-section">
 
-<div class="work-entry " data-modal="itsm" data-tags="Enterprise,ITSM,Salesforce,Service Design">
+<div class="work-entry " data-modal="email" data-tags="Analytics,Email Marketing,Data Visualization,CRM" style="--h:340">
   <div class="entry-visual">
+    <img class="img-card" src="../assets/work/thumbs/NikeEmailLibrary_Overlay_v2-0_0006_05_Click_Overlay.png" alt="Email Marketing Analytics Platform" loading="lazy" style="object-position:center center">
+    <svg class="wf-card" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+<rect width="1600" height="900" fill="#060c18"/>
+<rect width="1600" height="52" fill="#0a1220"/>
+<rect x="16" y="14" width="110" height="24" rx="4" fill="#182840"/>
+<rect x="200" y="16" width="400" height="20" rx="10" fill="#0e1a2c" stroke="#182840" stroke-width="1"/>
+<circle cx="1558" cy="26" r="14" fill="#182840"/>
+<rect x="0" y="52" width="60" height="848" fill="#090f1e"/>
+<circle cx="30" cy="88" r="16" fill="#162540"/>
+<circle cx="30" cy="136" r="16" fill="#0e1a2c"/>
+<circle cx="30" cy="184" r="16" fill="#0e1a2c"/>
+<circle cx="30" cy="232" r="16" fill="#0e1a2c"/>
+<circle cx="30" cy="280" r="16" fill="#0e1a2c"/>
+<rect x="60" y="52" width="380" height="848" fill="#0a1322"/>
+<rect x="76" y="70" width="160" height="12" rx="3" fill="#253e6a"/>
+<rect x="300" y="70" width="80" height="12" rx="6" fill="#1e3258"/>
+<rect x="60" y="96" width="380" height="1" fill="#182840"/>
+<rect x="76" y="116" width="348" height="76" rx="6" fill="#162540" stroke="#1e3258" stroke-width="1"/>
+<rect x="90" y="128" width="200" height="10" rx="2" fill="#2a4070"/>
+<rect x="90" y="146" width="260" height="8" rx="2" fill="#1a2e50"/>
+<rect x="90" y="162" width="180" height="8" rx="2" fill="#1a2e50"/>
+<rect x="316" y="124" width="92" height="10" rx="2" fill="#142035"/>
+<rect x="76" y="200" width="348" height="76" rx="6" fill="#0d1828"/>
+<rect x="90" y="212" width="200" height="10" rx="2" fill="#1a2e50"/>
+<rect x="90" y="230" width="260" height="8" rx="2" fill="#142035"/>
+<rect x="90" y="246" width="180" height="8" rx="2" fill="#142035"/>
+<rect x="76" y="284" width="348" height="76" rx="6" fill="#0d1828"/>
+<rect x="90" y="296" width="200" height="10" rx="2" fill="#1a2e50"/>
+<rect x="90" y="314" width="260" height="8" rx="2" fill="#142035"/>
+<rect x="76" y="368" width="348" height="76" rx="6" fill="#0d1828"/>
+<rect x="76" y="452" width="348" height="76" rx="6" fill="#0d1828"/>
+<rect x="76" y="536" width="348" height="76" rx="6" fill="#0d1828"/>
+<rect x="76" y="620" width="348" height="76" rx="6" fill="#0d1828"/>
+<rect x="440" y="52" width="1160" height="848" fill="#080e1c"/>
+<rect x="440" y="52" width="1160" height="52" fill="#0a1422"/>
+<rect x="456" y="66" width="140" height="12" rx="3" fill="#253e6a"/>
+<rect x="1360" y="64" width="60" height="16" rx="3" fill="#1a2e50"/>
+<rect x="1432" y="64" width="60" height="16" rx="3" fill="#1a2e50"/>
+<rect x="456" y="120" width="1128" height="56" fill="#0e1828"/>
+<rect x="472" y="132" width="180" height="12" rx="3" fill="#253e6a"/>
+<rect x="472" y="152" width="120" height="8" rx="2" fill="#1a2e50"/>
+<rect x="1440" y="132" width="100" height="32" rx="6" fill="#1e3258"/>
+<rect x="456" y="200" width="1128" height="500" rx="6" fill="#0d1828"/>
+<rect x="476" y="220" width="1088" height="8" rx="2" fill="#142035"/>
+<rect x="476" y="240" width="900" height="8" rx="2" fill="#142035"/>
+<rect x="476" y="260" width="960" height="8" rx="2" fill="#142035"/>
+<rect x="476" y="290" width="1000" height="220" rx="4" fill="#0a1422" stroke="#182840" stroke-width="1"/>
+<rect x="500" y="310" width="200" height="12" rx="2" fill="#1a2e50"/>
+<rect x="500" y="332" width="800" height="8" rx="2" fill="#142035"/>
+<rect x="500" y="352" width="760" height="8" rx="2" fill="#142035"/>
+<rect x="500" y="372" width="800" height="8" rx="2" fill="#142035"/>
+<rect x="476" y="530" width="300" height="10" rx="2" fill="#142035"/>
+<rect x="476" y="548" width="400" height="8" rx="2" fill="#142035"/>
+<rect x="476" y="566" width="360" height="8" rx="2" fill="#142035"/>
+</svg>
+    <span class="entry-cta">View Case Study →</span>
+  </div>
+  <div class="entry-content">
+    <div class="entry-eyebrow">Nike</div>
+    <h2 class="entry-title">Email Marketing Analytics Platform</h2>
+    <p class="entry-desc">Designed a 3-panel email analytics workspace enabling Nike's global CRM team to build, preview, test, and measure email campaigns within a single tool.</p>
+    <div class="entry-tags"><span class="entry-tag">Analytics</span><span class="entry-tag">Email Marketing</span><span class="entry-tag tag-overflow">Data Visualization</span><span class="entry-tag tag-overflow">CRM</span><button class="tag-more" title="+2 more" aria-label="Show 2 more tags">···</button></div>
+    <span class="entry-link">View Case Study <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+  </div>
+</div>
+
+<div class="work-entry work-entry--flip" data-modal="itsm" data-tags="Enterprise,ITSM,Salesforce,Service Design" style="--h:265">
+  <div class="entry-visual">
+    <img class="img-card" src="../assets/work/thumbs/technology-hero.png" alt="Enterprise Service Orchestration" loading="lazy" style="object-position:center top">
     <svg class="wf-card" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
 <rect width="1600" height="900" fill="#060c18"/>
 <rect width="1600" height="52" fill="#0a1220"/>
@@ -186,13 +303,14 @@ a{color:inherit;text-decoration:none}
     <div class="entry-eyebrow">Lumen Technologies</div>
     <h2 class="entry-title">Enterprise Service Orchestration</h2>
     <p class="entry-desc">Redesigned a mission-critical ITSM platform serving 4,000+ employees, streamlining incident, change, and request management inside a unified Salesforce console.</p>
-    <div class="entry-tags"><span class="entry-tag">Enterprise</span><span class="entry-tag">ITSM</span><span class="entry-tag tag-overflow">Salesforce</span><span class="entry-tag tag-overflow">Service Design</span><button class="tag-more" aria-label="Show more tags">+2</button></div>
+    <div class="entry-tags"><span class="entry-tag">Enterprise</span><span class="entry-tag">ITSM</span><span class="entry-tag tag-overflow">Salesforce</span><span class="entry-tag tag-overflow">Service Design</span><button class="tag-more" title="+2 more" aria-label="Show 2 more tags">···</button></div>
     <span class="entry-link">View Case Study <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
   </div>
 </div>
 
-<div class="work-entry work-entry--flip" data-modal="bopis" data-tags="Retail,Mobile,Omnichannel,B2C">
+<div class="work-entry " data-modal="bopis" data-tags="Retail,Mobile,Omnichannel,B2C" style="--h:210">
   <div class="entry-visual">
+    <img class="img-card" src="../assets/work/thumbs/retail-hero.png" alt="Omnichannel Retail Experience" loading="lazy" style="object-position:center 20%">
     <svg class="wf-card" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
 <rect width="1600" height="900" fill="#060c18"/>
 <rect width="1600" height="52" fill="#0a1220"/>
@@ -235,159 +353,191 @@ a{color:inherit;text-decoration:none}
     <div class="entry-eyebrow">AT&T</div>
     <h2 class="entry-title">Omnichannel Retail Experience</h2>
     <p class="entry-desc">Designed an end-to-end buy-online-pick-up-in-store experience for AT&T's 5,000+ retail locations, bridging digital and in-store touchpoints seamlessly.</p>
-    <div class="entry-tags"><span class="entry-tag">Retail</span><span class="entry-tag">Mobile</span><span class="entry-tag tag-overflow">Omnichannel</span><span class="entry-tag tag-overflow">B2C</span><button class="tag-more" aria-label="Show more tags">+2</button></div>
+    <div class="entry-tags"><span class="entry-tag">Retail</span><span class="entry-tag">Mobile</span><span class="entry-tag tag-overflow">Omnichannel</span><span class="entry-tag tag-overflow">B2C</span><button class="tag-more" title="+2 more" aria-label="Show 2 more tags">···</button></div>
     <span class="entry-link">View Case Study <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
   </div>
 </div>
 
-<div class="work-entry " data-modal="email" data-tags="Analytics,Email Marketing,Data Visualization,CRM">
+<div class="work-entry work-entry--flip" data-modal="backmargin" data-tags="Partner Program,Dashboard,SaaS,Analytics" style="--h:285">
   <div class="entry-visual">
+    <img class="img-card" src="../assets/work/thumbs/CRMA_ VP Review - Historicals v2.png" alt="Reseller Incentive Program Dashboard" loading="lazy" style="object-position:center top">
     <svg class="wf-card" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
 <rect width="1600" height="900" fill="#060c18"/>
+<!-- Top nav -->
 <rect width="1600" height="52" fill="#0a1220"/>
-<rect x="16" y="14" width="110" height="24" rx="4" fill="#182840"/>
-<rect x="200" y="16" width="400" height="20" rx="10" fill="#0e1a2c" stroke="#182840" stroke-width="1"/>
+<rect x="16" y="14" width="28" height="24" rx="4" fill="#182840"/>
+<rect x="56" y="18" width="80" height="16" rx="3" fill="#182840"/>
+<rect x="148" y="18" width="90" height="16" rx="3" fill="#253e6a"/>
+<rect x="250" y="18" width="64" height="16" rx="3" fill="#182840"/>
 <circle cx="1558" cy="26" r="14" fill="#182840"/>
-<rect x="0" y="52" width="60" height="848" fill="#090f1e"/>
-<circle cx="30" cy="88" r="16" fill="#162540"/>
-<circle cx="30" cy="136" r="16" fill="#0e1a2c"/>
-<circle cx="30" cy="184" r="16" fill="#0e1a2c"/>
-<circle cx="30" cy="232" r="16" fill="#0e1a2c"/>
-<circle cx="30" cy="280" r="16" fill="#0e1a2c"/>
-<rect x="60" y="52" width="380" height="848" fill="#0a1322"/>
-<rect x="76" y="70" width="160" height="12" rx="3" fill="#253e6a"/>
-<rect x="300" y="70" width="80" height="12" rx="6" fill="#1e3258"/>
-<rect x="60" y="96" width="380" height="1" fill="#182840"/>
-<rect x="76" y="116" width="348" height="76" rx="6" fill="#162540" stroke="#1e3258" stroke-width="1"/>
-<rect x="90" y="128" width="200" height="10" rx="2" fill="#2a4070"/>
-<rect x="90" y="146" width="260" height="8" rx="2" fill="#1a2e50"/>
-<rect x="90" y="162" width="180" height="8" rx="2" fill="#1a2e50"/>
-<rect x="316" y="124" width="92" height="10" rx="2" fill="#142035"/>
-<rect x="76" y="200" width="348" height="76" rx="6" fill="#0d1828"/>
-<rect x="90" y="212" width="200" height="10" rx="2" fill="#1a2e50"/>
-<rect x="90" y="230" width="260" height="8" rx="2" fill="#142035"/>
-<rect x="90" y="246" width="180" height="8" rx="2" fill="#142035"/>
-<rect x="76" y="284" width="348" height="76" rx="6" fill="#0d1828"/>
-<rect x="90" y="296" width="200" height="10" rx="2" fill="#1a2e50"/>
-<rect x="90" y="314" width="260" height="8" rx="2" fill="#142035"/>
-<rect x="76" y="368" width="348" height="76" rx="6" fill="#0d1828"/>
-<rect x="76" y="452" width="348" height="76" rx="6" fill="#0d1828"/>
-<rect x="76" y="536" width="348" height="76" rx="6" fill="#0d1828"/>
-<rect x="76" y="620" width="348" height="76" rx="6" fill="#0d1828"/>
-<rect x="440" y="52" width="1160" height="848" fill="#080e1c"/>
-<rect x="440" y="52" width="1160" height="52" fill="#0a1422"/>
-<rect x="456" y="66" width="140" height="12" rx="3" fill="#253e6a"/>
-<rect x="1360" y="64" width="60" height="16" rx="3" fill="#1a2e50"/>
-<rect x="1432" y="64" width="60" height="16" rx="3" fill="#1a2e50"/>
-<rect x="456" y="120" width="1128" height="56" fill="#0e1828"/>
-<rect x="472" y="132" width="180" height="12" rx="3" fill="#253e6a"/>
-<rect x="472" y="152" width="120" height="8" rx="2" fill="#1a2e50"/>
-<rect x="1440" y="132" width="100" height="32" rx="6" fill="#1e3258"/>
-<rect x="456" y="200" width="1128" height="500" rx="6" fill="#0d1828"/>
-<rect x="476" y="220" width="1088" height="8" rx="2" fill="#142035"/>
-<rect x="476" y="240" width="900" height="8" rx="2" fill="#142035"/>
-<rect x="476" y="260" width="960" height="8" rx="2" fill="#142035"/>
-<rect x="476" y="290" width="1000" height="220" rx="4" fill="#0a1422" stroke="#182840" stroke-width="1"/>
-<rect x="500" y="310" width="200" height="12" rx="2" fill="#1a2e50"/>
-<rect x="500" y="332" width="800" height="8" rx="2" fill="#142035"/>
-<rect x="500" y="352" width="760" height="8" rx="2" fill="#142035"/>
-<rect x="500" y="372" width="800" height="8" rx="2" fill="#142035"/>
-<rect x="476" y="530" width="300" height="10" rx="2" fill="#142035"/>
-<rect x="476" y="548" width="400" height="8" rx="2" fill="#142035"/>
-<rect x="476" y="566" width="360" height="8" rx="2" fill="#142035"/>
+<rect x="1480" y="18" width="60" height="16" rx="3" fill="#182840"/>
+<!-- Left sidebar -->
+<rect x="0" y="52" width="220" height="848" fill="#07101f"/>
+<rect x="16" y="76" width="80" height="9" rx="2" fill="#1a2e50"/>
+<rect x="8" y="96" width="204" height="32" rx="6" fill="#0f1e35"/>
+<rect x="22" y="108" width="12" height="10" rx="2" fill="#3b6ab0"/>
+<rect x="42" y="108" width="90" height="10" rx="2" fill="#3b6ab0"/>
+<circle cx="196" cy="113" r="5" fill="#5b8de8"/>
+<rect x="22" y="148" width="10" height="10" rx="2" fill="#1a2e50"/>
+<rect x="40" y="148" width="70" height="10" rx="2" fill="#1a2e50"/>
+<rect x="22" y="184" width="10" height="10" rx="2" fill="#1a2e50"/>
+<rect x="40" y="184" width="90" height="10" rx="2" fill="#1a2e50"/>
+<rect x="22" y="220" width="10" height="10" rx="2" fill="#1a2e50"/>
+<rect x="40" y="220" width="60" height="10" rx="2" fill="#1a2e50"/>
+<rect x="16" y="264" width="100" height="9" rx="2" fill="#1a2e50"/>
+<rect x="22" y="284" width="10" height="10" rx="2" fill="#1a2e50"/>
+<rect x="40" y="284" width="80" height="10" rx="2" fill="#1a2e50"/>
+<rect x="22" y="320" width="10" height="10" rx="2" fill="#1a2e50"/>
+<rect x="40" y="320" width="100" height="10" rx="2" fill="#1a2e50"/>
+<!-- Main content header -->
+<rect x="240" y="68" width="120" height="9" rx="2" fill="#1a2e50"/>
+<rect x="240" y="86" width="320" height="22" rx="3" fill="#253e6a"/>
+<rect x="240" y="116" width="220" height="9" rx="2" fill="#1a2e50"/>
+<rect x="1300" y="80" width="120" height="32" rx="6" fill="#1e3258"/>
+<rect x="1436" y="80" width="128" height="32" rx="6" fill="#2a5090"/>
+<!-- KPI cards row -->
+<rect x="240" y="152" width="310" height="108" rx="10" fill="#0b1624" stroke="#3b6ab0" stroke-width="2"/>
+<rect x="260" y="170" width="90" height="9" rx="2" fill="#5b8de8"/>
+<rect x="260" y="188" width="150" height="28" rx="3" fill="#3b80cc"/>
+<rect x="260" y="226" width="110" height="8" rx="2" fill="#1a2e50"/>
+<circle cx="452" cy="188" r="20" fill="#0e2240"/><line x1="443" y1="188" x2="461" y2="188" stroke="#3b80cc" stroke-width="2"/><line x1="452" y1="179" x2="452" y2="197" stroke="#3b80cc" stroke-width="2"/>
+<rect x="566" y="152" width="310" height="108" rx="10" fill="#0b1624" stroke="#0a7a3a" stroke-width="2"/>
+<rect x="586" y="170" width="100" height="9" rx="2" fill="#2ec85c"/>
+<rect x="586" y="188" width="120" height="28" rx="3" fill="#1a8850"/>
+<rect x="586" y="226" width="130" height="8" rx="2" fill="#1a3520"/>
+<circle cx="778" cy="188" r="20" fill="#0a3a18"/><line x1="769" y1="188" x2="787" y2="188" stroke="#2ec85c" stroke-width="2"/><line x1="778" y1="179" x2="778" y2="197" stroke="#2ec85c" stroke-width="2"/>
+<rect x="892" y="152" width="310" height="108" rx="10" fill="#0b1624" stroke="#c85a3a" stroke-width="2"/>
+<rect x="912" y="170" width="80" height="9" rx="2" fill="#ff8a60"/>
+<rect x="912" y="188" width="100" height="28" rx="3" fill="#c85a3a"/>
+<rect x="912" y="226" width="90" height="8" rx="2" fill="#4a2820"/>
+<circle cx="1104" cy="188" r="20" fill="#3a1810"/><line x1="1095" y1="188" x2="1113" y2="188" stroke="#ff8a60" stroke-width="2"/><line x1="1104" y1="179" x2="1104" y2="197" stroke="#ff8a60" stroke-width="2"/>
+<rect x="1218" y="152" width="346" height="108" rx="10" fill="#0b1624" stroke="#a85ac8" stroke-width="2"/>
+<rect x="1238" y="170" width="110" height="9" rx="2" fill="#da8aff"/>
+<rect x="1238" y="188" width="140" height="28" rx="3" fill="#a85ac8"/>
+<rect x="1238" y="226" width="100" height="8" rx="2" fill="#3a1a50"/>
+<circle cx="1530" cy="188" r="20" fill="#2a0a40"/><line x1="1521" y1="188" x2="1539" y2="188" stroke="#da8aff" stroke-width="2"/><line x1="1530" y1="179" x2="1530" y2="197" stroke="#da8aff" stroke-width="2"/>
+<!-- Bar chart panel -->
+<rect x="240" y="278" width="830" height="290" rx="12" fill="#0b1624" stroke="#182840" stroke-width="1"/>
+<rect x="260" y="298" width="210" height="14" rx="3" fill="#253e6a"/>
+<rect x="260" y="320" width="150" height="9" rx="2" fill="#1a2e50"/>
+<!-- chart legend -->
+<rect x="780" y="300" width="12" height="10" rx="2" fill="#2a4e8a"/>
+<rect x="798" y="301" width="60" height="8" rx="2" fill="#1a2e50"/>
+<rect x="870" y="300" width="12" height="10" rx="2" fill="#3b80cc"/>
+<rect x="888" y="301" width="60" height="8" rx="2" fill="#1a2e50"/>
+<!-- y-axis labels -->
+<rect x="262" y="366" width="28" height="7" rx="2" fill="#1a2e50"/>
+<rect x="262" y="396" width="28" height="7" rx="2" fill="#1a2e50"/>
+<rect x="262" y="426" width="28" height="7" rx="2" fill="#1a2e50"/>
+<rect x="262" y="456" width="28" height="7" rx="2" fill="#1a2e50"/>
+<rect x="262" y="486" width="28" height="7" rx="2" fill="#1a2e50"/>
+<!-- grid lines -->
+<rect x="298" y="364" width="752" height="1" fill="#182840"/>
+<rect x="298" y="394" width="752" height="1" fill="#182840"/>
+<rect x="298" y="424" width="752" height="1" fill="#182840"/>
+<rect x="298" y="454" width="752" height="1" fill="#182840"/>
+<rect x="298" y="484" width="752" height="1" fill="#182840"/>
+<!-- bars Q1 -->
+<rect x="318" y="414" width="64" height="76" rx="4" fill="#1e3a70"/>
+<rect x="390" y="430" width="64" height="60" rx="4" fill="#253e6a"/>
+<!-- bars Q2 -->
+<rect x="492" y="400" width="64" height="90" rx="4" fill="#1e3a70"/>
+<rect x="564" y="420" width="64" height="70" rx="4" fill="#253e6a"/>
+<!-- bars Q3 -->
+<rect x="666" y="388" width="64" height="102" rx="4" fill="#2a4e8a"/>
+<rect x="738" y="408" width="64" height="82" rx="4" fill="#2a5090"/>
+<!-- bars Q4 highlighted -->
+<rect x="840" y="364" width="64" height="126" rx="4" fill="#3b6ab0"/>
+<rect x="912" y="382" width="64" height="108" rx="4" fill="#3b80cc"/>
+<!-- Q4 value callout -->
+<rect x="835" y="348" width="74" height="18" rx="4" fill="#1e3a70"/>
+<rect x="845" y="354" width="54" height="6" rx="2" fill="#5b8de8"/>
+<!-- x-axis labels -->
+<rect x="328" y="508" width="46" height="7" rx="2" fill="#1a2e50"/>
+<rect x="502" y="508" width="46" height="7" rx="2" fill="#1a2e50"/>
+<rect x="676" y="508" width="46" height="7" rx="2" fill="#1a2e50"/>
+<rect x="844" y="508" width="46" height="7" rx="2" fill="#3b6ab0"/>
+<!-- Approval queue panel -->
+<rect x="1086" y="278" width="478" height="290" rx="12" fill="#0b1624" stroke="#182840" stroke-width="1"/>
+<rect x="1106" y="298" width="170" height="14" rx="3" fill="#253e6a"/>
+<rect x="1436" y="296" width="88" height="18" rx="4" fill="#142035"/>
+<rect x="1106" y="330" width="438" height="54" rx="7" fill="#0d1a2e"/>
+<rect x="1124" y="344" width="130" height="10" rx="2" fill="#253e6a"/>
+<rect x="1124" y="362" width="80" height="8" rx="2" fill="#1a2e50"/>
+<rect x="1400" y="342" width="90" height="20" rx="10" fill="#0a2818"/>
+<rect x="1408" y="348" width="74" height="8" rx="2" fill="#1a5040"/>
+<rect x="1106" y="394" width="438" height="54" rx="7" fill="#0f1e35"/>
+<rect x="1124" y="408" width="150" height="10" rx="2" fill="#253e6a"/>
+<rect x="1124" y="426" width="90" height="8" rx="2" fill="#1a2e50"/>
+<rect x="1400" y="406" width="90" height="20" rx="10" fill="#231c08"/>
+<rect x="1408" y="412" width="74" height="8" rx="2" fill="#4a3010"/>
+<rect x="1106" y="458" width="438" height="54" rx="7" fill="#0d1a2e"/>
+<rect x="1124" y="472" width="120" height="10" rx="2" fill="#253e6a"/>
+<rect x="1124" y="490" width="100" height="8" rx="2" fill="#1a2e50"/>
+<rect x="1400" y="470" width="90" height="20" rx="10" fill="#0a2818"/>
+<rect x="1408" y="476" width="74" height="8" rx="2" fill="#1a5040"/>
+<rect x="1106" y="522" width="438" height="40" rx="7" fill="#0f1e35"/>
+<rect x="1124" y="536" width="140" height="8" rx="2" fill="#1a2e50"/>
+<rect x="1400" y="530" width="90" height="20" rx="10" fill="#1e0e2a"/>
+<rect x="1408" y="536" width="74" height="8" rx="2" fill="#3a1a50"/>
+<!-- Programs table (bottom) -->
+<rect x="240" y="586" width="1324" height="36" fill="#0a1422"/>
+<rect x="258" y="600" width="150" height="8" rx="2" fill="#1a2e50"/>
+<rect x="560" y="600" width="80" height="8" rx="2" fill="#1a2e50"/>
+<rect x="760" y="600" width="80" height="8" rx="2" fill="#1a2e50"/>
+<rect x="1020" y="600" width="80" height="8" rx="2" fill="#1a2e50"/>
+<rect x="1380" y="600" width="80" height="8" rx="2" fill="#1a2e50"/>
+<rect x="240" y="626" width="1324" height="38" fill="#0d1828"/>
+<rect x="258" y="640" width="200" height="8" rx="2" fill="#142035"/>
+<rect x="560" y="640" width="80" height="8" rx="2" fill="#142035"/>
+<rect x="748" y="638" width="96" height="14" rx="7" fill="#0e2240"/>
+<rect x="1020" y="640" width="100" height="8" rx="2" fill="#142035"/>
+<rect x="1368" y="638" width="96" height="14" rx="7" fill="#0a2818"/>
+<rect x="240" y="668" width="1324" height="38" fill="#090f1c"/>
+<rect x="258" y="682" width="180" height="8" rx="2" fill="#142035"/>
+<rect x="560" y="682" width="80" height="8" rx="2" fill="#142035"/>
+<rect x="748" y="680" width="96" height="14" rx="7" fill="#231c08"/>
+<rect x="1020" y="682" width="100" height="8" rx="2" fill="#142035"/>
+<rect x="1368" y="680" width="96" height="14" rx="7" fill="#231c08"/>
+<rect x="240" y="710" width="1324" height="38" fill="#0d1828"/>
+<rect x="258" y="724" width="220" height="8" rx="2" fill="#142035"/>
+<rect x="560" y="724" width="80" height="8" rx="2" fill="#142035"/>
+<rect x="748" y="722" width="96" height="14" rx="7" fill="#0e2240"/>
+<rect x="1020" y="724" width="100" height="8" rx="2" fill="#142035"/>
+<rect x="1368" y="722" width="96" height="14" rx="7" fill="#0a2818"/>
+<rect x="240" y="752" width="1324" height="38" fill="#090f1c"/>
+<rect x="258" y="766" width="160" height="8" rx="2" fill="#142035"/>
+<rect x="560" y="766" width="80" height="8" rx="2" fill="#142035"/>
+<rect x="748" y="764" width="96" height="14" rx="7" fill="#1e0e2a"/>
+<rect x="1020" y="766" width="100" height="8" rx="2" fill="#142035"/>
+<rect x="1368" y="764" width="96" height="14" rx="7" fill="#1e0e2a"/>
+<rect x="240" y="794" width="1324" height="38" fill="#0d1828"/>
+<rect x="258" y="808" width="190" height="8" rx="2" fill="#142035"/>
+<rect x="560" y="808" width="80" height="8" rx="2" fill="#142035"/>
+<rect x="748" y="806" width="96" height="14" rx="7" fill="#0e2830"/>
+<rect x="1020" y="808" width="100" height="8" rx="2" fill="#142035"/>
+<rect x="1368" y="806" width="96" height="14" rx="7" fill="#0e2830"/>
+<!-- pagination -->
+<rect x="640" y="848" width="80" height="26" rx="5" fill="#182840"/>
+<rect x="734" y="852" width="40" height="18" rx="4" fill="#142035"/>
+<rect x="782" y="852" width="40" height="18" rx="4" fill="#1e3258"/>
+<rect x="830" y="852" width="40" height="18" rx="4" fill="#142035"/>
+<rect x="878" y="848" width="80" height="26" rx="5" fill="#182840"/>
 </svg>
     <span class="entry-cta">View Case Study →</span>
   </div>
   <div class="entry-content">
-    <div class="entry-eyebrow">Nike</div>
-    <h2 class="entry-title">Email Marketing Analytics Platform</h2>
-    <p class="entry-desc">Designed a 3-panel email analytics workspace enabling Nike's global CRM team to build, preview, test, and measure email campaigns within a single tool.</p>
-    <div class="entry-tags"><span class="entry-tag">Analytics</span><span class="entry-tag">Email Marketing</span><span class="entry-tag tag-overflow">Data Visualization</span><span class="entry-tag tag-overflow">CRM</span><button class="tag-more" aria-label="Show more tags">+2</button></div>
+    <div class="entry-eyebrow">Apple</div>
+    <h2 class="entry-title">Reseller Incentive Program Dashboard</h2>
+    <p class="entry-desc">Designed end-to-end incentive program strategy and built an interactive dashboard for Apple's reseller partner network to track real-time incentive accrual, performance metrics, and reward redemption across 1,200+ resellers in 9 global regions.</p>
+    <div class="entry-tags"><span class="entry-tag">Partner Program</span><span class="entry-tag">Dashboard</span><span class="entry-tag tag-overflow">SaaS</span><span class="entry-tag tag-overflow">Analytics</span><button class="tag-more" title="+2 more" aria-label="Show 2 more tags">···</button></div>
     <span class="entry-link">View Case Study <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
   </div>
 </div>
 
-<div class="work-entry work-entry--flip" data-modal="revenue" data-tags="AI,CRM,Revenue Intelligence,Salesforce">
+<div class="work-entry " data-modal="hpe" data-tags="HR Tech,Benefits,Employee Experience,Enterprise" style="--h:35">
   <div class="entry-visual">
-    <svg class="wf-card" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-<rect width="1600" height="900" fill="#060c18"/>
-<rect width="1600" height="52" fill="#0a1220"/>
-<rect x="16" y="14" width="110" height="24" rx="4" fill="#182840"/>
-<rect x="158" y="18" width="64" height="16" rx="3" fill="#182840"/>
-<rect x="234" y="18" width="64" height="16" rx="3" fill="#182840"/>
-<circle cx="1558" cy="26" r="14" fill="#182840"/>
-<rect x="0" y="52" width="1600" height="80" fill="#0a1422"/>
-<rect x="20" y="70" width="200" height="16" rx="3" fill="#2a4070"/>
-<rect x="20" y="94" width="140" height="10" rx="2" fill="#1a2e50"/>
-<rect x="800" y="62" width="90" height="24" rx="12" fill="#1e4a8a"/>
-<rect x="1440" y="64" width="120" height="20" rx="4" fill="#1e3258"/>
-<rect x="0" y="132" width="1600" height="44" fill="#090f1e"/>
-<rect x="20" y="146" width="80" height="14" rx="3" fill="#1e3258"/>
-<rect x="120" y="146" width="80" height="14" rx="3" fill="#142035"/>
-<rect x="220" y="146" width="80" height="14" rx="3" fill="#142035"/>
-<rect x="320" y="146" width="80" height="14" rx="3" fill="#142035"/>
-<rect x="0" y="176" width="760" height="724" fill="#090f1c"/>
-<rect x="20" y="196" width="200" height="12" rx="3" fill="#253e6a"/>
-<rect x="20" y="220" width="720" height="180" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="40" y="240" width="120" height="8" rx="2" fill="#1a2e50"/>
-<polyline points="40,380 150,340 260,360 370,290 480,310 590,260 700,280" fill="none" stroke="#2a5090" stroke-width="2"/>
-<polyline points="40,380 150,355 260,380 370,320 480,350 590,310 700,330" fill="none" stroke="#1a3060" stroke-width="1.5"/>
-<rect x="40" y="390" width="60" height="8" rx="2" fill="#142035"/>
-<rect x="120" y="390" width="60" height="8" rx="2" fill="#142035"/>
-<rect x="200" y="390" width="60" height="8" rx="2" fill="#142035"/>
-<rect x="20" y="416" width="720" height="120" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="40" y="432" width="100" height="10" rx="2" fill="#1a2e50"/>
-<rect x="40" y="452" width="40" height="40" rx="4" fill="#1a3060"/>
-<rect x="92" y="460" width="120" height="12" rx="2" fill="#1e3258"/>
-<rect x="92" y="480" width="80" height="8" rx="2" fill="#142035"/>
-<rect x="40" y="498" width="40" height="40" rx="4" fill="#0e1a2c"/>
-<rect x="92" y="506" width="120" height="12" rx="2" fill="#1a2e50"/>
-<rect x="40" y="552" width="720" height="100" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="40" y="568" width="100" height="10" rx="2" fill="#1a2e50"/>
-<rect x="40" y="590" width="680" height="8" rx="2" fill="#142035"/>
-<rect x="40" y="608" width="560" height="8" rx="2" fill="#142035"/>
-<rect x="760" y="176" width="840" height="724" fill="#080c18"/>
-<rect x="780" y="196" width="200" height="12" rx="3" fill="#253e6a"/>
-<rect x="780" y="220" width="800" height="280" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="800" y="240" width="100" height="10" rx="2" fill="#1a2e50"/>
-<rect x="800" y="260" width="760" height="1" fill="#182840"/>
-<rect x="800" y="274" width="160" height="8" rx="2" fill="#142035"/>
-<rect x="1100" y="274" width="120" height="8" rx="2" fill="#1a2e50"/>
-<rect x="800" y="298" width="160" height="8" rx="2" fill="#142035"/>
-<rect x="1100" y="298" width="120" height="8" rx="2" fill="#1a2e50"/>
-<rect x="800" y="322" width="160" height="8" rx="2" fill="#142035"/>
-<rect x="1100" y="322" width="120" height="8" rx="2" fill="#1a2e50"/>
-<rect x="800" y="346" width="160" height="8" rx="2" fill="#142035"/>
-<rect x="1100" y="346" width="120" height="8" rx="2" fill="#1a2e50"/>
-<rect x="800" y="370" width="160" height="8" rx="2" fill="#142035"/>
-<rect x="1100" y="370" width="100" height="20" rx="10" fill="#1e3a6a"/>
-<rect x="800" y="394" width="160" height="8" rx="2" fill="#142035"/>
-<rect x="1100" y="394" width="120" height="8" rx="2" fill="#1a2e50"/>
-<rect x="780" y="516" width="200" height="12" rx="3" fill="#253e6a"/>
-<rect x="780" y="540" width="800" height="240" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="800" y="560" width="760" height="32" fill="#0a1422"/>
-<rect x="820" y="570" width="100" height="8" rx="2" fill="#1a2e50"/>
-<rect x="800" y="596" width="760" height="32" fill="#0d1828"/>
-<rect x="820" y="606" width="160" height="8" rx="2" fill="#142035"/>
-<rect x="1200" y="606" width="80" height="16" rx="8" fill="#182840"/>
-<rect x="800" y="632" width="760" height="32" fill="#090f1c"/>
-<rect x="820" y="642" width="140" height="8" rx="2" fill="#142035"/>
-<rect x="800" y="668" width="760" height="32" fill="#0d1828"/>
-<rect x="820" y="678" width="180" height="8" rx="2" fill="#142035"/>
-</svg>
-    <span class="entry-cta">View Case Study →</span>
-  </div>
-  <div class="entry-content">
-    <div class="entry-eyebrow">Lumen Technologies</div>
-    <h2 class="entry-title">AI-Powered Revenue Intelligence</h2>
-    <p class="entry-desc">Redesigned Salesforce account records with embedded AI signals, surfacing churn risk, upsell opportunities, and engagement health directly in sellers' daily workflow.</p>
-    <div class="entry-tags"><span class="entry-tag">AI</span><span class="entry-tag">CRM</span><span class="entry-tag tag-overflow">Revenue Intelligence</span><span class="entry-tag tag-overflow">Salesforce</span><button class="tag-more" aria-label="Show more tags">+2</button></div>
-    <span class="entry-link">View Case Study <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
-  </div>
-</div>
-
-<div class="work-entry " data-modal="hpe" data-tags="HR Tech,Benefits,Employee Experience,Enterprise">
-  <div class="entry-visual">
+    <img class="img-card" src="../assets/work/thumbs/hpe-home.png" alt="Employee Benefits Self-Service Portal" loading="lazy" style="object-position:center top">
     <svg class="wf-card" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
 <rect width="1600" height="900" fill="#060c18"/>
 <rect width="1600" height="52" fill="#0a1220"/>
@@ -440,314 +590,14 @@ a{color:inherit;text-decoration:none}
     <div class="entry-eyebrow">HPE</div>
     <h2 class="entry-title">Employee Benefits Self-Service Portal</h2>
     <p class="entry-desc">Designed a modern benefits portal for HPE's 60,000 global employees, replacing a legacy system with a personalized, guided enrollment experience.</p>
-    <div class="entry-tags"><span class="entry-tag">HR Tech</span><span class="entry-tag">Benefits</span><span class="entry-tag tag-overflow">Employee Experience</span><span class="entry-tag tag-overflow">Enterprise</span><button class="tag-more" aria-label="Show more tags">+2</button></div>
+    <div class="entry-tags"><span class="entry-tag">HR Tech</span><span class="entry-tag">Benefits</span><span class="entry-tag tag-overflow">Employee Experience</span><span class="entry-tag tag-overflow">Enterprise</span><button class="tag-more" title="+2 more" aria-label="Show 2 more tags">···</button></div>
     <span class="entry-link">View Case Study <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
   </div>
 </div>
 
-<div class="work-entry work-entry--flip" data-modal="cases" data-tags="FinTech,Case Management,Service Design,Salesforce">
+<div class="work-entry work-entry--flip" data-modal="polaris" data-tags="Design Systems,Component Library,Marketing,Figma" style="--h:22">
   <div class="entry-visual">
-    <svg class="wf-card" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-<rect width="1600" height="900" fill="#060c18"/>
-<rect width="1600" height="52" fill="#0a1220"/>
-<rect x="16" y="14" width="110" height="24" rx="4" fill="#182840"/>
-<rect x="158" y="18" width="64" height="16" rx="3" fill="#182840"/>
-<rect x="234" y="18" width="64" height="16" rx="3" fill="#182840"/>
-<circle cx="1558" cy="26" r="14" fill="#182840"/>
-<rect x="0" y="52" width="380" height="848" fill="#090f1e"/>
-<rect x="10" y="70" width="240" height="12" rx="3" fill="#253e6a"/>
-<rect x="280" y="68" width="90" height="16" rx="4" fill="#1e3258"/>
-<rect x="10" y="96" width="360" height="44" rx="6" fill="#0e1a2c" stroke="#162540" stroke-width="1"/>
-<rect x="10" y="148" width="360" height="72" rx="6" fill="#162540" stroke="#1e3258" stroke-width="1"/>
-<circle cx="32" cy="184" r="8" fill="#2a5090"/>
-<rect x="50" y="160" width="180" height="10" rx="2" fill="#2a4070"/>
-<rect x="50" y="178" width="240" height="8" rx="2" fill="#1a2e50"/>
-<rect x="50" y="194" width="160" height="8" rx="2" fill="#1a2e50"/>
-<rect x="300" y="160" width="60" height="16" rx="8" fill="#1e3a6a"/>
-<rect x="10" y="228" width="360" height="72" rx="6" fill="#0d1828"/>
-<circle cx="32" cy="264" r="8" fill="#1a2e50"/>
-<rect x="50" y="240" width="180" height="10" rx="2" fill="#1a2e50"/>
-<rect x="50" y="258" width="240" height="8" rx="2" fill="#142035"/>
-<rect x="300" y="240" width="60" height="16" rx="8" fill="#182840"/>
-<rect x="10" y="308" width="360" height="72" rx="6" fill="#0d1828"/>
-<circle cx="32" cy="344" r="8" fill="#1a2e50"/>
-<rect x="50" y="320" width="180" height="10" rx="2" fill="#1a2e50"/>
-<rect x="10" y="388" width="360" height="72" rx="6" fill="#0d1828"/>
-<rect x="10" y="468" width="360" height="72" rx="6" fill="#0d1828"/>
-<rect x="10" y="548" width="360" height="72" rx="6" fill="#0d1828"/>
-<rect x="10" y="628" width="360" height="72" rx="6" fill="#0d1828"/>
-<rect x="10" y="708" width="360" height="72" rx="6" fill="#0d1828"/>
-<rect x="380" y="52" width="1220" height="848" fill="#080c18"/>
-<rect x="400" y="72" width="280" height="16" rx="3" fill="#253e6a"/>
-<rect x="400" y="96" width="180" height="10" rx="2" fill="#1a2e50"/>
-<rect x="1360" y="68" width="120" height="28" rx="6" fill="#1e3258"/>
-<rect x="400" y="128" width="1180" height="44" fill="#090f1e"/>
-<rect x="416" y="138" width="80" height="16" rx="3" fill="#1e3258"/>
-<rect x="516" y="140" width="80" height="14" rx="3" fill="#142035"/>
-<rect x="616" y="140" width="80" height="14" rx="3" fill="#142035"/>
-<rect x="716" y="140" width="80" height="14" rx="3" fill="#142035"/>
-<rect x="400" y="192" width="560" height="1" fill="#182840"/>
-<rect x="400" y="208" width="560" height="200" rx="8" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="420" y="228" width="100" height="8" rx="2" fill="#1a2e50"/>
-<rect x="560" y="224" width="180" height="12" rx="2" fill="#1e3258"/>
-<rect x="420" y="250" width="100" height="8" rx="2" fill="#142035"/>
-<rect x="560" y="248" width="240" height="8" rx="2" fill="#1a2e50"/>
-<rect x="420" y="272" width="100" height="8" rx="2" fill="#142035"/>
-<rect x="560" y="272" width="200" height="8" rx="2" fill="#1a2e50"/>
-<rect x="420" y="296" width="100" height="8" rx="2" fill="#142035"/>
-<rect x="560" y="296" width="220" height="8" rx="2" fill="#1a2e50"/>
-<rect x="420" y="320" width="100" height="8" rx="2" fill="#142035"/>
-<rect x="560" y="320" width="160" height="16" rx="8" fill="#1e3a6a"/>
-<rect x="400" y="428" width="1180" height="1" fill="#182840"/>
-<rect x="400" y="444" width="760" height="200" rx="8" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="420" y="464" width="160" height="10" rx="2" fill="#1a2e50"/>
-<rect x="420" y="488" width="720" height="8" rx="2" fill="#142035"/>
-<rect x="420" y="508" width="600" height="8" rx="2" fill="#142035"/>
-<rect x="420" y="528" width="680" height="8" rx="2" fill="#142035"/>
-<rect x="420" y="548" width="640" height="8" rx="2" fill="#142035"/>
-<rect x="980" y="444" width="600" height="120" rx="8" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="1000" y="464" width="120" height="10" rx="2" fill="#1a2e50"/>
-<rect x="1000" y="484" width="80" height="14" rx="3" fill="#142035"/>
-<rect x="1092" y="484" width="80" height="14" rx="3" fill="#142035"/>
-<rect x="1184" y="484" width="80" height="14" rx="3" fill="#142035"/>
-</svg>
-    <span class="entry-cta">View Case Study →</span>
-  </div>
-  <div class="entry-content">
-    <div class="entry-eyebrow">Jack Henry & Associates</div>
-    <h2 class="entry-title">Banking Case Management Platform</h2>
-    <p class="entry-desc">Designed a two-pane case management system for community bank service teams, unifying customer inquiry tracking, escalation workflows, and resolution documentation.</p>
-    <div class="entry-tags"><span class="entry-tag">FinTech</span><span class="entry-tag">Case Management</span><span class="entry-tag tag-overflow">Service Design</span><span class="entry-tag tag-overflow">Salesforce</span><button class="tag-more" aria-label="Show more tags">+2</button></div>
-    <span class="entry-link">View Case Study <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
-  </div>
-</div>
-
-<div class="work-entry " data-modal="ascent" data-tags="CRM,Partner Management,Salesforce,Enterprise">
-  <div class="entry-visual">
-    <svg class="wf-card" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-<rect width="1600" height="900" fill="#060c18"/>
-<rect width="1600" height="52" fill="#0a1220"/>
-<rect x="16" y="14" width="110" height="24" rx="4" fill="#182840"/>
-<rect x="158" y="18" width="64" height="16" rx="3" fill="#182840"/>
-<rect x="234" y="18" width="64" height="16" rx="3" fill="#182840"/>
-<circle cx="1558" cy="26" r="14" fill="#182840"/>
-<rect x="20" y="68" width="80" height="10" rx="2" fill="#1a2e50"/>
-<rect x="108" y="70" width="6" height="6" rx="1" fill="#142035"/>
-<rect x="120" y="68" width="80" height="10" rx="2" fill="#1a2e50"/>
-<rect x="208" y="70" width="6" height="6" rx="1" fill="#142035"/>
-<rect x="220" y="68" width="160" height="10" rx="2" fill="#1e3258"/>
-<rect x="0" y="90" width="1600" height="100" fill="#0a1422"/>
-<rect x="20" y="104" width="280" height="18" rx="3" fill="#253e6a"/>
-<rect x="20" y="130" width="160" height="12" rx="2" fill="#1a2e50"/>
-<rect x="500" y="100" width="120" height="28" rx="14" fill="#1e4a8a"/>
-<rect x="700" y="102" width="120" height="24" rx="4" fill="#1e3258"/>
-<rect x="900" y="102" width="80" height="24" rx="4" fill="#142035"/>
-<rect x="1400" y="102" width="160" height="32" rx="6" fill="#2a5090"/>
-<rect x="0" y="190" width="1600" height="44" fill="#090f1e"/>
-<rect x="20" y="204" width="80" height="14" rx="3" fill="#1e3258"/>
-<rect x="120" y="206" width="80" height="14" rx="3" fill="#142035"/>
-<rect x="220" y="206" width="80" height="14" rx="3" fill="#142035"/>
-<rect x="320" y="206" width="80" height="14" rx="3" fill="#142035"/>
-<rect x="0" y="234" width="760" height="666" fill="#090f1c"/>
-<rect x="20" y="254" width="200" height="12" rx="3" fill="#253e6a"/>
-<rect x="20" y="278" width="720" height="180" rx="8" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="40" y="296" width="120" height="8" rx="2" fill="#1a2e50"/>
-<rect x="200" y="292" width="200" height="12" rx="2" fill="#1e3258"/>
-<rect x="40" y="314" width="120" height="8" rx="2" fill="#142035"/>
-<rect x="200" y="314" width="160" height="8" rx="2" fill="#1a2e50"/>
-<rect x="40" y="332" width="120" height="8" rx="2" fill="#142035"/>
-<rect x="200" y="332" width="200" height="8" rx="2" fill="#1a2e50"/>
-<rect x="40" y="352" width="120" height="8" rx="2" fill="#142035"/>
-<rect x="200" y="352" width="160" height="8" rx="2" fill="#1a2e50"/>
-<rect x="40" y="372" width="120" height="8" rx="2" fill="#142035"/>
-<rect x="200" y="372" width="120" height="16" rx="8" fill="#1e3a6a"/>
-<rect x="40" y="394" width="120" height="8" rx="2" fill="#142035"/>
-<rect x="200" y="394" width="180" height="8" rx="2" fill="#1a2e50"/>
-<rect x="40" y="414" width="120" height="8" rx="2" fill="#142035"/>
-<rect x="200" y="414" width="140" height="8" rx="2" fill="#1a2e50"/>
-<rect x="20" y="476" width="200" height="12" rx="3" fill="#253e6a"/>
-<rect x="20" y="500" width="720" height="160" rx="8" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="40" y="520" width="680" height="32" fill="#0a1422"/>
-<rect x="56" y="530" width="100" height="8" rx="2" fill="#1a2e50"/>
-<rect x="40" y="556" width="680" height="32" fill="#0d1828"/>
-<rect x="56" y="566" width="160" height="8" rx="2" fill="#142035"/>
-<rect x="40" y="592" width="680" height="32" fill="#090f1c"/>
-<rect x="56" y="602" width="140" height="8" rx="2" fill="#142035"/>
-<rect x="760" y="234" width="840" height="666" fill="#080c18"/>
-<rect x="780" y="254" width="200" height="12" rx="3" fill="#253e6a"/>
-<rect x="780" y="278" width="800" height="240" rx="8" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="800" y="298" width="760" height="32" fill="#0a1422"/>
-<rect x="816" y="308" width="100" height="8" rx="2" fill="#1a2e50"/>
-<rect x="800" y="334" width="760" height="32" fill="#0d1828"/>
-<rect x="816" y="344" width="180" height="8" rx="2" fill="#142035"/>
-<rect x="800" y="370" width="760" height="32" fill="#090f1c"/>
-<rect x="816" y="380" width="160" height="8" rx="2" fill="#142035"/>
-<rect x="800" y="406" width="760" height="32" fill="#0d1828"/>
-<rect x="816" y="416" width="200" height="8" rx="2" fill="#142035"/>
-<rect x="800" y="442" width="760" height="32" fill="#090f1c"/>
-<rect x="780" y="534" width="200" height="12" rx="3" fill="#253e6a"/>
-<rect x="780" y="558" width="800" height="200" rx="8" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="800" y="578" width="760" height="32" fill="#0a1422"/>
-<rect x="816" y="588" width="100" height="8" rx="2" fill="#1a2e50"/>
-<rect x="800" y="614" width="760" height="32" fill="#0d1828"/>
-<rect x="800" y="650" width="760" height="32" fill="#090f1c"/>
-<rect x="800" y="686" width="760" height="32" fill="#0d1828"/>
-</svg>
-    <span class="entry-cta">View Case Study →</span>
-  </div>
-  <div class="entry-content">
-    <div class="entry-eyebrow">Apple</div>
-    <h2 class="entry-title">Partner Opportunity Management</h2>
-    <p class="entry-desc">Designed a Salesforce-based opportunity management tool for Apple's global channel partner network, giving partners clear visibility into deal stages, quotes, and closing workflows.</p>
-    <div class="entry-tags"><span class="entry-tag">CRM</span><span class="entry-tag">Partner Management</span><span class="entry-tag tag-overflow">Salesforce</span><span class="entry-tag tag-overflow">Enterprise</span><button class="tag-more" aria-label="Show more tags">+2</button></div>
-    <span class="entry-link">View Case Study <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
-  </div>
-</div>
-
-<div class="work-entry work-entry--flip" data-modal="backmargin" data-tags="Enterprise,Program Management,Salesforce,Data">
-  <div class="entry-visual">
-    <svg class="wf-card" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-<rect width="1600" height="900" fill="#060c18"/>
-<rect width="1600" height="52" fill="#0a1220"/>
-<rect x="16" y="14" width="110" height="24" rx="4" fill="#182840"/>
-<rect x="158" y="18" width="64" height="16" rx="3" fill="#182840"/>
-<rect x="234" y="18" width="64" height="16" rx="3" fill="#182840"/>
-<circle cx="1558" cy="26" r="14" fill="#182840"/>
-<rect x="20" y="70" width="260" height="16" rx="3" fill="#253e6a"/>
-<rect x="20" y="94" width="160" height="10" rx="2" fill="#1a2e50"/>
-<rect x="1360" y="68" width="100" height="28" rx="6" fill="#1e3258"/>
-<rect x="1472" y="68" width="100" height="28" rx="6" fill="#2a5090"/>
-<rect x="20" y="124" width="800" height="40" rx="8" fill="#0e1a2c" stroke="#182840" stroke-width="1"/>
-<rect x="36" y="136" width="160" height="16" rx="4" fill="#182840"/>
-<rect x="212" y="136" width="12" height="16" rx="2" fill="#142035"/>
-<rect x="840" y="124" width="60" height="40" rx="8" fill="#1e3258"/>
-<rect x="912" y="124" width="60" height="40" rx="8" fill="#1e3258"/>
-<rect x="20" y="180" width="1560" height="44" fill="#0a1422"/>
-<rect x="36" y="192" width="200" height="10" rx="2" fill="#1a2e50"/>
-<rect x="440" y="192" width="120" height="10" rx="2" fill="#1a2e50"/>
-<rect x="760" y="192" width="120" height="10" rx="2" fill="#1a2e50"/>
-<rect x="1080" y="192" width="120" height="10" rx="2" fill="#1a2e50"/>
-<rect x="1360" y="192" width="120" height="10" rx="2" fill="#1a2e50"/>
-<rect x="20" y="228" width="1560" height="40" fill="#0d1828"/>
-<rect x="36" y="240" width="240" height="10" rx="2" fill="#142035"/>
-<rect x="440" y="240" width="120" height="10" rx="2" fill="#142035"/>
-<rect x="760" y="240" width="120" height="10" rx="2" fill="#142035"/>
-<rect x="1080" y="238" width="100" height="16" rx="8" fill="#182840"/>
-<rect x="1360" y="240" width="100" height="10" rx="2" fill="#142035"/>
-<rect x="20" y="272" width="1560" height="40" fill="#090f1c"/>
-<rect x="36" y="284" width="220" height="10" rx="2" fill="#142035"/>
-<rect x="440" y="284" width="120" height="10" rx="2" fill="#142035"/>
-<rect x="760" y="284" width="120" height="10" rx="2" fill="#142035"/>
-<rect x="1080" y="282" width="100" height="16" rx="8" fill="#182840"/>
-<rect x="20" y="316" width="1560" height="40" fill="#0d1828"/>
-<rect x="36" y="328" width="260" height="10" rx="2" fill="#142035"/>
-<rect x="20" y="360" width="1560" height="40" fill="#090f1c"/>
-<rect x="36" y="372" width="200" height="10" rx="2" fill="#142035"/>
-<rect x="20" y="404" width="1560" height="40" fill="#0d1828"/>
-<rect x="36" y="416" width="240" height="10" rx="2" fill="#142035"/>
-<rect x="20" y="448" width="1560" height="40" fill="#090f1c"/>
-<rect x="36" y="460" width="180" height="10" rx="2" fill="#142035"/>
-<rect x="20" y="492" width="1560" height="40" fill="#0d1828"/>
-<rect x="36" y="504" width="220" height="10" rx="2" fill="#142035"/>
-<rect x="20" y="536" width="1560" height="40" fill="#090f1c"/>
-<rect x="36" y="548" width="200" height="10" rx="2" fill="#142035"/>
-<rect x="20" y="580" width="1560" height="40" fill="#0d1828"/>
-<rect x="36" y="592" width="240" height="10" rx="2" fill="#142035"/>
-<rect x="20" y="624" width="1560" height="40" fill="#090f1c"/>
-<rect x="36" y="636" width="180" height="10" rx="2" fill="#142035"/>
-<rect x="20" y="668" width="1560" height="40" fill="#0d1828"/>
-<rect x="20" y="732" width="1560" height="1" fill="#182840"/>
-<rect x="600" y="752" width="80" height="28" rx="4" fill="#182840"/>
-<rect x="700" y="756" width="50" height="20" rx="4" fill="#142035"/>
-<rect x="766" y="756" width="50" height="20" rx="4" fill="#142035"/>
-<rect x="832" y="756" width="50" height="20" rx="4" fill="#142035"/>
-<rect x="920" y="752" width="80" height="28" rx="4" fill="#182840"/>
-</svg>
-    <span class="entry-cta">View Case Study →</span>
-  </div>
-  <div class="entry-content">
-    <div class="entry-eyebrow">Apple</div>
-    <h2 class="entry-title">Channel Program Management</h2>
-    <p class="entry-desc">Designed a Salesforce list-view experience for Apple's back-margin program management team to track, approve, and report on reseller incentive programs at scale.</p>
-    <div class="entry-tags"><span class="entry-tag">Enterprise</span><span class="entry-tag">Program Management</span><span class="entry-tag tag-overflow">Salesforce</span><span class="entry-tag tag-overflow">Data</span><button class="tag-more" aria-label="Show more tags">+2</button></div>
-    <span class="entry-link">View Case Study <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
-  </div>
-</div>
-
-<div class="work-entry " data-modal="clm" data-tags="Enterprise,CLM,B2B,Catalog">
-  <div class="entry-visual">
-    <svg class="wf-card" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-<rect width="1600" height="900" fill="#060c18"/>
-<rect width="1600" height="52" fill="#0a1220"/>
-<rect x="16" y="14" width="110" height="24" rx="4" fill="#182840"/>
-<rect x="158" y="18" width="64" height="16" rx="3" fill="#182840"/>
-<rect x="234" y="18" width="64" height="16" rx="3" fill="#182840"/>
-<circle cx="1558" cy="26" r="14" fill="#182840"/>
-<rect x="0" y="52" width="260" height="848" fill="#090f1e"/>
-<rect x="12" y="72" width="236" height="36" rx="6" fill="#0e1a2c" stroke="#182840" stroke-width="1"/>
-<rect x="24" y="84" width="180" height="12" rx="3" fill="#182840"/>
-<rect x="12" y="124" width="110" height="10" rx="2" fill="#253e6a"/>
-<rect x="12" y="144" width="236" height="28" rx="4" fill="#0e1a2c"/>
-<rect x="24" y="152" width="120" height="12" rx="2" fill="#1a2e50"/>
-<rect x="12" y="180" width="236" height="28" rx="4" fill="#0e1a2c"/>
-<rect x="24" y="188" width="100" height="12" rx="2" fill="#1a2e50"/>
-<rect x="12" y="216" width="236" height="28" rx="4" fill="#0e1a2c"/>
-<rect x="12" y="264" width="100" height="10" rx="2" fill="#253e6a"/>
-<rect x="12" y="284" width="236" height="24" rx="4" fill="#0e1a2c"/>
-<rect x="24" y="291" width="14" height="10" rx="2" fill="#1a2e50"/>
-<rect x="44" y="291" width="100" height="10" rx="2" fill="#1a2e50"/>
-<rect x="12" y="316" width="236" height="24" rx="4" fill="#0e1a2c"/>
-<rect x="24" y="323" width="14" height="10" rx="2" fill="#182840"/>
-<rect x="44" y="323" width="100" height="10" rx="2" fill="#1a2e50"/>
-<rect x="12" y="348" width="236" height="24" rx="4" fill="#0e1a2c"/>
-<rect x="12" y="380" width="236" height="24" rx="4" fill="#0e1a2c"/>
-<rect x="12" y="412" width="236" height="24" rx="4" fill="#0e1a2c"/>
-<rect x="12" y="452" width="100" height="10" rx="2" fill="#253e6a"/>
-<rect x="12" y="472" width="236" height="24" rx="4" fill="#0e1a2c"/>
-<rect x="12" y="504" width="236" height="24" rx="4" fill="#0e1a2c"/>
-<rect x="12" y="536" width="236" height="24" rx="4" fill="#0e1a2c"/>
-<rect x="12" y="568" width="236" height="24" rx="4" fill="#0e1a2c"/>
-<rect x="260" y="52" width="1340" height="848" fill="#080c18"/>
-<rect x="276" y="70" width="280" height="16" rx="3" fill="#253e6a"/>
-<rect x="276" y="94" width="200" height="10" rx="2" fill="#1a2e50"/>
-<rect x="276" y="120" width="80" height="24" rx="12" fill="#1a2e50"/>
-<rect x="368" y="120" width="100" height="24" rx="12" fill="#182840"/>
-<rect x="480" y="120" width="80" height="24" rx="12" fill="#182840"/>
-<rect x="276" y="164" width="380" height="180" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="292" y="184" width="348" height="100" rx="4" fill="#0a1422"/>
-<rect x="292" y="296" width="180" height="12" rx="3" fill="#1e3258"/>
-<rect x="292" y="316" width="260" height="8" rx="2" fill="#142035"/>
-<rect x="292" y="332" width="100" height="24" rx="6" fill="#1a2e50"/>
-<rect x="676" y="164" width="380" height="180" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="692" y="184" width="348" height="100" rx="4" fill="#0a1422"/>
-<rect x="692" y="296" width="180" height="12" rx="3" fill="#1e3258"/>
-<rect x="692" y="332" width="100" height="24" rx="6" fill="#1a2e50"/>
-<rect x="1076" y="164" width="380" height="180" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="1092" y="184" width="348" height="100" rx="4" fill="#0a1422"/>
-<rect x="1092" y="296" width="180" height="12" rx="3" fill="#1e3258"/>
-<rect x="276" y="364" width="380" height="180" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="292" y="384" width="348" height="100" rx="4" fill="#0a1422"/>
-<rect x="292" y="496" width="180" height="12" rx="3" fill="#1e3258"/>
-<rect x="676" y="364" width="380" height="180" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="692" y="384" width="348" height="100" rx="4" fill="#0a1422"/>
-<rect x="1076" y="364" width="380" height="180" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="276" y="564" width="380" height="180" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="676" y="564" width="380" height="180" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="1076" y="564" width="380" height="180" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-</svg>
-    <span class="entry-cta">View Case Study →</span>
-  </div>
-  <div class="entry-content">
-    <div class="entry-eyebrow">AT&T</div>
-    <h2 class="entry-title">Contract Lifecycle Management</h2>
-    <p class="entry-desc">Designed a B2B contract catalog and lifecycle management experience for AT&T's enterprise sales teams, enabling dynamic filtering, pricing, and contract generation.</p>
-    <div class="entry-tags"><span class="entry-tag">Enterprise</span><span class="entry-tag">CLM</span><span class="entry-tag tag-overflow">B2B</span><span class="entry-tag tag-overflow">Catalog</span><button class="tag-more" aria-label="Show more tags">+2</button></div>
-    <span class="entry-link">View Case Study <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
-  </div>
-</div>
-
-<div class="work-entry work-entry--flip" data-modal="polaris" data-tags="Design Systems,Component Library,Marketing,Figma">
-  <div class="entry-visual">
+    <img class="img-card" src="../assets/work/thumbs/polaris-email.png" alt="Design System & Component Library" loading="lazy" style="object-position:left top">
     <svg class="wf-card" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
 <rect width="1600" height="900" fill="#060c18"/>
 <rect width="1600" height="52" fill="#0a1220"/>
@@ -817,13 +667,14 @@ a{color:inherit;text-decoration:none}
     <div class="entry-eyebrow">Polaris</div>
     <h2 class="entry-title">Design System & Component Library</h2>
     <p class="entry-desc">Built a comprehensive design system for Polaris's marketing and product teams, covering a token-based color system, 60+ components, and responsive page templates.</p>
-    <div class="entry-tags"><span class="entry-tag">Design Systems</span><span class="entry-tag">Component Library</span><span class="entry-tag tag-overflow">Marketing</span><span class="entry-tag tag-overflow">Figma</span><button class="tag-more" aria-label="Show more tags">+2</button></div>
+    <div class="entry-tags"><span class="entry-tag">Design Systems</span><span class="entry-tag">Component Library</span><span class="entry-tag tag-overflow">Marketing</span><span class="entry-tag tag-overflow">Figma</span><button class="tag-more" title="+2 more" aria-label="Show 2 more tags">···</button></div>
     <span class="entry-link">View Case Study <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
   </div>
 </div>
 
-<div class="work-entry " data-modal="portal" data-tags="Community,Banking,Experience Cloud,Portal">
+<div class="work-entry " data-modal="portal" data-tags="Community,Banking,Experience Cloud,Portal" style="--h:205">
   <div class="entry-visual">
+    <img class="img-card" src="../assets/work/thumbs/Experience Cloud Home-0.png" alt="Community Banking Experience Portal" loading="lazy" style="object-position:center 25%">
     <svg class="wf-card" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
 <rect width="1600" height="900" fill="#060c18"/>
 <rect width="1600" height="52" fill="#0a1220"/>
@@ -889,17 +740,249 @@ a{color:inherit;text-decoration:none}
     <div class="entry-eyebrow">Jack Henry & Associates</div>
     <h2 class="entry-title">Community Banking Experience Portal</h2>
     <p class="entry-desc">Designed a Salesforce Experience Cloud portal for community bank customers, creating a modern self-service hub for account management, support, and financial tools.</p>
-    <div class="entry-tags"><span class="entry-tag">Community</span><span class="entry-tag">Banking</span><span class="entry-tag tag-overflow">Experience Cloud</span><span class="entry-tag tag-overflow">Portal</span><button class="tag-more" aria-label="Show more tags">+2</button></div>
+    <div class="entry-tags"><span class="entry-tag">Community</span><span class="entry-tag">Banking</span><span class="entry-tag tag-overflow">Experience Cloud</span><span class="entry-tag tag-overflow">Portal</span><button class="tag-more" title="+2 more" aria-label="Show 2 more tags">···</button></div>
     <span class="entry-link">View Case Study <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
   </div>
 </div>
+<div class="more-section"><button class="more-toggle" id="more-toggle">More Case Studies<span class="more-arrow">+</span></button><div class="more-entries" id="more-entries">
+
+<div class="work-entry work-entry--flip" data-modal="fintech" data-tags="Fintech,Mobile,Portfolio,Investment" style="--h:180">
+  <div class="entry-visual">
+    <img class="img-card" src="../assets/work/thumbs/finance-hero.png" alt="Consumer Investment & Trading Platform" loading="lazy" style="object-position:center top">
+    <svg class="wf-card" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+<rect width="1600" height="900" fill="#0a0f20"/>
+<rect width="1600" height="64" fill="#0d1428"/>
+<rect x="32" y="20" width="140" height="24" rx="6" fill="#1a2e50"/>
+<rect x="800" y="24" width="60" height="16" rx="3" fill="#1a2e50"/>
+<rect x="1500" y="24" width="52" height="16" rx="3" fill="#1a2e50"/>
+<rect x="32" y="100" width="720" height="300" rx="12" fill="#0d1828" stroke="#1a3a5a" stroke-width="1"/>
+<circle cx="150" cy="180" r="40" fill="#1a3a5a"/>
+<rect x="220" y="160" width="480" height="40" rx="4" fill="#182840"/>
+<rect x="220" y="220" width="320" height="12" rx="2" fill="#0f1f35"/>
+<rect x="220" y="245" width="280" height="12" rx="2" fill="#0f1f35"/>
+<rect x="32" y="420" width="340" height="420" rx="12" fill="#0d1828" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="56" y="450" width="292" height="16" rx="2" fill="#1a2e50"/>
+<line x1="56" y1="485" x2="328" y2="485" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="56" y="510" width="292" height="60" rx="6" fill="#0a0f20"/>
+<rect x="56" y="590" width="292" height="60" rx="6" fill="#0a0f20"/>
+<rect x="56" y="670" width="292" height="60" rx="6" fill="#0a0f20"/>
+<rect x="800" y="420" width="720" height="180" rx="12" fill="#0d1828" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="832" y="450" width="656" height="12" rx="2" fill="#1a2e50"/>
+<rect x="832" y="475" width="400" height="8" rx="2" fill="#0f1f35"/>
+<rect x="832" y="510" width="120" height="8" rx="2" fill="#0f1f35"/>
+<rect x="832" y="530" width="100" height="60" rx="4" fill="#1a3a5a"/>
+<rect x="960" y="530" width="100" height="60" rx="4" fill="#1a3a5a"/>
+<rect x="1088" y="530" width="100" height="60" rx="4" fill="#1a3a5a"/>
+<rect x="800" y="620" width="720" height="220" rx="12" fill="#0d1828" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="832" y="650" width="656" height="12" rx="2" fill="#1a2e50"/>
+<line x1="832" y1="685" x2="1488" y2="685" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="832" y="705" width="148" height="40" rx="4" fill="#0a0f20"/>
+<rect x="1000" y="705" width="148" height="40" rx="4" fill="#0a0f20"/>
+<rect x="1168" y="705" width="148" height="40" rx="4" fill="#0a0f20"/>
+<rect x="832" y="760" width="148" height="40" rx="4" fill="#0a0f20"/>
+</svg>
+    <span class="entry-cta">View Case Study →</span>
+  </div>
+  <div class="entry-content">
+    <div class="entry-eyebrow">Digital Finance Co.</div>
+    <h2 class="entry-title">Consumer Investment & Trading Platform</h2>
+    <p class="entry-desc">Redesigned a consumer-facing fintech platform for retail investors, simplifying onboarding, portfolio management, and real-time market analysis within a mobile-first experience.</p>
+    <div class="entry-tags"><span class="entry-tag">Fintech</span><span class="entry-tag">Mobile</span><span class="entry-tag tag-overflow">Portfolio</span><span class="entry-tag tag-overflow">Investment</span><button class="tag-more" title="+2 more" aria-label="Show 2 more tags">···</button></div>
+    <span class="entry-link">View Case Study <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+  </div>
+</div>
+
+<div class="work-entry " data-modal="telecom" data-tags="B2B,Network,Operations,Dashboard" style="--h:95">
+  <div class="entry-visual">
+    <img class="img-card" src="../assets/work/thumbs/telecom-hero.png" alt="Internal Tool Suite for Network Operations" loading="lazy" style="object-position:center top">
+    <svg class="wf-card" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+<rect width="1600" height="900" fill="#0a0f20"/>
+<rect width="1600" height="60" fill="#0d1428"/>
+<rect x="24" y="16" width="120" height="28" rx="6" fill="#1a2e50"/>
+<rect x="1480" y="20" width="80" height="20" rx="3" fill="#1a2e50"/>
+<rect x="24" y="100" width="300" height="700" rx="10" fill="#0d1828" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="40" y="125" width="268" height="24" rx="4" fill="#182840"/>
+<rect x="40" y="170" width="268" height="40" rx="6" fill="#0a0f20"/>
+<rect x="40" y="230" width="268" height="40" rx="6" fill="#0a0f20"/>
+<rect x="40" y="290" width="268" height="40" rx="6" fill="#0a0f20"/>
+<rect x="40" y="350" width="268" height="40" rx="6" fill="#0a0f20"/>
+<line x1="24" y1="410" x2="324" y2="410" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="40" y="430" width="268" height="24" rx="3" fill="#1a2e50"/>
+<rect x="40" y="470" width="268" height="40" rx="6" fill="#0a0f20"/>
+<rect x="40" y="530" width="268" height="40" rx="6" fill="#0a0f20"/>
+<rect x="360" y="100" width="1180" height="300" rx="10" fill="#0d1828" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="400" y="130" width="1100" height="20" rx="3" fill="#1a2e50"/>
+<rect x="400" y="170" width="260" height="100" rx="6" fill="#1a3a5a"/>
+<rect x="680" y="170" width="260" height="100" rx="6" fill="#1a3a5a"/>
+<rect x="960" y="170" width="260" height="100" rx="6" fill="#1a3a5a"/>
+<rect x="1240" y="170" width="260" height="100" rx="6" fill="#1a3a5a"/>
+<rect x="360" y="430" width="1180" height="370" rx="10" fill="#0d1828" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="400" y="460" width="1100" height="16" rx="2" fill="#1a2e50"/>
+<line x1="400" y1="495" x2="1480" y2="495" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="400" y="515" width="256" height="12" rx="1" fill="#0f1f35"/>
+<rect x="400" y="540" width="256" height="12" rx="1" fill="#0f1f35"/>
+<rect x="400" y="565" width="256" height="12" rx="1" fill="#0f1f35"/>
+<rect x="700" y="515" width="256" height="12" rx="1" fill="#0f1f35"/>
+<rect x="700" y="540" width="256" height="12" rx="1" fill="#0f1f35"/>
+<rect x="700" y="565" width="256" height="12" rx="1" fill="#0f1f35"/>
+<rect x="1000" y="515" width="256" height="12" rx="1" fill="#0f1f35"/>
+<rect x="1000" y="540" width="256" height="12" rx="1" fill="#0f1f35"/>
+<rect x="1000" y="565" width="256" height="12" rx="1" fill="#0f1f35"/>
+<rect x="400" y="620" width="120" height="160" rx="6" fill="#0a0f20"/>
+<rect x="560" y="620" width="120" height="160" rx="6" fill="#0a0f20"/>
+<rect x="720" y="620" width="120" height="160" rx="6" fill="#0a0f20"/>
+<rect x="880" y="620" width="120" height="160" rx="6" fill="#0a0f20"/>
+</svg>
+    <span class="entry-cta">View Case Study →</span>
+  </div>
+  <div class="entry-content">
+    <div class="entry-eyebrow">Global Telecom Provider</div>
+    <h2 class="entry-title">Internal Tool Suite for Network Operations</h2>
+    <p class="entry-desc">Built a unified operations dashboard for telecom engineers to monitor network health, manage incidents, and automate routine maintenance across 15,000+ cell towers globally.</p>
+    <div class="entry-tags"><span class="entry-tag">B2B</span><span class="entry-tag">Network</span><span class="entry-tag tag-overflow">Operations</span><span class="entry-tag tag-overflow">Dashboard</span><button class="tag-more" title="+2 more" aria-label="Show 2 more tags">···</button></div>
+    <span class="entry-link">View Case Study <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+  </div>
+</div>
+
+<div class="work-entry work-entry--flip" data-modal="retail" data-tags="Retail,Mobile,Employee Experience,B2B2C" style="--h:50">
+  <div class="entry-visual">
+    <img class="img-card" src="../assets/work/thumbs/att-catalog-dynamic-filtering.png" alt="Staff Enablement Platform" loading="lazy" style="object-position:center 15%">
+    <svg class="wf-card" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+<rect width="1600" height="900" fill="#0a0f20"/>
+<rect width="1600" height="56" fill="#0d1428"/>
+<rect x="28" y="14" width="100" height="28" rx="6" fill="#1a2e50"/>
+<rect x="1504" y="18" width="52" height="20" rx="3" fill="#1a2e50"/>
+<rect x="28" y="90" width="1520" height="60" fill="#0a0f20" stroke="#1a3a5a" stroke-width="1" rx="6"/>
+<rect x="52" y="105" width="32" height="30" rx="4" fill="#1a3a5a"/>
+<rect x="100" y="105" width="280" height="30" rx="4" fill="#182840"/>
+<rect x="416" y="105" width="80" height="30" rx="4" fill="#0f1f35"/>
+<rect x="524" y="105" width="80" height="30" rx="4" fill="#0f1f35"/>
+<rect x="1420" y="105" width="96" height="30" rx="4" fill="#182840"/>
+<rect x="28" y="180" width="356" height="580" rx="10" fill="#0d1828" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="52" y="210" width="308" height="20" rx="3" fill="#1a2e50"/>
+<rect x="52" y="250" width="308" height="50" rx="6" fill="#0a0f20"/>
+<rect x="52" y="315" width="308" height="50" rx="6" fill="#0a0f20"/>
+<rect x="52" y="380" width="308" height="50" rx="6" fill="#0a0f20"/>
+<rect x="52" y="445" width="308" height="50" rx="6" fill="#0a0f20"/>
+<rect x="52" y="510" width="308" height="50" rx="6" fill="#0a0f20"/>
+<rect x="420" y="180" width="1128" height="580" rx="10" fill="#0d1828" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="456" y="210" width="1056" height="24" rx="3" fill="#1a2e50"/>
+<rect x="456" y="255" width="244" height="150" rx="6" fill="#1a3a5a"/>
+<rect x="720" y="255" width="244" height="150" rx="6" fill="#1a3a5a"/>
+<rect x="984" y="255" width="244" height="150" rx="6" fill="#1a3a5a"/>
+<rect x="1248" y="255" width="264" height="150" rx="6" fill="#1a3a5a"/>
+<rect x="456" y="425" width="1056" height="20" rx="2" fill="#0f1f35"/>
+<rect x="456" y="460" width="1056" height="80" rx="6" fill="#0a0f20"/>
+<rect x="456" y="555" width="1056" height="180" rx="6" fill="#0a0f20"/>
+</svg>
+    <span class="entry-cta">View Case Study →</span>
+  </div>
+  <div class="entry-content">
+    <div class="entry-eyebrow">Premium Retail Network</div>
+    <h2 class="entry-title">Staff Enablement Platform</h2>
+    <p class="entry-desc">Designed a mobile-first staff enablement platform for 2,000+ retail associates to access product knowledge, promotions, and customer insights in real-time during floor interactions.</p>
+    <div class="entry-tags"><span class="entry-tag">Retail</span><span class="entry-tag">Mobile</span><span class="entry-tag tag-overflow">Employee Experience</span><span class="entry-tag tag-overflow">B2B2C</span><button class="tag-more" title="+2 more" aria-label="Show 2 more tags">···</button></div>
+    <span class="entry-link">View Case Study <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+  </div>
+</div>
+</div></div>
 </section>
 
 
-<div class="modal-overlay" id="modal-itsm">
+<div class="modal-overlay " id="modal-email">
   <div class="modal-box">
     <div class="modal-hero">
-      <img class="img-design" src="../assets/work/technology-hero.png" alt="Enterprise Service Orchestration" loading="lazy">
+      
+      <div class="img-carousel" data-id="email">
+        <img class="img-design active" src="../assets/work/NikeEmailLibrary_Overlay_v2-0_0006_05_Click_Overlay.png" alt="Email Marketing Analytics Platform view 1" loading="lazy" style="object-position:center center">
+        <img class="img-design " src="../assets/work/NikeEmailLibrary_Overlay_v2-0_0006_05_Click_Overlay.png" alt="Email Marketing Analytics Platform view 2" loading="lazy" style="object-position:center center">
+        <button class="img-nav img-prev" aria-label="Previous image">‹</button>
+        <button class="img-nav img-next" aria-label="Next image">›</button>
+        <div class="img-dots"><span class="dot active" data-idx="0"></span><span class="dot" data-idx="1"></span></div>
+      </div>
+      <svg class="wf-modal" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+<rect width="1600" height="900" fill="#060c18"/>
+<rect width="1600" height="52" fill="#0a1220"/>
+<rect x="16" y="14" width="110" height="24" rx="4" fill="#182840"/>
+<rect x="200" y="16" width="400" height="20" rx="10" fill="#0e1a2c" stroke="#182840" stroke-width="1"/>
+<circle cx="1558" cy="26" r="14" fill="#182840"/>
+<rect x="0" y="52" width="60" height="848" fill="#090f1e"/>
+<circle cx="30" cy="88" r="16" fill="#162540"/>
+<circle cx="30" cy="136" r="16" fill="#0e1a2c"/>
+<circle cx="30" cy="184" r="16" fill="#0e1a2c"/>
+<circle cx="30" cy="232" r="16" fill="#0e1a2c"/>
+<circle cx="30" cy="280" r="16" fill="#0e1a2c"/>
+<rect x="60" y="52" width="380" height="848" fill="#0a1322"/>
+<rect x="76" y="70" width="160" height="12" rx="3" fill="#253e6a"/>
+<rect x="300" y="70" width="80" height="12" rx="6" fill="#1e3258"/>
+<rect x="60" y="96" width="380" height="1" fill="#182840"/>
+<rect x="76" y="116" width="348" height="76" rx="6" fill="#162540" stroke="#1e3258" stroke-width="1"/>
+<rect x="90" y="128" width="200" height="10" rx="2" fill="#2a4070"/>
+<rect x="90" y="146" width="260" height="8" rx="2" fill="#1a2e50"/>
+<rect x="90" y="162" width="180" height="8" rx="2" fill="#1a2e50"/>
+<rect x="316" y="124" width="92" height="10" rx="2" fill="#142035"/>
+<rect x="76" y="200" width="348" height="76" rx="6" fill="#0d1828"/>
+<rect x="90" y="212" width="200" height="10" rx="2" fill="#1a2e50"/>
+<rect x="90" y="230" width="260" height="8" rx="2" fill="#142035"/>
+<rect x="90" y="246" width="180" height="8" rx="2" fill="#142035"/>
+<rect x="76" y="284" width="348" height="76" rx="6" fill="#0d1828"/>
+<rect x="90" y="296" width="200" height="10" rx="2" fill="#1a2e50"/>
+<rect x="90" y="314" width="260" height="8" rx="2" fill="#142035"/>
+<rect x="76" y="368" width="348" height="76" rx="6" fill="#0d1828"/>
+<rect x="76" y="452" width="348" height="76" rx="6" fill="#0d1828"/>
+<rect x="76" y="536" width="348" height="76" rx="6" fill="#0d1828"/>
+<rect x="76" y="620" width="348" height="76" rx="6" fill="#0d1828"/>
+<rect x="440" y="52" width="1160" height="848" fill="#080e1c"/>
+<rect x="440" y="52" width="1160" height="52" fill="#0a1422"/>
+<rect x="456" y="66" width="140" height="12" rx="3" fill="#253e6a"/>
+<rect x="1360" y="64" width="60" height="16" rx="3" fill="#1a2e50"/>
+<rect x="1432" y="64" width="60" height="16" rx="3" fill="#1a2e50"/>
+<rect x="456" y="120" width="1128" height="56" fill="#0e1828"/>
+<rect x="472" y="132" width="180" height="12" rx="3" fill="#253e6a"/>
+<rect x="472" y="152" width="120" height="8" rx="2" fill="#1a2e50"/>
+<rect x="1440" y="132" width="100" height="32" rx="6" fill="#1e3258"/>
+<rect x="456" y="200" width="1128" height="500" rx="6" fill="#0d1828"/>
+<rect x="476" y="220" width="1088" height="8" rx="2" fill="#142035"/>
+<rect x="476" y="240" width="900" height="8" rx="2" fill="#142035"/>
+<rect x="476" y="260" width="960" height="8" rx="2" fill="#142035"/>
+<rect x="476" y="290" width="1000" height="220" rx="4" fill="#0a1422" stroke="#182840" stroke-width="1"/>
+<rect x="500" y="310" width="200" height="12" rx="2" fill="#1a2e50"/>
+<rect x="500" y="332" width="800" height="8" rx="2" fill="#142035"/>
+<rect x="500" y="352" width="760" height="8" rx="2" fill="#142035"/>
+<rect x="500" y="372" width="800" height="8" rx="2" fill="#142035"/>
+<rect x="476" y="530" width="300" height="10" rx="2" fill="#142035"/>
+<rect x="476" y="548" width="400" height="8" rx="2" fill="#142035"/>
+<rect x="476" y="566" width="360" height="8" rx="2" fill="#142035"/>
+</svg><div class="dissolve-pill"><span class="dissolve-dot"></span>Wireframe → Design</div>
+    </div>
+    <button class="modal-close" aria-label="Close">✕</button>
+    <div class="modal-body">
+      <div class="modal-client">Nike</div>
+      <h2 class="modal-title">Email Marketing Analytics Platform</h2>
+      <div class="modal-meta">
+        <div><div class="meta-label">Role</div><div class="meta-value">UX Lead</div></div>
+        <div><div class="meta-label">Duration</div><div class="meta-value">8 months</div></div>
+        <div><div class="meta-label">Year</div><div class="meta-value">2021</div></div>
+      </div>
+      <div class="modal-sec"><h3>Challenge</h3><p>Email marketers juggled 4 disconnected tools to manage campaign creation, preview, and performance — creating a fragmented process that slowed time-to-launch by days.</p></div>
+      <div class="modal-sec"><h3>Approach</h3><p>Ran contextual inquiry sessions with 14 marketers across North America and EMEA, synthesized workflows, and designed a unified 3-column interface with live preview and integrated metrics.</p></div>
+      <div class="modal-sec"><h3>Outcome</h3><p>Campaign creation time dropped from 3+ days to under 6 hours. Tool adoption reached 94% within 2 quarters of rollout.</p></div>
+      <div class="modal-tags"><span class="modal-tag">Analytics</span><span class="modal-tag">Email Marketing</span><span class="modal-tag">Data Visualization</span><span class="modal-tag">CRM</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay " id="modal-itsm">
+  <div class="modal-box">
+    <div class="modal-hero">
+      
+      <div class="img-carousel" data-id="itsm">
+        <img class="img-design active" src="../assets/work/technology-hero.png" alt="Enterprise Service Orchestration view 1" loading="lazy" style="object-position:center top">
+        <img class="img-design " src="../assets/work/technology-2.png" alt="Enterprise Service Orchestration view 2" loading="lazy" style="object-position:center top">
+        <button class="img-nav img-prev" aria-label="Previous image">‹</button>
+        <button class="img-nav img-next" aria-label="Next image">›</button>
+        <div class="img-dots"><span class="dot active" data-idx="0"></span><span class="dot" data-idx="1"></span></div>
+      </div>
       <svg class="wf-modal" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
 <rect width="1600" height="900" fill="#060c18"/>
 <rect width="1600" height="52" fill="#0a1220"/>
@@ -960,8 +1043,7 @@ a{color:inherit;text-decoration:none}
 <rect x="234" y="756" width="1216" height="32" fill="#0d1828"/>
 <rect x="234" y="792" width="1216" height="32" fill="#090f1c"/>
 <rect x="234" y="828" width="1216" height="32" fill="#0d1828"/>
-</svg>
-      <div class="dissolve-pill"><span class="dissolve-dot"></span>Wireframe → Design</div>
+</svg><div class="dissolve-pill"><span class="dissolve-dot"></span>Wireframe → Design</div>
     </div>
     <button class="modal-close" aria-label="Close">✕</button>
     <div class="modal-body">
@@ -970,7 +1052,7 @@ a{color:inherit;text-decoration:none}
       <div class="modal-meta">
         <div><div class="meta-label">Role</div><div class="meta-value">Lead UX Designer</div></div>
         <div><div class="meta-label">Duration</div><div class="meta-value">14 months</div></div>
-        <div><div class="meta-label">Year</div><div class="meta-value">2022</div></div>
+        <div><div class="meta-label">Year</div><div class="meta-value">2025</div></div>
       </div>
       <div class="modal-sec"><h3>Challenge</h3><p>Siloed legacy tools created fragmented workflows across IT teams, leading to missed SLAs and repeated context-switching between 6+ separate systems.</p></div>
       <div class="modal-sec"><h3>Approach</h3><p>Conducted 28 stakeholder interviews, mapped end-to-end service journeys, and designed a consolidated console with intelligent routing, real-time dashboards, and in-context knowledge panels.</p></div>
@@ -980,10 +1062,17 @@ a{color:inherit;text-decoration:none}
   </div>
 </div>
 
-<div class="modal-overlay" id="modal-bopis">
+<div class="modal-overlay modal--zoom-out" id="modal-bopis">
   <div class="modal-box">
     <div class="modal-hero">
-      <img class="img-design" src="../assets/work/retail-hero.png" alt="Omnichannel Retail Experience" loading="lazy">
+      
+      <div class="img-carousel" data-id="bopis">
+        <img class="img-design active" src="../assets/work/retail-hero.png" alt="Omnichannel Retail Experience view 1" loading="lazy" style="object-position:center 20%">
+        <img class="img-design " src="../assets/work/retail-gradient.png" alt="Omnichannel Retail Experience view 2" loading="lazy" style="object-position:center 20%">
+        <button class="img-nav img-prev" aria-label="Previous image">‹</button>
+        <button class="img-nav img-next" aria-label="Next image">›</button>
+        <div class="img-dots"><span class="dot active" data-idx="0"></span><span class="dot" data-idx="1"></span></div>
+      </div>
       <svg class="wf-modal" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
 <rect width="1600" height="900" fill="#060c18"/>
 <rect width="1600" height="52" fill="#0a1220"/>
@@ -1019,8 +1108,7 @@ a{color:inherit;text-decoration:none}
 <rect x="676" y="858" width="48" height="28" rx="4" fill="#253e6a"/>
 <rect x="1152" y="858" width="48" height="28" rx="4" fill="#182840"/>
 <rect x="1352" y="858" width="48" height="28" rx="4" fill="#182840"/>
-</svg>
-      <div class="dissolve-pill"><span class="dissolve-dot"></span>Wireframe → Design</div>
+</svg><div class="dissolve-pill"><span class="dissolve-dot"></span>Wireframe → Design</div>
     </div>
     <button class="modal-close" aria-label="Close">✕</button>
     <div class="modal-body">
@@ -1039,176 +1127,48 @@ a{color:inherit;text-decoration:none}
   </div>
 </div>
 
-<div class="modal-overlay" id="modal-email">
+<div class="modal-overlay " id="modal-backmargin">
   <div class="modal-box">
     <div class="modal-hero">
-      <img class="img-design" src="../assets/work/NikeEmailLibrary_Overlay_v2-0_0006_05_Click_Overlay.png" alt="Email Marketing Analytics Platform" loading="lazy">
-      <svg class="wf-modal" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-<rect width="1600" height="900" fill="#060c18"/>
-<rect width="1600" height="52" fill="#0a1220"/>
-<rect x="16" y="14" width="110" height="24" rx="4" fill="#182840"/>
-<rect x="200" y="16" width="400" height="20" rx="10" fill="#0e1a2c" stroke="#182840" stroke-width="1"/>
-<circle cx="1558" cy="26" r="14" fill="#182840"/>
-<rect x="0" y="52" width="60" height="848" fill="#090f1e"/>
-<circle cx="30" cy="88" r="16" fill="#162540"/>
-<circle cx="30" cy="136" r="16" fill="#0e1a2c"/>
-<circle cx="30" cy="184" r="16" fill="#0e1a2c"/>
-<circle cx="30" cy="232" r="16" fill="#0e1a2c"/>
-<circle cx="30" cy="280" r="16" fill="#0e1a2c"/>
-<rect x="60" y="52" width="380" height="848" fill="#0a1322"/>
-<rect x="76" y="70" width="160" height="12" rx="3" fill="#253e6a"/>
-<rect x="300" y="70" width="80" height="12" rx="6" fill="#1e3258"/>
-<rect x="60" y="96" width="380" height="1" fill="#182840"/>
-<rect x="76" y="116" width="348" height="76" rx="6" fill="#162540" stroke="#1e3258" stroke-width="1"/>
-<rect x="90" y="128" width="200" height="10" rx="2" fill="#2a4070"/>
-<rect x="90" y="146" width="260" height="8" rx="2" fill="#1a2e50"/>
-<rect x="90" y="162" width="180" height="8" rx="2" fill="#1a2e50"/>
-<rect x="316" y="124" width="92" height="10" rx="2" fill="#142035"/>
-<rect x="76" y="200" width="348" height="76" rx="6" fill="#0d1828"/>
-<rect x="90" y="212" width="200" height="10" rx="2" fill="#1a2e50"/>
-<rect x="90" y="230" width="260" height="8" rx="2" fill="#142035"/>
-<rect x="90" y="246" width="180" height="8" rx="2" fill="#142035"/>
-<rect x="76" y="284" width="348" height="76" rx="6" fill="#0d1828"/>
-<rect x="90" y="296" width="200" height="10" rx="2" fill="#1a2e50"/>
-<rect x="90" y="314" width="260" height="8" rx="2" fill="#142035"/>
-<rect x="76" y="368" width="348" height="76" rx="6" fill="#0d1828"/>
-<rect x="76" y="452" width="348" height="76" rx="6" fill="#0d1828"/>
-<rect x="76" y="536" width="348" height="76" rx="6" fill="#0d1828"/>
-<rect x="76" y="620" width="348" height="76" rx="6" fill="#0d1828"/>
-<rect x="440" y="52" width="1160" height="848" fill="#080e1c"/>
-<rect x="440" y="52" width="1160" height="52" fill="#0a1422"/>
-<rect x="456" y="66" width="140" height="12" rx="3" fill="#253e6a"/>
-<rect x="1360" y="64" width="60" height="16" rx="3" fill="#1a2e50"/>
-<rect x="1432" y="64" width="60" height="16" rx="3" fill="#1a2e50"/>
-<rect x="456" y="120" width="1128" height="56" fill="#0e1828"/>
-<rect x="472" y="132" width="180" height="12" rx="3" fill="#253e6a"/>
-<rect x="472" y="152" width="120" height="8" rx="2" fill="#1a2e50"/>
-<rect x="1440" y="132" width="100" height="32" rx="6" fill="#1e3258"/>
-<rect x="456" y="200" width="1128" height="500" rx="6" fill="#0d1828"/>
-<rect x="476" y="220" width="1088" height="8" rx="2" fill="#142035"/>
-<rect x="476" y="240" width="900" height="8" rx="2" fill="#142035"/>
-<rect x="476" y="260" width="960" height="8" rx="2" fill="#142035"/>
-<rect x="476" y="290" width="1000" height="220" rx="4" fill="#0a1422" stroke="#182840" stroke-width="1"/>
-<rect x="500" y="310" width="200" height="12" rx="2" fill="#1a2e50"/>
-<rect x="500" y="332" width="800" height="8" rx="2" fill="#142035"/>
-<rect x="500" y="352" width="760" height="8" rx="2" fill="#142035"/>
-<rect x="500" y="372" width="800" height="8" rx="2" fill="#142035"/>
-<rect x="476" y="530" width="300" height="10" rx="2" fill="#142035"/>
-<rect x="476" y="548" width="400" height="8" rx="2" fill="#142035"/>
-<rect x="476" y="566" width="360" height="8" rx="2" fill="#142035"/>
-</svg>
-      <div class="dissolve-pill"><span class="dissolve-dot"></span>Wireframe → Design</div>
-    </div>
-    <button class="modal-close" aria-label="Close">✕</button>
-    <div class="modal-body">
-      <div class="modal-client">Nike</div>
-      <h2 class="modal-title">Email Marketing Analytics Platform</h2>
-      <div class="modal-meta">
-        <div><div class="meta-label">Role</div><div class="meta-value">UX Lead</div></div>
-        <div><div class="meta-label">Duration</div><div class="meta-value">8 months</div></div>
-        <div><div class="meta-label">Year</div><div class="meta-value">2021</div></div>
+      
+      <div class="img-carousel" data-id="backmargin">
+        <img class="img-design active" src="../assets/work/CRMA_ VP Review - Historicals v2.png" alt="Reseller Incentive Program Dashboard view 1" loading="lazy" style="object-position:center top">
+        <img class="img-design " src="../assets/work/CRMA_ JP Historical trend of attained BM% with Current Quarter Target and Actuals.png" alt="Reseller Incentive Program Dashboard view 2" loading="lazy" style="object-position:center top">
+        <img class="img-design " src="../assets/work/[ALT] CRMA_  Historic performance.png" alt="Reseller Incentive Program Dashboard view 3" loading="lazy" style="object-position:center top">
+        <button class="img-nav img-prev" aria-label="Previous image">‹</button>
+        <button class="img-nav img-next" aria-label="Next image">›</button>
+        <div class="img-dots"><span class="dot active" data-idx="0"></span><span class="dot" data-idx="1"></span><span class="dot" data-idx="2"></span></div>
       </div>
-      <div class="modal-sec"><h3>Challenge</h3><p>Email marketers juggled 4 disconnected tools to manage campaign creation, preview, and performance — creating a fragmented process that slowed time-to-launch by days.</p></div>
-      <div class="modal-sec"><h3>Approach</h3><p>Ran contextual inquiry sessions with 14 marketers across North America and EMEA, synthesized workflows, and designed a unified 3-column interface with live preview and integrated metrics.</p></div>
-      <div class="modal-sec"><h3>Outcome</h3><p>Campaign creation time dropped from 3+ days to under 6 hours. Tool adoption reached 94% within 2 quarters of rollout.</p></div>
-      <div class="modal-tags"><span class="modal-tag">Analytics</span><span class="modal-tag">Email Marketing</span><span class="modal-tag">Data Visualization</span><span class="modal-tag">CRM</span></div>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-revenue">
-  <div class="modal-box">
-    <div class="modal-hero">
-      <img class="img-design" src="../assets/work/Account Record Page - CS trailblazers.png" alt="AI-Powered Revenue Intelligence" loading="lazy">
-      <svg class="wf-modal" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-<rect width="1600" height="900" fill="#060c18"/>
-<rect width="1600" height="52" fill="#0a1220"/>
-<rect x="16" y="14" width="110" height="24" rx="4" fill="#182840"/>
-<rect x="158" y="18" width="64" height="16" rx="3" fill="#182840"/>
-<rect x="234" y="18" width="64" height="16" rx="3" fill="#182840"/>
-<circle cx="1558" cy="26" r="14" fill="#182840"/>
-<rect x="0" y="52" width="1600" height="80" fill="#0a1422"/>
-<rect x="20" y="70" width="200" height="16" rx="3" fill="#2a4070"/>
-<rect x="20" y="94" width="140" height="10" rx="2" fill="#1a2e50"/>
-<rect x="800" y="62" width="90" height="24" rx="12" fill="#1e4a8a"/>
-<rect x="1440" y="64" width="120" height="20" rx="4" fill="#1e3258"/>
-<rect x="0" y="132" width="1600" height="44" fill="#090f1e"/>
-<rect x="20" y="146" width="80" height="14" rx="3" fill="#1e3258"/>
-<rect x="120" y="146" width="80" height="14" rx="3" fill="#142035"/>
-<rect x="220" y="146" width="80" height="14" rx="3" fill="#142035"/>
-<rect x="320" y="146" width="80" height="14" rx="3" fill="#142035"/>
-<rect x="0" y="176" width="760" height="724" fill="#090f1c"/>
-<rect x="20" y="196" width="200" height="12" rx="3" fill="#253e6a"/>
-<rect x="20" y="220" width="720" height="180" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="40" y="240" width="120" height="8" rx="2" fill="#1a2e50"/>
-<polyline points="40,380 150,340 260,360 370,290 480,310 590,260 700,280" fill="none" stroke="#2a5090" stroke-width="2"/>
-<polyline points="40,380 150,355 260,380 370,320 480,350 590,310 700,330" fill="none" stroke="#1a3060" stroke-width="1.5"/>
-<rect x="40" y="390" width="60" height="8" rx="2" fill="#142035"/>
-<rect x="120" y="390" width="60" height="8" rx="2" fill="#142035"/>
-<rect x="200" y="390" width="60" height="8" rx="2" fill="#142035"/>
-<rect x="20" y="416" width="720" height="120" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="40" y="432" width="100" height="10" rx="2" fill="#1a2e50"/>
-<rect x="40" y="452" width="40" height="40" rx="4" fill="#1a3060"/>
-<rect x="92" y="460" width="120" height="12" rx="2" fill="#1e3258"/>
-<rect x="92" y="480" width="80" height="8" rx="2" fill="#142035"/>
-<rect x="40" y="498" width="40" height="40" rx="4" fill="#0e1a2c"/>
-<rect x="92" y="506" width="120" height="12" rx="2" fill="#1a2e50"/>
-<rect x="40" y="552" width="720" height="100" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="40" y="568" width="100" height="10" rx="2" fill="#1a2e50"/>
-<rect x="40" y="590" width="680" height="8" rx="2" fill="#142035"/>
-<rect x="40" y="608" width="560" height="8" rx="2" fill="#142035"/>
-<rect x="760" y="176" width="840" height="724" fill="#080c18"/>
-<rect x="780" y="196" width="200" height="12" rx="3" fill="#253e6a"/>
-<rect x="780" y="220" width="800" height="280" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="800" y="240" width="100" height="10" rx="2" fill="#1a2e50"/>
-<rect x="800" y="260" width="760" height="1" fill="#182840"/>
-<rect x="800" y="274" width="160" height="8" rx="2" fill="#142035"/>
-<rect x="1100" y="274" width="120" height="8" rx="2" fill="#1a2e50"/>
-<rect x="800" y="298" width="160" height="8" rx="2" fill="#142035"/>
-<rect x="1100" y="298" width="120" height="8" rx="2" fill="#1a2e50"/>
-<rect x="800" y="322" width="160" height="8" rx="2" fill="#142035"/>
-<rect x="1100" y="322" width="120" height="8" rx="2" fill="#1a2e50"/>
-<rect x="800" y="346" width="160" height="8" rx="2" fill="#142035"/>
-<rect x="1100" y="346" width="120" height="8" rx="2" fill="#1a2e50"/>
-<rect x="800" y="370" width="160" height="8" rx="2" fill="#142035"/>
-<rect x="1100" y="370" width="100" height="20" rx="10" fill="#1e3a6a"/>
-<rect x="800" y="394" width="160" height="8" rx="2" fill="#142035"/>
-<rect x="1100" y="394" width="120" height="8" rx="2" fill="#1a2e50"/>
-<rect x="780" y="516" width="200" height="12" rx="3" fill="#253e6a"/>
-<rect x="780" y="540" width="800" height="240" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="800" y="560" width="760" height="32" fill="#0a1422"/>
-<rect x="820" y="570" width="100" height="8" rx="2" fill="#1a2e50"/>
-<rect x="800" y="596" width="760" height="32" fill="#0d1828"/>
-<rect x="820" y="606" width="160" height="8" rx="2" fill="#142035"/>
-<rect x="1200" y="606" width="80" height="16" rx="8" fill="#182840"/>
-<rect x="800" y="632" width="760" height="32" fill="#090f1c"/>
-<rect x="820" y="642" width="140" height="8" rx="2" fill="#142035"/>
-<rect x="800" y="668" width="760" height="32" fill="#0d1828"/>
-<rect x="820" y="678" width="180" height="8" rx="2" fill="#142035"/>
-</svg>
-      <div class="dissolve-pill"><span class="dissolve-dot"></span>Wireframe → Design</div>
+      
     </div>
     <button class="modal-close" aria-label="Close">✕</button>
     <div class="modal-body">
-      <div class="modal-client">Lumen Technologies</div>
-      <h2 class="modal-title">AI-Powered Revenue Intelligence</h2>
+      <div class="modal-client">Apple</div>
+      <h2 class="modal-title">Reseller Incentive Program Dashboard</h2>
       <div class="modal-meta">
         <div><div class="meta-label">Role</div><div class="meta-value">Lead UX Designer</div></div>
-        <div><div class="meta-label">Duration</div><div class="meta-value">12 months</div></div>
+        <div><div class="meta-label">Duration</div><div class="meta-value">9 months</div></div>
         <div><div class="meta-label">Year</div><div class="meta-value">2023</div></div>
       </div>
-      <div class="modal-sec"><h3>Challenge</h3><p>Sales reps had access to rich data but no coherent signal — dashboards lived outside Salesforce, required manual exports, and delivered insights too late to act on.</p></div>
-      <div class="modal-sec"><h3>Approach</h3><p>Embedded AI insights directly into account and opportunity records using Salesforce LWC, designing progressive disclosure of intelligence without overwhelming the UI.</p></div>
-      <div class="modal-sec"><h3>Outcome</h3><p>Early access sellers saw a 22% increase in pipeline progression rates and a 15% improvement in forecast accuracy within the first two quarters.</p></div>
-      <div class="modal-tags"><span class="modal-tag">AI</span><span class="modal-tag">CRM</span><span class="modal-tag">Revenue Intelligence</span><span class="modal-tag">Salesforce</span></div>
+      <div class="modal-sec"><h3>Challenge</h3><p>No unified incentive program structure existed. Reseller partners couldn't understand balances or performance. Managers manually calculated metrics via spreadsheet. Documentation and program governance were fragmented across regions.</p></div>
+      <div class="modal-sec"><h3>Approach</h3><p>Conducted global user research with 20+ reseller managers and partner stakeholders across regions. Defined program architecture, budget models, and tier structures. Designed dashboard with real-time KPIs, performance tracking, tier status, and predictive earning projections. Created regional documentation and training materials.</p></div>
+      <div class="modal-sec"><h3>Outcome</h3><p>Self-service platform reduced manager workload by 82%. Partner engagement increased 64%, reseller retention improved from 78% to 91%. Program rollout completed across all 9 regions with 98% adoption within 2 quarters.</p></div>
+      <div class="modal-tags"><span class="modal-tag">Partner Program</span><span class="modal-tag">Dashboard</span><span class="modal-tag">SaaS</span><span class="modal-tag">Analytics</span></div>
     </div>
   </div>
 </div>
 
-<div class="modal-overlay" id="modal-hpe">
+<div class="modal-overlay " id="modal-hpe">
   <div class="modal-box">
     <div class="modal-hero">
-      <img class="img-design" src="../assets/work/hpe-home.png" alt="Employee Benefits Self-Service Portal" loading="lazy">
+      
+      <div class="img-carousel" data-id="hpe">
+        <img class="img-design active" src="../assets/work/hpe-home.png" alt="Employee Benefits Self-Service Portal view 1" loading="lazy" style="object-position:center top">
+        <img class="img-design " src="../assets/work/hpe-self-service.png" alt="Employee Benefits Self-Service Portal view 2" loading="lazy" style="object-position:center top">
+        <button class="img-nav img-prev" aria-label="Previous image">‹</button>
+        <button class="img-nav img-next" aria-label="Next image">›</button>
+        <div class="img-dots"><span class="dot active" data-idx="0"></span><span class="dot" data-idx="1"></span></div>
+      </div>
       <svg class="wf-modal" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
 <rect width="1600" height="900" fill="#060c18"/>
 <rect width="1600" height="52" fill="#0a1220"/>
@@ -1254,8 +1214,7 @@ a{color:inherit;text-decoration:none}
 <rect x="116" y="810" width="180" height="8" rx="2" fill="#142035"/>
 <rect x="100" y="836" width="1400" height="32" fill="#090f1c"/>
 <rect x="116" y="846" width="160" height="8" rx="2" fill="#142035"/>
-</svg>
-      <div class="dissolve-pill"><span class="dissolve-dot"></span>Wireframe → Design</div>
+</svg><div class="dissolve-pill"><span class="dissolve-dot"></span>Wireframe → Design</div>
     </div>
     <button class="modal-close" aria-label="Close">✕</button>
     <div class="modal-body">
@@ -1264,7 +1223,7 @@ a{color:inherit;text-decoration:none}
       <div class="modal-meta">
         <div><div class="meta-label">Role</div><div class="meta-value">Senior UX Designer</div></div>
         <div><div class="meta-label">Duration</div><div class="meta-value">9 months</div></div>
-        <div><div class="meta-label">Year</div><div class="meta-value">2022</div></div>
+        <div><div class="meta-label">Year</div><div class="meta-value">2025</div></div>
       </div>
       <div class="modal-sec"><h3>Challenge</h3><p>The existing benefits platform had a 41% task-completion rate for open enrollment — employees were confused, often calling HR support lines to complete basic tasks.</p></div>
       <div class="modal-sec"><h3>Approach</h3><p>Conducted card sorting and tree testing to restructure information architecture, and designed a step-by-step enrollment wizard with real-time cost calculators and plan comparisons.</p></div>
@@ -1274,351 +1233,17 @@ a{color:inherit;text-decoration:none}
   </div>
 </div>
 
-<div class="modal-overlay" id="modal-cases">
+<div class="modal-overlay modal--zoom-pan" id="modal-polaris">
   <div class="modal-box">
     <div class="modal-hero">
-      <img class="img-design" src="../assets/work/jh-case-details.png" alt="Banking Case Management Platform" loading="lazy">
-      <svg class="wf-modal" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-<rect width="1600" height="900" fill="#060c18"/>
-<rect width="1600" height="52" fill="#0a1220"/>
-<rect x="16" y="14" width="110" height="24" rx="4" fill="#182840"/>
-<rect x="158" y="18" width="64" height="16" rx="3" fill="#182840"/>
-<rect x="234" y="18" width="64" height="16" rx="3" fill="#182840"/>
-<circle cx="1558" cy="26" r="14" fill="#182840"/>
-<rect x="0" y="52" width="380" height="848" fill="#090f1e"/>
-<rect x="10" y="70" width="240" height="12" rx="3" fill="#253e6a"/>
-<rect x="280" y="68" width="90" height="16" rx="4" fill="#1e3258"/>
-<rect x="10" y="96" width="360" height="44" rx="6" fill="#0e1a2c" stroke="#162540" stroke-width="1"/>
-<rect x="10" y="148" width="360" height="72" rx="6" fill="#162540" stroke="#1e3258" stroke-width="1"/>
-<circle cx="32" cy="184" r="8" fill="#2a5090"/>
-<rect x="50" y="160" width="180" height="10" rx="2" fill="#2a4070"/>
-<rect x="50" y="178" width="240" height="8" rx="2" fill="#1a2e50"/>
-<rect x="50" y="194" width="160" height="8" rx="2" fill="#1a2e50"/>
-<rect x="300" y="160" width="60" height="16" rx="8" fill="#1e3a6a"/>
-<rect x="10" y="228" width="360" height="72" rx="6" fill="#0d1828"/>
-<circle cx="32" cy="264" r="8" fill="#1a2e50"/>
-<rect x="50" y="240" width="180" height="10" rx="2" fill="#1a2e50"/>
-<rect x="50" y="258" width="240" height="8" rx="2" fill="#142035"/>
-<rect x="300" y="240" width="60" height="16" rx="8" fill="#182840"/>
-<rect x="10" y="308" width="360" height="72" rx="6" fill="#0d1828"/>
-<circle cx="32" cy="344" r="8" fill="#1a2e50"/>
-<rect x="50" y="320" width="180" height="10" rx="2" fill="#1a2e50"/>
-<rect x="10" y="388" width="360" height="72" rx="6" fill="#0d1828"/>
-<rect x="10" y="468" width="360" height="72" rx="6" fill="#0d1828"/>
-<rect x="10" y="548" width="360" height="72" rx="6" fill="#0d1828"/>
-<rect x="10" y="628" width="360" height="72" rx="6" fill="#0d1828"/>
-<rect x="10" y="708" width="360" height="72" rx="6" fill="#0d1828"/>
-<rect x="380" y="52" width="1220" height="848" fill="#080c18"/>
-<rect x="400" y="72" width="280" height="16" rx="3" fill="#253e6a"/>
-<rect x="400" y="96" width="180" height="10" rx="2" fill="#1a2e50"/>
-<rect x="1360" y="68" width="120" height="28" rx="6" fill="#1e3258"/>
-<rect x="400" y="128" width="1180" height="44" fill="#090f1e"/>
-<rect x="416" y="138" width="80" height="16" rx="3" fill="#1e3258"/>
-<rect x="516" y="140" width="80" height="14" rx="3" fill="#142035"/>
-<rect x="616" y="140" width="80" height="14" rx="3" fill="#142035"/>
-<rect x="716" y="140" width="80" height="14" rx="3" fill="#142035"/>
-<rect x="400" y="192" width="560" height="1" fill="#182840"/>
-<rect x="400" y="208" width="560" height="200" rx="8" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="420" y="228" width="100" height="8" rx="2" fill="#1a2e50"/>
-<rect x="560" y="224" width="180" height="12" rx="2" fill="#1e3258"/>
-<rect x="420" y="250" width="100" height="8" rx="2" fill="#142035"/>
-<rect x="560" y="248" width="240" height="8" rx="2" fill="#1a2e50"/>
-<rect x="420" y="272" width="100" height="8" rx="2" fill="#142035"/>
-<rect x="560" y="272" width="200" height="8" rx="2" fill="#1a2e50"/>
-<rect x="420" y="296" width="100" height="8" rx="2" fill="#142035"/>
-<rect x="560" y="296" width="220" height="8" rx="2" fill="#1a2e50"/>
-<rect x="420" y="320" width="100" height="8" rx="2" fill="#142035"/>
-<rect x="560" y="320" width="160" height="16" rx="8" fill="#1e3a6a"/>
-<rect x="400" y="428" width="1180" height="1" fill="#182840"/>
-<rect x="400" y="444" width="760" height="200" rx="8" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="420" y="464" width="160" height="10" rx="2" fill="#1a2e50"/>
-<rect x="420" y="488" width="720" height="8" rx="2" fill="#142035"/>
-<rect x="420" y="508" width="600" height="8" rx="2" fill="#142035"/>
-<rect x="420" y="528" width="680" height="8" rx="2" fill="#142035"/>
-<rect x="420" y="548" width="640" height="8" rx="2" fill="#142035"/>
-<rect x="980" y="444" width="600" height="120" rx="8" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="1000" y="464" width="120" height="10" rx="2" fill="#1a2e50"/>
-<rect x="1000" y="484" width="80" height="14" rx="3" fill="#142035"/>
-<rect x="1092" y="484" width="80" height="14" rx="3" fill="#142035"/>
-<rect x="1184" y="484" width="80" height="14" rx="3" fill="#142035"/>
-</svg>
-      <div class="dissolve-pill"><span class="dissolve-dot"></span>Wireframe → Design</div>
-    </div>
-    <button class="modal-close" aria-label="Close">✕</button>
-    <div class="modal-body">
-      <div class="modal-client">Jack Henry & Associates</div>
-      <h2 class="modal-title">Banking Case Management Platform</h2>
-      <div class="modal-meta">
-        <div><div class="meta-label">Role</div><div class="meta-value">UX Lead</div></div>
-        <div><div class="meta-label">Duration</div><div class="meta-value">11 months</div></div>
-        <div><div class="meta-label">Year</div><div class="meta-value">2022</div></div>
+      
+      <div class="img-carousel" data-id="polaris">
+        <img class="img-design active" src="../assets/work/polaris-email.png" alt="Design System & Component Library view 1" loading="lazy" style="object-position:left top">
+        <img class="img-design " src="../assets/work/polaris-landing-pages.png" alt="Design System & Component Library view 2" loading="lazy" style="object-position:left top">
+        <button class="img-nav img-prev" aria-label="Previous image">‹</button>
+        <button class="img-nav img-next" aria-label="Next image">›</button>
+        <div class="img-dots"><span class="dot active" data-idx="0"></span><span class="dot" data-idx="1"></span></div>
       </div>
-      <div class="modal-sec"><h3>Challenge</h3><p>Bankers were managing service cases across email, spreadsheets, and a rigid legacy ticketing system — leading to duplicated effort and customers receiving inconsistent service.</p></div>
-      <div class="modal-sec"><h3>Approach</h3><p>Shadowed service teams at 5 community banks, mapped case lifecycle states, and designed a responsive two-pane interface within Jack Henry's Salesforce Experience Cloud.</p></div>
-      <div class="modal-sec"><h3>Outcome</h3><p>Average case handle time reduced by 38%. First-contact resolution improved by 24 percentage points.</p></div>
-      <div class="modal-tags"><span class="modal-tag">FinTech</span><span class="modal-tag">Case Management</span><span class="modal-tag">Service Design</span><span class="modal-tag">Salesforce</span></div>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-ascent">
-  <div class="modal-box">
-    <div class="modal-hero">
-      <img class="img-design" src="../assets/work/EX-1B2-Opportunity-Details-Tab.png" alt="Partner Opportunity Management" loading="lazy">
-      <svg class="wf-modal" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-<rect width="1600" height="900" fill="#060c18"/>
-<rect width="1600" height="52" fill="#0a1220"/>
-<rect x="16" y="14" width="110" height="24" rx="4" fill="#182840"/>
-<rect x="158" y="18" width="64" height="16" rx="3" fill="#182840"/>
-<rect x="234" y="18" width="64" height="16" rx="3" fill="#182840"/>
-<circle cx="1558" cy="26" r="14" fill="#182840"/>
-<rect x="20" y="68" width="80" height="10" rx="2" fill="#1a2e50"/>
-<rect x="108" y="70" width="6" height="6" rx="1" fill="#142035"/>
-<rect x="120" y="68" width="80" height="10" rx="2" fill="#1a2e50"/>
-<rect x="208" y="70" width="6" height="6" rx="1" fill="#142035"/>
-<rect x="220" y="68" width="160" height="10" rx="2" fill="#1e3258"/>
-<rect x="0" y="90" width="1600" height="100" fill="#0a1422"/>
-<rect x="20" y="104" width="280" height="18" rx="3" fill="#253e6a"/>
-<rect x="20" y="130" width="160" height="12" rx="2" fill="#1a2e50"/>
-<rect x="500" y="100" width="120" height="28" rx="14" fill="#1e4a8a"/>
-<rect x="700" y="102" width="120" height="24" rx="4" fill="#1e3258"/>
-<rect x="900" y="102" width="80" height="24" rx="4" fill="#142035"/>
-<rect x="1400" y="102" width="160" height="32" rx="6" fill="#2a5090"/>
-<rect x="0" y="190" width="1600" height="44" fill="#090f1e"/>
-<rect x="20" y="204" width="80" height="14" rx="3" fill="#1e3258"/>
-<rect x="120" y="206" width="80" height="14" rx="3" fill="#142035"/>
-<rect x="220" y="206" width="80" height="14" rx="3" fill="#142035"/>
-<rect x="320" y="206" width="80" height="14" rx="3" fill="#142035"/>
-<rect x="0" y="234" width="760" height="666" fill="#090f1c"/>
-<rect x="20" y="254" width="200" height="12" rx="3" fill="#253e6a"/>
-<rect x="20" y="278" width="720" height="180" rx="8" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="40" y="296" width="120" height="8" rx="2" fill="#1a2e50"/>
-<rect x="200" y="292" width="200" height="12" rx="2" fill="#1e3258"/>
-<rect x="40" y="314" width="120" height="8" rx="2" fill="#142035"/>
-<rect x="200" y="314" width="160" height="8" rx="2" fill="#1a2e50"/>
-<rect x="40" y="332" width="120" height="8" rx="2" fill="#142035"/>
-<rect x="200" y="332" width="200" height="8" rx="2" fill="#1a2e50"/>
-<rect x="40" y="352" width="120" height="8" rx="2" fill="#142035"/>
-<rect x="200" y="352" width="160" height="8" rx="2" fill="#1a2e50"/>
-<rect x="40" y="372" width="120" height="8" rx="2" fill="#142035"/>
-<rect x="200" y="372" width="120" height="16" rx="8" fill="#1e3a6a"/>
-<rect x="40" y="394" width="120" height="8" rx="2" fill="#142035"/>
-<rect x="200" y="394" width="180" height="8" rx="2" fill="#1a2e50"/>
-<rect x="40" y="414" width="120" height="8" rx="2" fill="#142035"/>
-<rect x="200" y="414" width="140" height="8" rx="2" fill="#1a2e50"/>
-<rect x="20" y="476" width="200" height="12" rx="3" fill="#253e6a"/>
-<rect x="20" y="500" width="720" height="160" rx="8" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="40" y="520" width="680" height="32" fill="#0a1422"/>
-<rect x="56" y="530" width="100" height="8" rx="2" fill="#1a2e50"/>
-<rect x="40" y="556" width="680" height="32" fill="#0d1828"/>
-<rect x="56" y="566" width="160" height="8" rx="2" fill="#142035"/>
-<rect x="40" y="592" width="680" height="32" fill="#090f1c"/>
-<rect x="56" y="602" width="140" height="8" rx="2" fill="#142035"/>
-<rect x="760" y="234" width="840" height="666" fill="#080c18"/>
-<rect x="780" y="254" width="200" height="12" rx="3" fill="#253e6a"/>
-<rect x="780" y="278" width="800" height="240" rx="8" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="800" y="298" width="760" height="32" fill="#0a1422"/>
-<rect x="816" y="308" width="100" height="8" rx="2" fill="#1a2e50"/>
-<rect x="800" y="334" width="760" height="32" fill="#0d1828"/>
-<rect x="816" y="344" width="180" height="8" rx="2" fill="#142035"/>
-<rect x="800" y="370" width="760" height="32" fill="#090f1c"/>
-<rect x="816" y="380" width="160" height="8" rx="2" fill="#142035"/>
-<rect x="800" y="406" width="760" height="32" fill="#0d1828"/>
-<rect x="816" y="416" width="200" height="8" rx="2" fill="#142035"/>
-<rect x="800" y="442" width="760" height="32" fill="#090f1c"/>
-<rect x="780" y="534" width="200" height="12" rx="3" fill="#253e6a"/>
-<rect x="780" y="558" width="800" height="200" rx="8" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="800" y="578" width="760" height="32" fill="#0a1422"/>
-<rect x="816" y="588" width="100" height="8" rx="2" fill="#1a2e50"/>
-<rect x="800" y="614" width="760" height="32" fill="#0d1828"/>
-<rect x="800" y="650" width="760" height="32" fill="#090f1c"/>
-<rect x="800" y="686" width="760" height="32" fill="#0d1828"/>
-</svg>
-      <div class="dissolve-pill"><span class="dissolve-dot"></span>Wireframe → Design</div>
-    </div>
-    <button class="modal-close" aria-label="Close">✕</button>
-    <div class="modal-body">
-      <div class="modal-client">Apple</div>
-      <h2 class="modal-title">Partner Opportunity Management</h2>
-      <div class="modal-meta">
-        <div><div class="meta-label">Role</div><div class="meta-value">Lead UX Designer</div></div>
-        <div><div class="meta-label">Duration</div><div class="meta-value">13 months</div></div>
-        <div><div class="meta-label">Year</div><div class="meta-value">2023</div></div>
-      </div>
-      <div class="modal-sec"><h3>Challenge</h3><p>Apple's partner managers operated in 3 disconnected systems to track opportunity progress, resulting in pipeline inaccuracy and partner frustration during deal review.</p></div>
-      <div class="modal-sec"><h3>Approach</h3><p>Facilitated co-design workshops with partner managers and Salesforce architects, designed a unified opportunity detail view with embedded quoting and activity streams.</p></div>
-      <div class="modal-sec"><h3>Outcome</h3><p>Partner satisfaction with deal management tools increased by 31 points. Pipeline data accuracy improved from 67% to 94% within one cycle.</p></div>
-      <div class="modal-tags"><span class="modal-tag">CRM</span><span class="modal-tag">Partner Management</span><span class="modal-tag">Salesforce</span><span class="modal-tag">Enterprise</span></div>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-backmargin">
-  <div class="modal-box">
-    <div class="modal-hero">
-      <img class="img-design" src="../assets/work/apple-bm-program-list.png" alt="Channel Program Management" loading="lazy">
-      <svg class="wf-modal" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-<rect width="1600" height="900" fill="#060c18"/>
-<rect width="1600" height="52" fill="#0a1220"/>
-<rect x="16" y="14" width="110" height="24" rx="4" fill="#182840"/>
-<rect x="158" y="18" width="64" height="16" rx="3" fill="#182840"/>
-<rect x="234" y="18" width="64" height="16" rx="3" fill="#182840"/>
-<circle cx="1558" cy="26" r="14" fill="#182840"/>
-<rect x="20" y="70" width="260" height="16" rx="3" fill="#253e6a"/>
-<rect x="20" y="94" width="160" height="10" rx="2" fill="#1a2e50"/>
-<rect x="1360" y="68" width="100" height="28" rx="6" fill="#1e3258"/>
-<rect x="1472" y="68" width="100" height="28" rx="6" fill="#2a5090"/>
-<rect x="20" y="124" width="800" height="40" rx="8" fill="#0e1a2c" stroke="#182840" stroke-width="1"/>
-<rect x="36" y="136" width="160" height="16" rx="4" fill="#182840"/>
-<rect x="212" y="136" width="12" height="16" rx="2" fill="#142035"/>
-<rect x="840" y="124" width="60" height="40" rx="8" fill="#1e3258"/>
-<rect x="912" y="124" width="60" height="40" rx="8" fill="#1e3258"/>
-<rect x="20" y="180" width="1560" height="44" fill="#0a1422"/>
-<rect x="36" y="192" width="200" height="10" rx="2" fill="#1a2e50"/>
-<rect x="440" y="192" width="120" height="10" rx="2" fill="#1a2e50"/>
-<rect x="760" y="192" width="120" height="10" rx="2" fill="#1a2e50"/>
-<rect x="1080" y="192" width="120" height="10" rx="2" fill="#1a2e50"/>
-<rect x="1360" y="192" width="120" height="10" rx="2" fill="#1a2e50"/>
-<rect x="20" y="228" width="1560" height="40" fill="#0d1828"/>
-<rect x="36" y="240" width="240" height="10" rx="2" fill="#142035"/>
-<rect x="440" y="240" width="120" height="10" rx="2" fill="#142035"/>
-<rect x="760" y="240" width="120" height="10" rx="2" fill="#142035"/>
-<rect x="1080" y="238" width="100" height="16" rx="8" fill="#182840"/>
-<rect x="1360" y="240" width="100" height="10" rx="2" fill="#142035"/>
-<rect x="20" y="272" width="1560" height="40" fill="#090f1c"/>
-<rect x="36" y="284" width="220" height="10" rx="2" fill="#142035"/>
-<rect x="440" y="284" width="120" height="10" rx="2" fill="#142035"/>
-<rect x="760" y="284" width="120" height="10" rx="2" fill="#142035"/>
-<rect x="1080" y="282" width="100" height="16" rx="8" fill="#182840"/>
-<rect x="20" y="316" width="1560" height="40" fill="#0d1828"/>
-<rect x="36" y="328" width="260" height="10" rx="2" fill="#142035"/>
-<rect x="20" y="360" width="1560" height="40" fill="#090f1c"/>
-<rect x="36" y="372" width="200" height="10" rx="2" fill="#142035"/>
-<rect x="20" y="404" width="1560" height="40" fill="#0d1828"/>
-<rect x="36" y="416" width="240" height="10" rx="2" fill="#142035"/>
-<rect x="20" y="448" width="1560" height="40" fill="#090f1c"/>
-<rect x="36" y="460" width="180" height="10" rx="2" fill="#142035"/>
-<rect x="20" y="492" width="1560" height="40" fill="#0d1828"/>
-<rect x="36" y="504" width="220" height="10" rx="2" fill="#142035"/>
-<rect x="20" y="536" width="1560" height="40" fill="#090f1c"/>
-<rect x="36" y="548" width="200" height="10" rx="2" fill="#142035"/>
-<rect x="20" y="580" width="1560" height="40" fill="#0d1828"/>
-<rect x="36" y="592" width="240" height="10" rx="2" fill="#142035"/>
-<rect x="20" y="624" width="1560" height="40" fill="#090f1c"/>
-<rect x="36" y="636" width="180" height="10" rx="2" fill="#142035"/>
-<rect x="20" y="668" width="1560" height="40" fill="#0d1828"/>
-<rect x="20" y="732" width="1560" height="1" fill="#182840"/>
-<rect x="600" y="752" width="80" height="28" rx="4" fill="#182840"/>
-<rect x="700" y="756" width="50" height="20" rx="4" fill="#142035"/>
-<rect x="766" y="756" width="50" height="20" rx="4" fill="#142035"/>
-<rect x="832" y="756" width="50" height="20" rx="4" fill="#142035"/>
-<rect x="920" y="752" width="80" height="28" rx="4" fill="#182840"/>
-</svg>
-      <div class="dissolve-pill"><span class="dissolve-dot"></span>Wireframe → Design</div>
-    </div>
-    <button class="modal-close" aria-label="Close">✕</button>
-    <div class="modal-body">
-      <div class="modal-client">Apple</div>
-      <h2 class="modal-title">Channel Program Management</h2>
-      <div class="modal-meta">
-        <div><div class="meta-label">Role</div><div class="meta-value">UX Designer</div></div>
-        <div><div class="meta-label">Duration</div><div class="meta-value">9 months</div></div>
-        <div><div class="meta-label">Year</div><div class="meta-value">2023</div></div>
-      </div>
-      <div class="modal-sec"><h3>Challenge</h3><p>Program managers used ad-hoc spreadsheets alongside a barely-adopted Salesforce org — reconciliation took days per quarter and errors surfaced only at audit.</p></div>
-      <div class="modal-sec"><h3>Approach</h3><p>Defined the object model alongside the data team, designed filterable list views with inline editing, bulk actions, and an approval workflow that replaced the manual process.</p></div>
-      <div class="modal-sec"><h3>Outcome</h3><p>Quarterly reconciliation time reduced from 3 days to 4 hours. Audit findings dropped to zero in the two cycles following launch.</p></div>
-      <div class="modal-tags"><span class="modal-tag">Enterprise</span><span class="modal-tag">Program Management</span><span class="modal-tag">Salesforce</span><span class="modal-tag">Data</span></div>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-clm">
-  <div class="modal-box">
-    <div class="modal-hero">
-      <img class="img-design" src="../assets/work/att-catalog-dynamic-filtering.png" alt="Contract Lifecycle Management" loading="lazy">
-      <svg class="wf-modal" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-<rect width="1600" height="900" fill="#060c18"/>
-<rect width="1600" height="52" fill="#0a1220"/>
-<rect x="16" y="14" width="110" height="24" rx="4" fill="#182840"/>
-<rect x="158" y="18" width="64" height="16" rx="3" fill="#182840"/>
-<rect x="234" y="18" width="64" height="16" rx="3" fill="#182840"/>
-<circle cx="1558" cy="26" r="14" fill="#182840"/>
-<rect x="0" y="52" width="260" height="848" fill="#090f1e"/>
-<rect x="12" y="72" width="236" height="36" rx="6" fill="#0e1a2c" stroke="#182840" stroke-width="1"/>
-<rect x="24" y="84" width="180" height="12" rx="3" fill="#182840"/>
-<rect x="12" y="124" width="110" height="10" rx="2" fill="#253e6a"/>
-<rect x="12" y="144" width="236" height="28" rx="4" fill="#0e1a2c"/>
-<rect x="24" y="152" width="120" height="12" rx="2" fill="#1a2e50"/>
-<rect x="12" y="180" width="236" height="28" rx="4" fill="#0e1a2c"/>
-<rect x="24" y="188" width="100" height="12" rx="2" fill="#1a2e50"/>
-<rect x="12" y="216" width="236" height="28" rx="4" fill="#0e1a2c"/>
-<rect x="12" y="264" width="100" height="10" rx="2" fill="#253e6a"/>
-<rect x="12" y="284" width="236" height="24" rx="4" fill="#0e1a2c"/>
-<rect x="24" y="291" width="14" height="10" rx="2" fill="#1a2e50"/>
-<rect x="44" y="291" width="100" height="10" rx="2" fill="#1a2e50"/>
-<rect x="12" y="316" width="236" height="24" rx="4" fill="#0e1a2c"/>
-<rect x="24" y="323" width="14" height="10" rx="2" fill="#182840"/>
-<rect x="44" y="323" width="100" height="10" rx="2" fill="#1a2e50"/>
-<rect x="12" y="348" width="236" height="24" rx="4" fill="#0e1a2c"/>
-<rect x="12" y="380" width="236" height="24" rx="4" fill="#0e1a2c"/>
-<rect x="12" y="412" width="236" height="24" rx="4" fill="#0e1a2c"/>
-<rect x="12" y="452" width="100" height="10" rx="2" fill="#253e6a"/>
-<rect x="12" y="472" width="236" height="24" rx="4" fill="#0e1a2c"/>
-<rect x="12" y="504" width="236" height="24" rx="4" fill="#0e1a2c"/>
-<rect x="12" y="536" width="236" height="24" rx="4" fill="#0e1a2c"/>
-<rect x="12" y="568" width="236" height="24" rx="4" fill="#0e1a2c"/>
-<rect x="260" y="52" width="1340" height="848" fill="#080c18"/>
-<rect x="276" y="70" width="280" height="16" rx="3" fill="#253e6a"/>
-<rect x="276" y="94" width="200" height="10" rx="2" fill="#1a2e50"/>
-<rect x="276" y="120" width="80" height="24" rx="12" fill="#1a2e50"/>
-<rect x="368" y="120" width="100" height="24" rx="12" fill="#182840"/>
-<rect x="480" y="120" width="80" height="24" rx="12" fill="#182840"/>
-<rect x="276" y="164" width="380" height="180" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="292" y="184" width="348" height="100" rx="4" fill="#0a1422"/>
-<rect x="292" y="296" width="180" height="12" rx="3" fill="#1e3258"/>
-<rect x="292" y="316" width="260" height="8" rx="2" fill="#142035"/>
-<rect x="292" y="332" width="100" height="24" rx="6" fill="#1a2e50"/>
-<rect x="676" y="164" width="380" height="180" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="692" y="184" width="348" height="100" rx="4" fill="#0a1422"/>
-<rect x="692" y="296" width="180" height="12" rx="3" fill="#1e3258"/>
-<rect x="692" y="332" width="100" height="24" rx="6" fill="#1a2e50"/>
-<rect x="1076" y="164" width="380" height="180" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="1092" y="184" width="348" height="100" rx="4" fill="#0a1422"/>
-<rect x="1092" y="296" width="180" height="12" rx="3" fill="#1e3258"/>
-<rect x="276" y="364" width="380" height="180" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="292" y="384" width="348" height="100" rx="4" fill="#0a1422"/>
-<rect x="292" y="496" width="180" height="12" rx="3" fill="#1e3258"/>
-<rect x="676" y="364" width="380" height="180" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="692" y="384" width="348" height="100" rx="4" fill="#0a1422"/>
-<rect x="1076" y="364" width="380" height="180" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="276" y="564" width="380" height="180" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="676" y="564" width="380" height="180" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-<rect x="1076" y="564" width="380" height="180" rx="10" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-</svg>
-      <div class="dissolve-pill"><span class="dissolve-dot"></span>Wireframe → Design</div>
-    </div>
-    <button class="modal-close" aria-label="Close">✕</button>
-    <div class="modal-body">
-      <div class="modal-client">AT&T</div>
-      <h2 class="modal-title">Contract Lifecycle Management</h2>
-      <div class="modal-meta">
-        <div><div class="meta-label">Role</div><div class="meta-value">UX Lead</div></div>
-        <div><div class="meta-label">Duration</div><div class="meta-value">10 months</div></div>
-        <div><div class="meta-label">Year</div><div class="meta-value">2020</div></div>
-      </div>
-      <div class="modal-sec"><h3>Challenge</h3><p>Enterprise sellers were navigating a catalog of 3,000+ service components with no filtering, comparison, or context — deals were slowed by back-and-forth with contract ops.</p></div>
-      <div class="modal-sec"><h3>Approach</h3><p>Conducted generative research with 18 enterprise sales reps, mapped the full contracting lifecycle, and designed a filterable catalog with dynamic pricing and templated contract generation.</p></div>
-      <div class="modal-sec"><h3>Outcome</h3><p>Average enterprise quote cycle time reduced from 11 days to 4 days. Catalog adoption by enterprise sales rose from 23% to 81%.</p></div>
-      <div class="modal-tags"><span class="modal-tag">Enterprise</span><span class="modal-tag">CLM</span><span class="modal-tag">B2B</span><span class="modal-tag">Catalog</span></div>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-polaris">
-  <div class="modal-box">
-    <div class="modal-hero">
-      <img class="img-design" src="../assets/work/polaris-landing-pages.png" alt="Design System & Component Library" loading="lazy">
       <svg class="wf-modal" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
 <rect width="1600" height="900" fill="#060c18"/>
 <rect width="1600" height="52" fill="#0a1220"/>
@@ -1681,8 +1306,7 @@ a{color:inherit;text-decoration:none}
 <rect x="1336" y="264" width="228" height="80" rx="6" fill="#0e1a2c"/>
 <rect x="1336" y="356" width="228" height="80" rx="6" fill="#0e1a2c"/>
 <rect x="1336" y="448" width="228" height="80" rx="6" fill="#0e1a2c"/>
-</svg>
-      <div class="dissolve-pill"><span class="dissolve-dot"></span>Wireframe → Design</div>
+</svg><div class="dissolve-pill"><span class="dissolve-dot"></span>Wireframe → Design</div>
     </div>
     <button class="modal-close" aria-label="Close">✕</button>
     <div class="modal-body">
@@ -1701,10 +1325,17 @@ a{color:inherit;text-decoration:none}
   </div>
 </div>
 
-<div class="modal-overlay" id="modal-portal">
+<div class="modal-overlay modal--zoom-out" id="modal-portal">
   <div class="modal-box">
     <div class="modal-hero">
-      <img class="img-design" src="../assets/work/Experience Cloud Home-0.png" alt="Community Banking Experience Portal" loading="lazy">
+      
+      <div class="img-carousel" data-id="portal">
+        <img class="img-design active" src="../assets/work/Experience Cloud Home-0.png" alt="Community Banking Experience Portal view 1" loading="lazy" style="object-position:center 25%">
+        <img class="img-design " src="../assets/work/jh-home-landing.png" alt="Community Banking Experience Portal view 2" loading="lazy" style="object-position:center 25%">
+        <button class="img-nav img-prev" aria-label="Previous image">‹</button>
+        <button class="img-nav img-next" aria-label="Next image">›</button>
+        <div class="img-dots"><span class="dot active" data-idx="0"></span><span class="dot" data-idx="1"></span></div>
+      </div>
       <svg class="wf-modal" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
 <rect width="1600" height="900" fill="#060c18"/>
 <rect width="1600" height="52" fill="#0a1220"/>
@@ -1763,8 +1394,7 @@ a{color:inherit;text-decoration:none}
 <rect x="1096" y="624" width="448" height="44" rx="6" fill="#0d1828" stroke="#182840" stroke-width="1"/>
 <rect x="1096" y="676" width="448" height="44" rx="6" fill="#0d1828" stroke="#182840" stroke-width="1"/>
 <rect x="1096" y="728" width="448" height="44" rx="6" fill="#0d1828" stroke="#182840" stroke-width="1"/>
-</svg>
-      <div class="dissolve-pill"><span class="dissolve-dot"></span>Wireframe → Design</div>
+</svg><div class="dissolve-pill"><span class="dissolve-dot"></span>Wireframe → Design</div>
     </div>
     <button class="modal-close" aria-label="Close">✕</button>
     <div class="modal-body">
@@ -1783,121 +1413,385 @@ a{color:inherit;text-decoration:none}
   </div>
 </div>
 
+<div class="modal-overlay " id="modal-fintech">
+  <div class="modal-box">
+    <div class="modal-hero">
+      
+      <div class="img-carousel" data-id="fintech">
+        <img class="img-design active" src="../assets/work/finance-hero.png" alt="Consumer Investment & Trading Platform view 1" loading="lazy" style="object-position:center top">
+        <img class="img-design " src="../assets/work/finance-2.png" alt="Consumer Investment & Trading Platform view 2" loading="lazy" style="object-position:center top">
+        <button class="img-nav img-prev" aria-label="Previous image">‹</button>
+        <button class="img-nav img-next" aria-label="Next image">›</button>
+        <div class="img-dots"><span class="dot active" data-idx="0"></span><span class="dot" data-idx="1"></span></div>
+      </div>
+      <svg class="wf-modal" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+<rect width="1600" height="900" fill="#0a0f20"/>
+<rect width="1600" height="64" fill="#0d1428"/>
+<rect x="32" y="20" width="140" height="24" rx="6" fill="#1a2e50"/>
+<rect x="800" y="24" width="60" height="16" rx="3" fill="#1a2e50"/>
+<rect x="1500" y="24" width="52" height="16" rx="3" fill="#1a2e50"/>
+<rect x="32" y="100" width="720" height="300" rx="12" fill="#0d1828" stroke="#1a3a5a" stroke-width="1"/>
+<circle cx="150" cy="180" r="40" fill="#1a3a5a"/>
+<rect x="220" y="160" width="480" height="40" rx="4" fill="#182840"/>
+<rect x="220" y="220" width="320" height="12" rx="2" fill="#0f1f35"/>
+<rect x="220" y="245" width="280" height="12" rx="2" fill="#0f1f35"/>
+<rect x="32" y="420" width="340" height="420" rx="12" fill="#0d1828" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="56" y="450" width="292" height="16" rx="2" fill="#1a2e50"/>
+<line x1="56" y1="485" x2="328" y2="485" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="56" y="510" width="292" height="60" rx="6" fill="#0a0f20"/>
+<rect x="56" y="590" width="292" height="60" rx="6" fill="#0a0f20"/>
+<rect x="56" y="670" width="292" height="60" rx="6" fill="#0a0f20"/>
+<rect x="800" y="420" width="720" height="180" rx="12" fill="#0d1828" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="832" y="450" width="656" height="12" rx="2" fill="#1a2e50"/>
+<rect x="832" y="475" width="400" height="8" rx="2" fill="#0f1f35"/>
+<rect x="832" y="510" width="120" height="8" rx="2" fill="#0f1f35"/>
+<rect x="832" y="530" width="100" height="60" rx="4" fill="#1a3a5a"/>
+<rect x="960" y="530" width="100" height="60" rx="4" fill="#1a3a5a"/>
+<rect x="1088" y="530" width="100" height="60" rx="4" fill="#1a3a5a"/>
+<rect x="800" y="620" width="720" height="220" rx="12" fill="#0d1828" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="832" y="650" width="656" height="12" rx="2" fill="#1a2e50"/>
+<line x1="832" y1="685" x2="1488" y2="685" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="832" y="705" width="148" height="40" rx="4" fill="#0a0f20"/>
+<rect x="1000" y="705" width="148" height="40" rx="4" fill="#0a0f20"/>
+<rect x="1168" y="705" width="148" height="40" rx="4" fill="#0a0f20"/>
+<rect x="832" y="760" width="148" height="40" rx="4" fill="#0a0f20"/>
+</svg><div class="dissolve-pill"><span class="dissolve-dot"></span>Wireframe → Design</div>
+    </div>
+    <button class="modal-close" aria-label="Close">✕</button>
+    <div class="modal-body">
+      <div class="modal-client">Digital Finance Co.</div>
+      <h2 class="modal-title">Consumer Investment & Trading Platform</h2>
+      <div class="modal-meta">
+        <div><div class="meta-label">Role</div><div class="meta-value">Lead UX Designer</div></div>
+        <div><div class="meta-label">Duration</div><div class="meta-value">11 months</div></div>
+        <div><div class="meta-label">Year</div><div class="meta-value">2023</div></div>
+      </div>
+      <div class="modal-sec"><h3>Challenge</h3><p>New users abandoned account setup 60% of the time. Existing users found the portfolio dashboard overwhelming with too many data points and unclear actionable insights.</p></div>
+      <div class="modal-sec"><h3>Approach</h3><p>Conducted 30 user interviews across age groups, validated new IA with tree testing, and designed a progressive disclosure system that revealed insights based on user sophistication level.</p></div>
+      <div class="modal-sec"><h3>Outcome</h3><p>Onboarding completion improved from 40% to 89%. Daily active users increased 34% and average session length grew from 8 to 18 minutes within 6 months.</p></div>
+      <div class="modal-tags"><span class="modal-tag">Fintech</span><span class="modal-tag">Mobile</span><span class="modal-tag">Portfolio</span><span class="modal-tag">Investment</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay " id="modal-telecom">
+  <div class="modal-box">
+    <div class="modal-hero">
+      
+      <div class="img-carousel" data-id="telecom">
+        <img class="img-design active" src="../assets/work/telecom-hero.png" alt="Internal Tool Suite for Network Operations view 1" loading="lazy" style="object-position:center top">
+        <img class="img-design " src="../assets/work/telecom-2.png" alt="Internal Tool Suite for Network Operations view 2" loading="lazy" style="object-position:center top">
+        <button class="img-nav img-prev" aria-label="Previous image">‹</button>
+        <button class="img-nav img-next" aria-label="Next image">›</button>
+        <div class="img-dots"><span class="dot active" data-idx="0"></span><span class="dot" data-idx="1"></span></div>
+      </div>
+      <svg class="wf-modal" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+<rect width="1600" height="900" fill="#0a0f20"/>
+<rect width="1600" height="60" fill="#0d1428"/>
+<rect x="24" y="16" width="120" height="28" rx="6" fill="#1a2e50"/>
+<rect x="1480" y="20" width="80" height="20" rx="3" fill="#1a2e50"/>
+<rect x="24" y="100" width="300" height="700" rx="10" fill="#0d1828" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="40" y="125" width="268" height="24" rx="4" fill="#182840"/>
+<rect x="40" y="170" width="268" height="40" rx="6" fill="#0a0f20"/>
+<rect x="40" y="230" width="268" height="40" rx="6" fill="#0a0f20"/>
+<rect x="40" y="290" width="268" height="40" rx="6" fill="#0a0f20"/>
+<rect x="40" y="350" width="268" height="40" rx="6" fill="#0a0f20"/>
+<line x1="24" y1="410" x2="324" y2="410" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="40" y="430" width="268" height="24" rx="3" fill="#1a2e50"/>
+<rect x="40" y="470" width="268" height="40" rx="6" fill="#0a0f20"/>
+<rect x="40" y="530" width="268" height="40" rx="6" fill="#0a0f20"/>
+<rect x="360" y="100" width="1180" height="300" rx="10" fill="#0d1828" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="400" y="130" width="1100" height="20" rx="3" fill="#1a2e50"/>
+<rect x="400" y="170" width="260" height="100" rx="6" fill="#1a3a5a"/>
+<rect x="680" y="170" width="260" height="100" rx="6" fill="#1a3a5a"/>
+<rect x="960" y="170" width="260" height="100" rx="6" fill="#1a3a5a"/>
+<rect x="1240" y="170" width="260" height="100" rx="6" fill="#1a3a5a"/>
+<rect x="360" y="430" width="1180" height="370" rx="10" fill="#0d1828" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="400" y="460" width="1100" height="16" rx="2" fill="#1a2e50"/>
+<line x1="400" y1="495" x2="1480" y2="495" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="400" y="515" width="256" height="12" rx="1" fill="#0f1f35"/>
+<rect x="400" y="540" width="256" height="12" rx="1" fill="#0f1f35"/>
+<rect x="400" y="565" width="256" height="12" rx="1" fill="#0f1f35"/>
+<rect x="700" y="515" width="256" height="12" rx="1" fill="#0f1f35"/>
+<rect x="700" y="540" width="256" height="12" rx="1" fill="#0f1f35"/>
+<rect x="700" y="565" width="256" height="12" rx="1" fill="#0f1f35"/>
+<rect x="1000" y="515" width="256" height="12" rx="1" fill="#0f1f35"/>
+<rect x="1000" y="540" width="256" height="12" rx="1" fill="#0f1f35"/>
+<rect x="1000" y="565" width="256" height="12" rx="1" fill="#0f1f35"/>
+<rect x="400" y="620" width="120" height="160" rx="6" fill="#0a0f20"/>
+<rect x="560" y="620" width="120" height="160" rx="6" fill="#0a0f20"/>
+<rect x="720" y="620" width="120" height="160" rx="6" fill="#0a0f20"/>
+<rect x="880" y="620" width="120" height="160" rx="6" fill="#0a0f20"/>
+</svg><div class="dissolve-pill"><span class="dissolve-dot"></span>Wireframe → Design</div>
+    </div>
+    <button class="modal-close" aria-label="Close">✕</button>
+    <div class="modal-body">
+      <div class="modal-client">Global Telecom Provider</div>
+      <h2 class="modal-title">Internal Tool Suite for Network Operations</h2>
+      <div class="modal-meta">
+        <div><div class="meta-label">Role</div><div class="meta-value">Senior UX Designer</div></div>
+        <div><div class="meta-label">Duration</div><div class="meta-value">10 months</div></div>
+        <div><div class="meta-label">Year</div><div class="meta-value">2022</div></div>
+      </div>
+      <div class="modal-sec"><h3>Challenge</h3><p>Engineers toggled between 8 legacy systems with inconsistent data models, leading to missed alerts and duplicated troubleshooting across teams.</p></div>
+      <div class="modal-sec"><h3>Approach</h3><p>Mapped data flows across systems, designed a unified schema, and built a dashboard with customizable widgets, critical alert prioritization, and one-click incident escalation.</p></div>
+      <div class="modal-sec"><h3>Outcome</h3><p>Mean time to incident response dropped 42%. Engineers reported 52% less context-switching. System adoption reached 98% across all regions within 4 months.</p></div>
+      <div class="modal-tags"><span class="modal-tag">B2B</span><span class="modal-tag">Network</span><span class="modal-tag">Operations</span><span class="modal-tag">Dashboard</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay " id="modal-retail">
+  <div class="modal-box">
+    <div class="modal-hero">
+      
+      <div class="img-carousel" data-id="retail">
+        <img class="img-design active" src="../assets/work/att-catalog-dynamic-filtering.png" alt="Staff Enablement Platform view 1" loading="lazy" style="object-position:center 15%">
+        <img class="img-design " src="../assets/work/att-wbb-cover.png" alt="Staff Enablement Platform view 2" loading="lazy" style="object-position:center 15%">
+        <button class="img-nav img-prev" aria-label="Previous image">‹</button>
+        <button class="img-nav img-next" aria-label="Next image">›</button>
+        <div class="img-dots"><span class="dot active" data-idx="0"></span><span class="dot" data-idx="1"></span></div>
+      </div>
+      <svg class="wf-modal" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+<rect width="1600" height="900" fill="#0a0f20"/>
+<rect width="1600" height="56" fill="#0d1428"/>
+<rect x="28" y="14" width="100" height="28" rx="6" fill="#1a2e50"/>
+<rect x="1504" y="18" width="52" height="20" rx="3" fill="#1a2e50"/>
+<rect x="28" y="90" width="1520" height="60" fill="#0a0f20" stroke="#1a3a5a" stroke-width="1" rx="6"/>
+<rect x="52" y="105" width="32" height="30" rx="4" fill="#1a3a5a"/>
+<rect x="100" y="105" width="280" height="30" rx="4" fill="#182840"/>
+<rect x="416" y="105" width="80" height="30" rx="4" fill="#0f1f35"/>
+<rect x="524" y="105" width="80" height="30" rx="4" fill="#0f1f35"/>
+<rect x="1420" y="105" width="96" height="30" rx="4" fill="#182840"/>
+<rect x="28" y="180" width="356" height="580" rx="10" fill="#0d1828" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="52" y="210" width="308" height="20" rx="3" fill="#1a2e50"/>
+<rect x="52" y="250" width="308" height="50" rx="6" fill="#0a0f20"/>
+<rect x="52" y="315" width="308" height="50" rx="6" fill="#0a0f20"/>
+<rect x="52" y="380" width="308" height="50" rx="6" fill="#0a0f20"/>
+<rect x="52" y="445" width="308" height="50" rx="6" fill="#0a0f20"/>
+<rect x="52" y="510" width="308" height="50" rx="6" fill="#0a0f20"/>
+<rect x="420" y="180" width="1128" height="580" rx="10" fill="#0d1828" stroke="#1a3a5a" stroke-width="1"/>
+<rect x="456" y="210" width="1056" height="24" rx="3" fill="#1a2e50"/>
+<rect x="456" y="255" width="244" height="150" rx="6" fill="#1a3a5a"/>
+<rect x="720" y="255" width="244" height="150" rx="6" fill="#1a3a5a"/>
+<rect x="984" y="255" width="244" height="150" rx="6" fill="#1a3a5a"/>
+<rect x="1248" y="255" width="264" height="150" rx="6" fill="#1a3a5a"/>
+<rect x="456" y="425" width="1056" height="20" rx="2" fill="#0f1f35"/>
+<rect x="456" y="460" width="1056" height="80" rx="6" fill="#0a0f20"/>
+<rect x="456" y="555" width="1056" height="180" rx="6" fill="#0a0f20"/>
+</svg><div class="dissolve-pill"><span class="dissolve-dot"></span>Wireframe → Design</div>
+    </div>
+    <button class="modal-close" aria-label="Close">✕</button>
+    <div class="modal-body">
+      <div class="modal-client">Premium Retail Network</div>
+      <h2 class="modal-title">Staff Enablement Platform</h2>
+      <div class="modal-meta">
+        <div><div class="meta-label">Role</div><div class="meta-value">UX Designer</div></div>
+        <div><div class="meta-label">Duration</div><div class="meta-value">7 months</div></div>
+        <div><div class="meta-label">Year</div><div class="meta-value">2020</div></div>
+      </div>
+      <div class="modal-sec"><h3>Challenge</h3><p>Staff relied on outdated printed guides and slow desktop systems. Customer questions about product details often went unanswered, reducing confidence and closing rates.</p></div>
+      <div class="modal-sec"><h3>Approach</h3><p>Partnered with store managers to identify top 20 questions, built searchable knowledge base with rich media, and added push notifications for flash promotions and inventory updates.</p></div>
+      <div class="modal-sec"><h3>Outcome</h3><p>Customer satisfaction scores improved 28%. Staff average handle time for inquiries dropped 60%. Promotion participation rates increased from 12% to 47%.</p></div>
+      <div class="modal-tags"><span class="modal-tag">Retail</span><span class="modal-tag">Mobile</span><span class="modal-tag">Employee Experience</span><span class="modal-tag">B2B2C</span></div>
+    </div>
+  </div>
+</div>
+
 <script>
-/* ── Modal open/close — pure-CSS dissolve, no transition juggling ── */
-function openModal(id) {
-  const overlay = document.getElementById('modal-' + id);
-  if (!overlay) return;
-  overlay.classList.add('is-open');
-  document.body.style.overflow = 'hidden';
-}
-function closeModal(overlay) {
-  overlay.classList.remove('is-open');
-  document.body.style.overflow = '';
-}
 
-document.querySelectorAll('.work-entry').forEach(entry => {
-  entry.addEventListener('click', e => {
-    if (e.target.closest('.entry-tag')) return; // tag click handled separately
-    openModal(entry.dataset.modal);
-  });
-});
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', e => {
-    if (e.target === overlay) closeModal(overlay);
-  });
-});
-document.querySelectorAll('.modal-close').forEach(btn => {
-  btn.addEventListener('click', () => closeModal(btn.closest('.modal-overlay')));
-});
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    document.querySelectorAll('.modal-overlay.is-open').forEach(closeModal);
+console.log('=== Portfolio Loading ===');
+
+// ── STATE ──
+let currentModal = null;
+let currentImageIndex = {};
+
+// Wait for DOM to be fully ready
+function initInterface() {
+  console.log('Initializing interface...');
+  
+  // ══════════════════════════════════════════════════════════════
+  // MODAL FUNCTIONS
+  // ══════════════════════════════════════════════════════════════
+  
+  function openModal(modalId) {
+    console.log('Opening modal:', modalId);
+    const modal = document.getElementById('modal-' + modalId);
+    if (!modal) {
+      console.error('Modal not found:', 'modal-' + modalId);
+      return;
+    }
+    currentModal = modal;
+    modal.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    console.log('Modal opened');
   }
-});
-
-/* ── Tag filter system ── */
-let activeTag = null;
-const banner = document.getElementById('filter-banner');
-const bannerLabel = document.getElementById('filter-label');
-const filterBar = document.getElementById('tag-filter-bar');
-
-// Build pills from unique tags across all entries
-const allTags = [];
-document.querySelectorAll('.work-entry').forEach(entry => {
-  (entry.dataset.tags || '').split(',').forEach(t => {
-    t = t.trim();
-    if (t && !allTags.includes(t)) allTags.push(t);
-  });
-});
-allTags.sort().forEach(tag => {
-  const pill = document.createElement('button');
-  pill.className = 'filter-pill';
-  pill.textContent = tag;
-  pill.addEventListener('click', () => applyFilter(tag, pill));
-  filterBar.appendChild(pill);
-});
-
-function applyFilter(tag, sourcePill) {
-  if (activeTag === tag) {
-    clearFilter();
-    return;
+  
+  function closeModal() {
+    console.log('Closing modal');
+    if (currentModal) {
+      currentModal.classList.remove('is-open');
+      document.body.style.overflow = '';
+      currentModal = null;
+    }
   }
-  activeTag = tag;
-  // Update pills
-  document.querySelectorAll('.filter-pill').forEach(p => {
-    p.classList.toggle('active', p.textContent === tag);
-  });
-  // Filter entries
+  
+  // ══════════════════════════════════════════════════════════════
+  // CAROUSEL FUNCTIONS
+  // ══════════════════════════════════════════════════════════════
+  
+  function showImage(carouselId, index) {
+    const carousel = document.querySelector('[data-id="' + carouselId + '"]');
+    if (!carousel) {
+      console.error('Carousel not found:', carouselId);
+      return;
+    }
+    
+    const images = carousel.querySelectorAll('.img-design');
+    const dots = carousel.querySelectorAll('.dot');
+    
+    if (images.length === 0) return;
+    
+    // Normalize index
+    index = ((index % images.length) + images.length) % images.length;
+    currentImageIndex[carouselId] = index;
+    
+    console.log('Showing image', index, 'of', images.length, 'in carousel', carouselId);
+    
+    // Hide all, show target
+    images.forEach((img, i) => {
+      img.classList.toggle('active', i === index);
+    });
+    
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === index);
+    });
+  }
+  
+  // ══════════════════════════════════════════════════════════════
+  // ENTRY CLICKS - OPEN MODAL
+  // ══════════════════════════════════════════════════════════════
+  
   document.querySelectorAll('.work-entry').forEach(entry => {
-    const tags = (entry.dataset.tags || '').split(',').map(t => t.trim());
-    entry.classList.toggle('filtered-out', !tags.includes(tag));
-  });
-  // Show banner
-  bannerLabel.textContent = tag;
-  banner.classList.add('visible');
-}
-
-function clearFilter() {
-  activeTag = null;
-  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.work-entry').forEach(e => e.classList.remove('filtered-out'));
-  banner.classList.remove('visible');
-}
-
-document.getElementById('filter-clear').addEventListener('click', clearFilter);
-
-// +N more pill — expand tag list in place, do not open modal
-document.querySelectorAll('.tag-more').forEach(btn => {
-  btn.addEventListener('click', e => {
-    e.stopPropagation();
-    btn.closest('.entry-tags').classList.add('expanded');
-  });
-});
-
-// Entry tags (inline) — also trigger filter and stop card-click propagation
-document.querySelectorAll('.entry-tag').forEach(tag => {
-  tag.addEventListener('click', e => {
-    e.stopPropagation();
-    applyFilter(tag.textContent.trim(), null);
-    // Sync pill state
-    document.querySelectorAll('.filter-pill').forEach(p => {
-      p.classList.toggle('active', p.textContent === tag.textContent.trim());
+    entry.addEventListener('click', function(e) {
+      // Don't open modal if clicking tag
+      if (e.target.closest('.entry-tag')) {
+        console.log('Tag clicked, not opening modal');
+        return;
+      }
+      
+      const modalId = this.dataset.modal;
+      console.log('Entry clicked:', modalId);
+      openModal(modalId);
     });
   });
-});
-
-// Modal tags — filter + close modal
-document.querySelectorAll('.modal-tag').forEach(tag => {
-  tag.addEventListener('click', () => {
-    const overlay = tag.closest('.modal-overlay');
-    closeModal(overlay);
-    applyFilter(tag.textContent.trim(), null);
-    document.querySelectorAll('.filter-pill').forEach(p => {
-      p.classList.toggle('active', p.textContent === tag.textContent.trim());
+  console.log('✓ Entry listeners attached');
+  
+  // ══════════════════════════════════════════════════════════════
+  // MODAL CLOSE BUTTON
+  // ══════════════════════════════════════════════════════════════
+  
+  document.querySelectorAll('.modal-close').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      console.log('Close button clicked');
+      e.stopPropagation();
+      closeModal();
     });
   });
-});
+  console.log('✓ Close button listeners attached');
+  
+  // ══════════════════════════════════════════════════════════════
+  // MODAL BACKGROUND CLICK
+  // ══════════════════════════════════════════════════════════════
+  
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+      if (e.target === this) {
+        console.log('Modal background clicked');
+        closeModal();
+      }
+    });
+  });
+  console.log('✓ Modal overlay listeners attached');
+  
+  // ══════════════════════════════════════════════════════════════
+  // CAROUSEL DOTS
+  // ══════════════════════════════════════════════════════════════
+  
+  document.querySelectorAll('.dot').forEach(dot => {
+    dot.addEventListener('click', function(e) {
+      console.log('Dot clicked');
+      e.stopPropagation();
+      const carousel = this.closest('.img-carousel');
+      if (!carousel) {
+        console.error('Carousel not found from dot');
+        return;
+      }
+      const carouselId = carousel.dataset.id;
+      const idx = parseInt(this.dataset.idx);
+      showImage(carouselId, idx);
+    });
+  });
+  console.log('✓ Carousel dot listeners attached:', document.querySelectorAll('.dot').length);
+  
+  // ══════════════════════════════════════════════════════════════
+  // CAROUSEL ARROWS
+  // ══════════════════════════════════════════════════════════════
+  
+  document.querySelectorAll('.img-nav').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      console.log('Carousel arrow clicked');
+      e.stopPropagation();
+      const carousel = this.closest('.img-carousel');
+      if (!carousel) {
+        console.error('Carousel not found from arrow');
+        return;
+      }
+      const carouselId = carousel.dataset.id;
+      const currentIdx = currentImageIndex[carouselId] || 0;
+      const direction = this.classList.contains('img-prev') ? -1 : 1;
+      showImage(carouselId, currentIdx + direction);
+    });
+  });
+  console.log('✓ Carousel arrow listeners attached:', document.querySelectorAll('.img-nav').length);
+  
+  // ══════════════════════════════════════════════════════════════
+  // KEYBOARD - ESCAPE TO CLOSE
+  // ══════════════════════════════════════════════════════════════
+  
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && currentModal) {
+      console.log('Escape pressed');
+      closeModal();
+    }
+  });
+  console.log('✓ Keyboard listener attached');
+  
+  // ══════════════════════════════════════════════════════════════
+  // TAG EXPAND/COLLAPSE
+  // ══════════════════════════════════════════════════════════════
+  
+  document.querySelectorAll('.tag-more').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      console.log('Tag more button clicked');
+      e.stopPropagation();
+      const tags = this.closest('.entry-tags');
+      const isExpanded = tags.classList.toggle('expanded');
+      this.textContent = isExpanded ? '↑' : '···';
+    });
+  });
+  console.log('✓ Tag expand listeners attached');
+  
+  console.log('=== Interface Ready ===');
+}
+
+// Run on DOM ready (not waiting for images)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initInterface);
+} else {
+  initInterface();
+}
+
 </script>
 </body>
 </html>

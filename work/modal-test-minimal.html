@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modal Test - Minimal</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: system-ui; background: #f5f5f5; padding: 40px 20px; }
+
+    .entry {
+      padding: 20px;
+      background: white;
+      border: 2px solid #ccc;
+      margin: 10px 0;
+      cursor: pointer;
+      border-radius: 8px;
+      user-select: none;
+    }
+    .entry:hover { background: #f0f0f0; }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 200ms;
+    }
+    .modal-overlay.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      max-width: 500px;
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Modal Test - Minimal</h1>
+<p>Click any entry to test modals:</p>
+
+<div class="entry" data-modal="one">Entry 1</div>
+<div class="entry" data-modal="two">Entry 2</div>
+<div class="entry" data-modal="three">Entry 3</div>
+
+<div id="modal-one" class="modal-overlay">
+  <div class="modal-box">
+    <button class="modal-close">✕</button>
+    <h2>Modal One</h2>
+    <p>This is modal one. Click outside or the X to close.</p>
+  </div>
+</div>
+
+<div id="modal-two" class="modal-overlay">
+  <div class="modal-box">
+    <button class="modal-close">✕</button>
+    <h2>Modal Two</h2>
+    <p>This is modal two. Click outside or the X to close.</p>
+  </div>
+</div>
+
+<div id="modal-three" class="modal-overlay">
+  <div class="modal-box">
+    <button class="modal-close">✕</button>
+    <h2>Modal Three</h2>
+    <p>This is modal three. Click outside or the X to close.</p>
+  </div>
+</div>
+
+<script>
+function openModal(id) {
+  const overlay = document.getElementById('modal-' + id);
+  if (!overlay) return;
+  overlay.classList.add('is-open');
+}
+
+function closeModal(overlay) {
+  overlay.classList.remove('is-open');
+}
+
+// Entry click handlers
+document.querySelectorAll('.entry').forEach(entry => {
+  entry.addEventListener('click', () => {
+    openModal(entry.dataset.modal);
+  });
+});
+
+// Modal close handlers
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeModal(overlay);
+  });
+});
+
+document.querySelectorAll('.modal-close').forEach(btn => {
+  btn.addEventListener('click', () => {
+    closeModal(btn.closest('.modal-overlay'));
+  });
+});
+</script>
+
+</body>
+</html>
