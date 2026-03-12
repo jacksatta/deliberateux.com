@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Portfolio</title>
+  <style>
+    *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #070812;
+      color: rgba(255,255,255,.92);
+      min-height: 100vh;
+      background: radial-gradient(1200px 900px at 20% -10%, rgba(142,72,255,.22), transparent 55%),
+                  radial-gradient(900px 700px at 90% 0%, rgba(0,168,255,.15), transparent 55%),
+                  radial-gradient(600px 600px at 50% 100%, rgba(0,80,200,.08), transparent 60%),
+                  #070812;
+    }
+    :root {
+      --accent: #7c5cfc;
+      --muted: rgba(255,255,255,.68);
+      --faint: rgba(255,255,255,.52);
+      --border: rgba(255,255,255,.10);
+      --border2: rgba(255,255,255,.14);
+      --ease: cubic-bezier(.2,.8,.2,1);
+    }
+
+    /* ── STICKY HEADER ── */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      padding: 18px 80px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(to bottom, rgba(4,6,18,.97) 55%, rgba(4,6,18,0) 100%);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .site-logo {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -.01em;
+      color: rgba(255,255,255,.95);
+    }
+    .site-tagline {
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--faint);
+    }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      padding: 56px 80px 0;
+      max-width: 1360px;
+      margin: 0 auto;
+    }
+    .eyebrow {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .page-header h1 {
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -.02em;
+      margin-bottom: 18px;
+    }
+    .page-header p {
+      font-size: 17px;
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 560px;
+    }
+
+    /* ── TAG FILTER SECTION ── */
+    .tag-section {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 40px 80px 0;
+    }
+    .tag-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--faint);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0 0 14px;
+      transition: color 200ms;
+      font-family: inherit;
+    }
+    .tag-toggle:hover { color: rgba(255,255,255,.8); }
+    .tag-toggle-arrow {
+      display: inline-block;
+      transition: transform 300ms var(--ease);
+      font-style: normal;
+    }
+    .tag-section.open .tag-toggle-arrow { transform: rotate(180deg); }
+    .tag-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 400ms var(--ease), opacity 300ms;
+    }
+    .tag-section.open .tag-filter { max-height: 200px; opacity: 1; }
+    .filter-pill {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      padding: 7px 16px;
+      border-radius: 24px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      color: var(--faint);
+      cursor: pointer;
+      transition: background 200ms, border-color 200ms, color 200ms;
+      white-space: nowrap;
+    }
+    .filter-pill:hover { background: rgba(255,255,255,.11); color: rgba(255,255,255,.85); border-color: rgba(255,255,255,.20); }
+    .filter-pill.active { background: rgba(124,92,252,.18); border-color: rgba(124,92,252,.4); color: rgba(200,185,255,.95); }
+
+    /* ── FILTER BANNER ── */
+    .filter-banner {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      padding: 0 80px;
+      max-width: 1360px;
+      margin: 24px auto 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .filter-banner.visible { display: flex; }
+    .filter-banner strong { color: rgba(255,255,255,.9); }
+    .filter-clear {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--accent);
+      cursor: pointer;
+      padding: 4px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(124,92,252,.3);
+      transition: background 200ms;
+    }
+    .filter-clear:hover { background: rgba(124,92,252,.15); }
+
+    /* ── WORK SECTION ── */
+    .work-section {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 48px 80px 120px;
+      display: flex;
+      flex-direction: column;
+      gap: 88px;
+    }
+
+    /* ── CASE ENTRY ── */
+    .case {
+      display: grid;
+      grid-template-columns: 56% 44%;
+      min-height: 480px;
+      border: 1px solid hsla(var(--h,265), 60%, 65%, .18);
+      border-radius: 20px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      background: hsla(var(--h,265), 70%, 50%, .025);
+      opacity: 1;
+      transform: translateY(0);
+      transition: background 300ms var(--ease), border-color 300ms, box-shadow 300ms, opacity 650ms cubic-bezier(.2,.8,.2,1), transform 650ms cubic-bezier(.2,.8,.2,1);
+    }
+    .case.in-view { opacity: 1; transform: translateY(0); }
+    .case:hover {
+      background: hsla(var(--h,265), 70%, 55%, .055);
+      border-color: hsla(var(--h,265), 65%, 70%, .4);
+      box-shadow: 0 8px 48px hsla(var(--h,265), 70%, 40%, .18);
+    }
+    .case.filtered-out { display: none; }
+    .case.flip { grid-template-columns: 44% 56%; }
+    .case.flip .case-visual { order: 2; border-right: none; border-left: 1px solid hsla(var(--h,265), 60%, 65%, .18); }
+    .case.flip .case-content { order: 1; }
+
+    .case-visual {
+      position: relative;
+      overflow: hidden;
+      background: rgba(0,0,0,.25);
+      border-right: 1px solid hsla(var(--h,265), 60%, 65%, .18);
+      cursor: pointer !important;
+      pointer-events: auto;
+      will-change: contents;
+    }
+
+    .case-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      pointer-events: none;
+      filter: grayscale(1);
+      transition: filter 180ms;
+      image-rendering: auto;
+    }
+    .case:hover .case-image { filter: grayscale(0.4); }
+
+    .case-wireframe {
+      width: 100%;
+      height: 100%;
+      display: block;
+      transition: opacity 200ms;
+      position: relative;
+      z-index: 1;
+      pointer-events: none;
+      filter: saturate(0);
+    }
+    .case:hover .case-wireframe { opacity: 0.55; }
+
+    .case-visual::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, hsla(var(--h,265), 70%, 55%, .1), hsla(var(--h,265), 80%, 65%, .04));
+      opacity: 0;
+      transition: opacity 150ms;
+      pointer-events: none;
+    }
+    .case:hover .case-visual::after { opacity: 1; }
+
+    .case-cta {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: hsla(var(--h,265), 85%, 82%, 1);
+      background: hsla(var(--h,265), 70%, 45%, .22);
+      border: 1px solid hsla(var(--h,265), 65%, 62%, .38);
+      padding: 6px 14px;
+      border-radius: 20px;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 120ms, transform 120ms, background 120ms, border-color 120ms;
+      pointer-events: none;
+      cursor: pointer;
+    }
+    .case:hover .case-cta {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .case:hover .case-cta:hover {
+      background: hsla(var(--h,265), 70%, 50%, .35);
+      border-color: hsla(var(--h,265), 65%, 70%, .6);
+    }
+
+    .case-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 56px 60px;
+    }
+
+    .case-client {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: hsla(var(--h,265), 75%, 72%, 1);
+      margin-bottom: 14px;
+    }
+
+    .case-title {
+      font-size: clamp(20px, 2vw, 28px);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -.02em;
+      margin-bottom: 14px;
+    }
+
+    .case-desc {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    .case-meta {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+      font-size: 13px;
+      color: var(--faint);
+    }
+    .case-meta strong { color: var(--muted); font-weight: 600; }
+
+    .case-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+
+    .tag {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      color: var(--faint);
+      cursor: pointer;
+      transition: background 200ms, color 200ms, border-color 200ms;
+    }
+    .tag:hover {
+      background: rgba(124,92,252,.15);
+      border-color: rgba(124,92,252,.35);
+      color: rgba(200,185,255,.9);
+    }
+
+    .tag-overflow { display: none; }
+    .case-tags.expanded .tag-overflow { display: inline-flex; }
+
+    .tag-more {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      color: var(--faint);
+      cursor: pointer;
+      transition: background 200ms, color 200ms, border-color 200ms;
+      font-family: inherit;
+      line-height: 1.4;
+    }
+    .tag-more:hover {
+      background: rgba(124,92,252,.12);
+      border-color: rgba(124,92,252,.3);
+      color: rgba(200,185,255,.85);
+    }
+
+    .case-tags.expanded .tag-more {
+      background: rgba(255,255,255,.07);
+      border-color: rgba(255,255,255,.14);
+      color: rgba(255,255,255,.6);
+    }
+
+    .case-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: hsla(var(--h,265), 80%, 74%, 1);
+      transition: gap 200ms var(--ease), color 200ms;
+    }
+    .case-link:hover { gap: 12px; color: hsla(var(--h,265), 85%, 84%, 1); }
+
+    /* ── MODAL ── */
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(4,5,14,.88);
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 48px 24px 24px;
+      overflow-y: auto;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 200ms ease-out;
+      will-change: opacity;
+    }
+    .modal.open {
+      display: flex;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      width: 100%;
+      max-width: 960px;
+      background: #0b1124;
+      border: 1px solid var(--border2);
+      border-radius: 24px;
+      overflow: hidden;
+      transform: translateY(20px);
+      transition: transform 250ms ease-out;
+      position: relative;
+      will-change: transform;
+    }
+    .modal.open .modal-content { transform: translateY(0); }
+
+    .modal-hero {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      background: #080f1c;
+    }
+
+    .modal-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 300ms ease-out;
+    }
+    .modal-image.active { opacity: 1; pointer-events: auto; }
+
+    .carousel-controls {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .carousel-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.4);
+      cursor: pointer;
+      transition: background 100ms, opacity 100ms;
+    }
+    .carousel-dot:hover { background: rgba(255,255,255,.7); }
+    .carousel-dot.active { background: #fff; }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 20;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(0,0,0,.6);
+      border: 1.5px solid rgba(255,255,255,.2);
+      color: rgba(255,255,255,.8);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      line-height: 1;
+      transition: opacity 80ms, transform 80ms;
+      will-change: transform;
+      padding: 0;
+    }
+    .modal-close:hover { opacity: 1; color: #fff; transform: scale(1.1); }
+    .modal-close:active { transform: scale(0.92); }
+
+    .modal-body { padding: 40px 48px 48px; }
+
+    .modal-client {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .modal-title {
+      font-size: clamp(20px, 2.5vw, 32px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -.02em;
+      margin-bottom: 20px;
+    }
+
+    .modal-meta {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .meta-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--faint);
+      margin-bottom: 4px;
+    }
+
+    .meta-value { font-size: 14px; color: var(--muted); }
+
+    .modal-section { margin-bottom: 24px; }
+    .modal-section h3 {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--faint);
+      margin-bottom: 8px;
+    }
+    .modal-section p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ── MORE CASE STUDIES SECTION ── */
+    .more-section {
+      max-width: 1360px;
+      margin: 120px auto 0;
+      padding: 0 80px;
+      text-align: center;
+    }
+    .more-toggle {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid var(--border);
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: color 300ms, border-color 300ms, background 300ms;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .more-toggle:hover {
+      color: rgba(255,255,255,.9);
+      border-color: rgba(255,255,255,.3);
+      background: rgba(255,255,255,.05);
+    }
+    .more-arrow {
+      display: inline-block;
+      transition: transform 300ms var(--ease);
+      font-size: 18px;
+      font-weight: 300;
+      line-height: 1;
+    }
+    .more-toggle[aria-expanded="true"] .more-arrow { transform: rotate(45deg); }
+    .more-entries {
+      display: flex;
+      flex-direction: column;
+      gap: 88px;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height 500ms var(--ease), opacity 500ms var(--ease), margin-top 500ms var(--ease);
+      overflow: hidden;
+      padding: 0 80px;
+      max-width: 1360px;
+      margin: 0 auto;
+    }
+    .more-entries.open {
+      max-height: 8000px;
+      opacity: 1;
+      margin-top: 80px;
+    }
+    .more-entries .case {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fade-in 600ms var(--ease) forwards;
+    }
+    .more-entries .case:nth-child(1) { animation-delay: 100ms; }
+    .more-entries .case:nth-child(2) { animation-delay: 200ms; }
+    .more-entries .case:nth-child(3) { animation-delay: 300ms; }
+    .more-entries .case:nth-child(4) { animation-delay: 400ms; }
+    .more-entries .case:nth-child(5) { animation-delay: 500ms; }
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 900px) {
+      .site-header, .work-section, .page-header, .tag-section, .filter-banner, .more-section, .more-entries {
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+      .case, .case.flip { grid-template-columns: 1fr; min-height: auto; }
+      .case.flip .case-visual { order: 0; border-left: none; border-bottom: 1px solid var(--border); }
+      .case-visual, .case.flip .case-visual {
+        aspect-ratio: 16/9;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .case-content { padding: 32px 24px; }
+      .case-cta { font-size: 9px; padding: 4px 10px; }
+      .modal-body { padding: 28px 24px 32px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <span class="site-logo">Deliberate UX</span>
+  <span class="site-tagline">Enterprise UX · Design Strategy</span>
+</header>
+
+<header class="page-header">
+  <div class="eyebrow">Selected Work</div>
+  <h1>Design that moves<br>people and numbers.</h1>
+  <p>Enterprise UX across CRM, ITSM, retail, fintech, and design systems — from research through shipped product.</p>
+</header>
+
+<div class="tag-section" id="tag-section">
+  <button class="tag-toggle" id="tag-toggle">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 3h10M3 6h6M5 9h2"/></svg>
+    Filter
+    <em class="tag-toggle-arrow">↓</em>
+  </button>
+  <div id="tag-filter-bar" class="tag-filter"></div>
+</div>
+
+<div id="filter-banner" class="filter-banner">
+  Showing work tagged <strong id="filter-label"></strong>
+  <button id="filter-clear" class="filter-clear">Clear ✕</button>
+</div>
+
+<section class="work-section" id="work-section"></section>
+
+<div class="more-section">
+  <button class="more-toggle" id="more-toggle" aria-expanded="false">
+    More Case Studies
+    <span class="more-arrow">+</span>
+  </button>
+  <div class="more-entries" id="more-entries"></div>
+</div>
+
+<div id="modals"></div>
+
+<script>
+const CASES = [
+  {id:'email', client:'Nike', title:'Email Marketing Analytics Platform', role:'UX Lead', year:'2021', duration:'8 months', desc:'Designed a 3-panel email analytics workspace enabling Nike\'s global CRM team to build, preview, test, and measure email campaigns within a single tool.', challenge:'Email marketers juggled 4 disconnected tools to manage campaign creation, preview, and performance — creating a fragmented process that slowed time-to-launch by days.', approach:'Ran contextual inquiry sessions with 14 marketers across North America and EMEA, synthesized workflows, and designed a unified 3-column interface with live preview and integrated metrics.', outcome:'Campaign creation time dropped from 3+ days to under 6 hours. Tool adoption reached 94% within 2 quarters of rollout.', img:'NikeEmailLibrary_Overlay_v2-0_0006_05_Click_Overlay.png', img2:'NikeEmailLibrary_Overlay_v2-0_0006_05_Click_Overlay.png', tags:['Analytics','Email Marketing','Data Visualization','CRM'], hue:340},
+  {id:'itsm', client:'Lumen Technologies', title:'Enterprise Service Orchestration', role:'Lead UX Designer', year:'2025', duration:'14 months', desc:'Redesigned a mission-critical ITSM platform serving 4,000+ employees, streamlining incident, change, and request management inside a unified Salesforce console.', challenge:'Siloed legacy tools created fragmented workflows across IT teams, leading to missed SLAs and repeated context-switching between 6+ separate systems.', approach:'Conducted 28 stakeholder interviews, mapped end-to-end service journeys, and designed a consolidated console with intelligent routing, real-time dashboards, and in-context knowledge panels.', outcome:'Reduced average ticket resolution time by 34%, decreased tool-switching by 71%, and increased team satisfaction scores from 3.1 to 4.6 out of 5.', img:'technology-hero.png', img2:'technology-2.png', tags:['Enterprise','ITSM','Salesforce','Service Design'], hue:265, flip:true},
+  {id:'bopis', client:'AT&T', title:'Omnichannel Retail Experience', role:'Senior UX Designer', year:'2021', duration:'10 months', desc:'Designed an end-to-end buy-online-pick-up-in-store experience for AT&T\'s 5,000+ retail locations, bridging digital and in-store touchpoints seamlessly.', challenge:'Customers faced a disjointed experience between the AT&T app and in-store pickup — no real-time inventory visibility, unclear pickup instructions, and no status communication.', approach:'Ran moderated usability tests with 22 customers across 3 retail regions, co-designed flows with store associates, and built a prototype-to-pilot process in partnership with engineering.', outcome:'Pilot stores saw a 28% increase in BOPIS order completion rates and a 19-point NPS improvement for the pickup experience.', img:'retail-hero.png', img2:'retail-gradient.png', tags:['Retail','Mobile','Omnichannel','B2C'], hue:210},
+  {id:'backmargin', client:'Apple', title:'Reseller Incentive Program Dashboard', role:'Lead UX Designer', year:'2023', duration:'9 months', desc:'Designed end-to-end incentive program strategy and built an interactive dashboard for Apple\'s reseller partner network to track real-time incentive accrual, performance metrics, and reward redemption across 1,200+ resellers in 9 global regions.', challenge:'No unified incentive program structure existed. Reseller partners couldn\'t understand balances or performance. Managers manually calculated metrics via spreadsheet. Documentation and program governance were fragmented across regions.', approach:'Conducted global user research with 20+ reseller managers and partner stakeholders across regions. Defined program architecture, budget models, and tier structures. Designed dashboard with real-time KPIs, performance tracking, tier status, and predictive earning projections. Created regional documentation and training materials.', outcome:'Self-service platform reduced manager workload by 82%. Partner engagement increased 64%, reseller retention improved from 78% to 91%. Program rollout completed across all 9 regions with 98% adoption within 2 quarters.', img:'CRMA_ VP Review - Historicals v2.png', img2:'CRMA_ JP Historical trend of attained BM% with Current Quarter Target and Actuals.png', img3:'[ALT] CRMA_  Historic performance.png', tags:['Partner Program','Dashboard','SaaS','Analytics'], hue:285, flip:true},
+  {id:'hpe', client:'HPE', title:'Employee Benefits Self-Service Portal', role:'Senior UX Designer', year:'2025', duration:'9 months', desc:'Designed a modern benefits portal for HPE\'s 60,000 global employees, replacing a legacy system with a personalized, guided enrollment experience.', challenge:'The existing benefits platform had a 41% task-completion rate for open enrollment — employees were confused, often calling HR support lines to complete basic tasks.', approach:'Conducted card sorting and tree testing to restructure information architecture, and designed a step-by-step enrollment wizard with real-time cost calculators and plan comparisons.', outcome:'Task completion rate rose to 87% at launch. HR support call volume during open enrollment dropped by 52%.', img:'hpe-home.png', img2:'hpe-self-service.png', tags:['HR Tech','Benefits','Employee Experience','Enterprise'], hue:35},
+  {id:'polaris', client:'Polaris', title:'Design System & Component Library', role:'Design System Architect', year:'2021', duration:'7 months', desc:'Built a comprehensive design system for Polaris\'s marketing and product teams, covering a token-based color system, 60+ components, and responsive page templates.', challenge:'Design and engineering teams maintained separate and divergent component libraries, creating visual inconsistency across 7 products and a 2-week lag between design changes and implementation.', approach:'Audited existing components across products, established a token architecture, built a shared Figma library with dev-ready annotations, and published documentation alongside Storybook.', outcome:'Design-to-engineering handoff time cut by 60%. Component reuse across products reached 78% within two release cycles.', img:'polaris-email.png', img2:'polaris-landing-pages.png', tags:['Design Systems','Component Library','Marketing','Figma'], hue:22, flip:true},
+  {id:'portal', client:'Jack Henry & Associates', title:'Community Banking Experience Portal', role:'Senior UX Designer', year:'2021', duration:'8 months', desc:'Designed a Salesforce Experience Cloud portal for community bank customers, creating a modern self-service hub for account management, support, and financial tools.', challenge:'Community banks needed a compelling digital front door for customers, but lacked the design capability to differentiate from big-bank apps on their own.', approach:'Built a flexible portal design system on Experience Cloud, with configurable hero sections, service tiles, and guided task flows that non-technical bank admins could maintain.', outcome:'Client banks saw average portal adoption of 63% within 90 days of launch, and a 40% reduction in branch visits for routine service requests.', img:'Experience Cloud Home-0.png', img2:'jh-home-landing.png', tags:['Community','Banking','Experience Cloud','Portal'], hue:205},
+  {id:'fintech', client:'Digital Finance Co.', title:'Consumer Investment & Trading Platform', role:'Lead UX Designer', year:'2023', duration:'11 months', desc:'Redesigned a consumer-facing fintech platform for retail investors, simplifying onboarding, portfolio management, and real-time market analysis within a mobile-first experience.', challenge:'New users abandoned account setup 60% of the time. Existing users found the portfolio dashboard overwhelming with too many data points and unclear actionable insights.', approach:'Conducted 30 user interviews across age groups, validated new IA with tree testing, and designed a progressive disclosure system that revealed insights based on user sophistication level.', outcome:'Onboarding completion improved from 40% to 89%. Daily active users increased 34% and average session length grew from 8 to 18 minutes within 6 months.', img:'finance-hero.png', img2:'finance-2.png', tags:['Fintech','Mobile','Portfolio','Investment'], hue:180, flip:true},
+  {id:'telecom', client:'Global Telecom Provider', title:'Internal Tool Suite for Network Operations', role:'Senior UX Designer', year:'2022', duration:'10 months', desc:'Built a unified operations dashboard for telecom engineers to monitor network health, manage incidents, and automate routine maintenance across 15,000+ cell towers globally.', challenge:'Engineers toggled between 8 legacy systems with inconsistent data models, leading to missed alerts and duplicated troubleshooting across teams.', approach:'Mapped data flows across systems, designed a unified schema, and built a dashboard with customizable widgets, critical alert prioritization, and one-click incident escalation.', outcome:'Mean time to incident response dropped 42%. Engineers reported 52% less context-switching. System adoption reached 98% across all regions within 4 months.', img:'telecom-hero.png', img2:'telecom-2.png', tags:['B2B','Network','Operations','Dashboard'], hue:95},
+  {id:'retail', client:'Premium Retail Network', title:'Staff Enablement Platform', role:'UX Designer', year:'2020', duration:'7 months', desc:'Designed a mobile-first staff enablement platform for 2,000+ retail associates to access product knowledge, promotions, and customer insights in real-time during floor interactions.', challenge:'Staff relied on outdated printed guides and slow desktop systems. Customer questions about product details often went unanswered, reducing confidence and closing rates.', approach:'Partnered with store managers to identify top 20 questions, built searchable knowledge base with rich media, and added push notifications for flash promotions and inventory updates.', outcome:'Customer satisfaction scores improved 28%. Staff average handle time for inquiries dropped 60%. Promotion participation rates increased from 12% to 47%.', img:'att-catalog-dynamic-filtering.png', img2:'att-wbb-cover.png', tags:['Retail','Mobile','Employee Experience','B2B2C'], hue:50, flip:true}
+];
+
+function generateWireframe(hue) {
+  const colors = { bg: `hsl(${hue}, 15%, 8%)`, dark: `hsl(${hue}, 20%, 12%)`, med: `hsl(${hue}, 25%, 20%)`, light: `hsl(${hue}, 30%, 28%)` };
+  return `<svg class="case-wireframe" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1600" height="900" fill="${colors.bg}"/><rect width="1600" height="60" fill="${colors.dark}"/>
+    <rect x="20" y="18" width="100" height="24" rx="4" fill="${colors.light}"/><rect x="150" y="22" width="200" height="16" rx="3" fill="${colors.med}"/><rect x="400" y="22" width="150" height="16" rx="3" fill="${colors.med}"/><rect x="1480" y="18" width="80" height="24" rx="4" fill="${colors.med}"/>
+    <rect x="40" y="120" width="1520" height="400" rx="12" fill="${colors.med}" opacity="0.3"/><rect x="80" y="160" width="1440" height="60" rx="6" fill="${colors.light}"/><rect x="80" y="240" width="1440" height="220" rx="8" fill="${colors.dark}"/>
+    <rect x="120" y="280" width="300" height="140" rx="4" fill="${colors.light}"/><rect x="460" y="280" width="300" height="140" rx="4" fill="${colors.light}"/><rect x="800" y="280" width="300" height="140" rx="4" fill="${colors.light}"/>
+    <rect x="40" y="580" width="1520" height="250" rx="12" fill="${colors.dark}" opacity="0.5"/>
+  </svg>`;
+}
+
+// Build tag filter pills and case cards
+const allTags = [...new Set(CASES.flatMap(c => c.tags))];
+const tagFilterHtml = allTags.map(tag => `<button class="filter-pill" data-tag="${tag}">${tag}</button>`).join('');
+document.getElementById('tag-filter-bar').innerHTML = tagFilterHtml;
+
+function renderCase(c) {
+  return `
+  <div class="case ${c.flip ? 'flip' : ''}" data-modal="${c.id}" data-tags="${c.tags.join(',')}" style="--h:${c.hue}">
+    <div class="case-visual">
+      ${generateWireframe(c.hue)}
+      <img class="case-image" src="../assets/work/thumbs/${c.img}" alt="${c.title}" loading="lazy">
+      <span class="case-cta">View Case Study →</span>
+    </div>
+    <div class="case-content">
+      <div class="case-client">${c.client}</div>
+      <h2 class="case-title">${c.title}</h2>
+      <div class="case-meta"><strong>${c.role}</strong> · ${c.duration} · ${c.year}</div>
+      <p class="case-desc">${c.desc}</p>
+      <div class="case-tags">${c.tags.map((t, i) => i < 2 ? `<span class="tag">${t}</span>` : `<span class="tag tag-overflow">${t}</span>`).join('')}${c.tags.length > 2 ? `<button class="tag-more" title="+${c.tags.length - 2} more">···</button>` : ''}</div>
+      <span class="case-link">View Case Study <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+    </div>
+  </div>`;
+}
+
+// Split cases: top 5 and remaining
+const topCases = CASES.slice(0, 5);
+const moreCases = CASES.slice(5);
+
+const topCasesHtml = topCases.map(renderCase).join('');
+document.getElementById('work-section').innerHTML = topCasesHtml;
+
+// Render more cases section only if there are more than 5
+if (moreCases.length > 0) {
+  const moreCasesHtml = moreCases.map(renderCase).join('');
+  document.getElementById('more-entries').innerHTML = moreCasesHtml;
+
+  // Toggle more entries
+  document.getElementById('more-toggle').addEventListener('click', () => {
+    const moreSection = document.getElementById('more-entries');
+    const isOpen = moreSection.classList.toggle('open');
+    document.getElementById('more-toggle').setAttribute('aria-expanded', isOpen);
+  });
+} else {
+  // Hide more section if no additional cases
+  document.querySelector('.more-section').style.display = 'none';
+}
+
+const modalsHtml = CASES.map(c => {
+  const images = [c.img, c.img2, c.img3, c.img4].filter(Boolean);
+  const carousel = images.length > 1 ? `<div class="carousel-controls">${images.map((_, i) => `<span class="carousel-dot${i === 0 ? ' active' : ''}" data-idx="${i}"></span>`).join('')}</div>` : '';
+  return `<div class="modal" id="modal-${c.id}" style="--h:${c.hue}"><div class="modal-content"><button class="modal-close">✕</button><div class="modal-hero">${images.map((img, i) => `<img class="modal-image${i === 0 ? ' active' : ''}" src="../assets/work/${img}">`).join('')}${carousel}</div><div class="modal-body"><div class="modal-client">${c.client}</div><h2 class="modal-title">${c.title}</h2><div class="modal-meta"><div><div class="meta-label">Role</div><div class="meta-value">${c.role}</div></div><div><div class="meta-label">Duration</div><div class="meta-value">${c.duration}</div></div><div><div class="meta-label">Year</div><div class="meta-value">${c.year}</div></div></div><div class="modal-section"><h3>Challenge</h3><p>${c.challenge}</p></div><div class="modal-section"><h3>Approach</h3><p>${c.approach}</p></div><div class="modal-section"><h3>Outcome</h3><p>${c.outcome}</p></div></div></div></div>`;
+}).join('');
+
+document.getElementById('modals').innerHTML = modalsHtml;
+
+let currentModal = null, currentImageIndex = {}, activeFilter = null;
+
+function openModal(id) {
+  const m = document.getElementById('modal-' + id);
+  if (m) {
+    m.classList.add('open');
+    currentModal = m;
+    document.body.style.overflow = 'hidden';
+    currentImageIndex[id] = 0;
+  }
+}
+
+function closeModal() {
+  if (currentModal) {
+    currentModal.classList.remove('open');
+    currentModal = null;
+    document.body.style.overflow = '';
+  }
+}
+
+function showImage(caseId, idx) {
+  const carousel = document.querySelector(`#modal-${caseId} .modal-hero`);
+  if (!carousel) return;
+  const images = carousel.querySelectorAll('.modal-image'), dots = carousel.querySelectorAll('.carousel-dot');
+  if (images.length === 0) return;
+  idx = ((idx % images.length) + images.length) % images.length;
+  currentImageIndex[caseId] = idx;
+  images.forEach((img, i) => img.classList.toggle('active', i === idx));
+  dots.forEach((dot, i) => dot.classList.toggle('active', i === idx));
+}
+
+// Tag filtering
+function applyFilter(tag) {
+  activeFilter = tag;
+  const cases = document.querySelectorAll('.case');
+  cases.forEach(c => {
+    const tags = c.dataset.tags.split(',');
+    c.classList.toggle('filtered-out', !tags.includes(tag));
+  });
+
+  // Update filter pills
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.toggle('active', p.dataset.tag === tag));
+
+  // Show filter banner
+  const banner = document.getElementById('filter-banner');
+  banner.classList.add('visible');
+  document.getElementById('filter-label').textContent = tag;
+}
+
+function clearFilter() {
+  activeFilter = null;
+  document.querySelectorAll('.case').forEach(c => c.classList.remove('filtered-out'));
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  document.getElementById('filter-banner').classList.remove('visible');
+}
+
+// Event listeners
+document.getElementById('tag-toggle').addEventListener('click', () => {
+  document.getElementById('tag-section').classList.toggle('open');
+});
+
+document.querySelectorAll('.filter-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    applyFilter(pill.dataset.tag);
+    document.getElementById('tag-section').classList.remove('open');
+  });
+});
+
+document.getElementById('filter-clear').addEventListener('click', clearFilter);
+
+document.addEventListener('click', e => {
+  const caseEl = e.target.closest('.case:not(.filtered-out)');
+  if (caseEl && !e.target.closest('.tag-more')) openModal(caseEl.dataset.modal);
+
+  const closeBtn = e.target.closest('.modal-close');
+  if (closeBtn) { e.stopPropagation(); closeModal(); }
+
+  const dot = e.target.closest('.carousel-dot');
+  if (dot) { e.stopPropagation(); const caseId = dot.closest('.modal').id.replace('modal-', ''); showImage(caseId, parseInt(dot.dataset.idx)); }
+
+  const tagMore = e.target.closest('.tag-more');
+  if (tagMore) { e.stopPropagation(); tagMore.closest('.case-tags').classList.toggle('expanded'); }
+});
+
+document.querySelectorAll('.modal').forEach(m => {
+  m.addEventListener('click', e => {
+    if (e.target === m) closeModal();
+  });
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+console.log('✓ Portfolio ready');
+</script>
+
+</body>
+</html>
