@@ -11,101 +11,196 @@
 
 <body>
   <main class="page">
-	<div class="container">
-	  <section class="section panel">
-		<div class="section-head">
-		  <div>
-			<h2 class="section-title">Selected work</h2>
-			<p class="section-kicker">Case studies and practice notes on enterprise UX, design systems, and adoption.</p>
-		  </div>
-		</div>
+    <div class="container">
 
-		<div class="cards" style="grid-template-columns: 1fr;">
-		  <div class="card" style="cursor: default; opacity: 0.6;">
-			<h3 class="card-title">Enterprise UX at scale</h3>
-			<p class="card-body">Design systems, agent workflows, and real-world constraints in large organizations.</p>
-			<span class="card-cta" style="opacity: 0.5;">Coming soon</span>
-		  </div>
+      <section class="work-hero">
+        <div class="work-hero-monitor">
+          <img src="/assets/work/technology-hero.png" alt="Enterprise UX work sample" />
+          <div class="work-hero-moire"></div>
+          <div class="work-hero-fade"></div>
+        </div>
+        <div class="work-hero-text">
+          <h1 class="work-hero-title">Design that moves<br>people and numbers.</h1>
+          <p class="work-hero-subtitle">Enterprise UX across CRM, ITSM, retail, fintech, and design systems — from research through shipped product.</p>
+        </div>
+      </section>
 
-		  <div class="card" style="cursor: default; opacity: 0.6;">
-			<h3 class="card-title">Fixing invisible friction</h3>
-			<p class="card-body">Case studies on identifying and resolving adoption barriers that don't show up in usability tests.</p>
-			<span class="card-cta" style="opacity: 0.5;">Coming soon</span>
-		  </div>
+      <section class="section">
+        <div class="work-grid">
 
-		  <div class="card" style="cursor: default; opacity: 0.6;">
-			<h3 class="card-title">Intentional product decisions</h3>
-			<p class="card-body">What to build, what not to build, and how to make the call when everyone has an opinion.</p>
-			<span class="card-cta" style="opacity: 0.5;">Coming soon</span>
-		  </div>
-		</div>
-	  </section>
+          <div class="work-card" id="technology" data-case="technology" data-modal="technology" style="--hue:265">
+            <div class="work-card-image work-card-slideshow">
+              <img class="slide slide-1" src="/assets/work/technology-hero.png" alt="Enterprise Service Orchestration" />
+              <img class="slide slide-2" src="/assets/work/technology-2.png" alt="Enterprise Service Orchestration detail" />
+            </div>
+            <div class="work-card-content">
+              <div class="work-card-tag">Lumen Technologies · 2025</div>
+              <h2 class="work-card-title">Enterprise Service Orchestration</h2>
+              <p class="work-card-excerpt">Redesigned a mission-critical ITSM platform serving 4,000+ employees across unified Salesforce console.</p>
+            </div>
+          </div>
 
-	  <!-- Full list with thumbnails -->
-	  <section class="section panel panel-soft">
-		<div class="section-head">
-		  <div>
-			<h2 class="section-title">Additional projects</h2>
-			<p class="section-kicker">More work and explorations</p>
-		  </div>
-		</div>
+          <div class="work-card" id="telecom" data-case="telecom" data-modal="telecom" style="--hue:95">
+            <div class="work-card-image work-card-slideshow">
+              <img class="slide slide-1" src="/assets/work/telecom-hero.png" alt="Network Operations Dashboard" />
+              <img class="slide slide-2" src="/assets/work/telecom-2.png" alt="Network Operations detail" />
+            </div>
+            <div class="work-card-content">
+              <div class="work-card-tag">Global Telecom · 2022</div>
+              <h2 class="work-card-title">Internal Tool Suite for Network Operations</h2>
+              <p class="work-card-excerpt">Unified operations dashboard for engineers to monitor network health across 15,000+ cell towers globally.</p>
+            </div>
+          </div>
 
-		<div class="work-list">
-		  <article class="work-item" data-modal="enterprise-ux">
-			<div class="work-item-thumb">
-			  <div class="work-thumb-placeholder"></div>
-			</div>
-			<div class="work-item-content">
-			  <h3 class="work-item-title">Design system evolution</h3>
-			  <p class="work-item-excerpt">Building scalable component libraries for enterprise teams with competing priorities.</p>
-			  <div class="work-item-meta">
-				<span class="work-item-tag">Design Systems</span>
-				<span class="work-item-tag">Enterprise</span>
-			  </div>
-			</div>
-		  </article>
+          <div class="work-card" id="fintech" data-case="fintech" data-modal="fintech" style="--hue:180">
+            <div class="work-card-image work-card-slideshow">
+              <img class="slide slide-1" src="/assets/work/finance-hero.png" alt="Consumer Investment Platform" />
+              <img class="slide slide-2" src="/assets/work/finance-2.png" alt="Consumer Investment Platform detail" />
+            </div>
+            <div class="work-card-content">
+              <div class="work-card-tag">Digital Finance Co. · 2023</div>
+              <h2 class="work-card-title">Consumer Investment &amp; Trading Platform</h2>
+              <p class="work-card-excerpt">Redesigned a mobile-first fintech platform — onboarding completion improved from 40% to 89%.</p>
+            </div>
+          </div>
 
-		  <article class="work-item" data-modal="adoption-metrics">
-			<div class="work-item-thumb">
-			  <div class="work-thumb-placeholder"></div>
-			</div>
-			<div class="work-item-content">
-			  <h3 class="work-item-title">Adoption metrics that matter</h3>
-			  <p class="work-item-excerpt">Moving beyond vanity metrics to measure what actually drives product success.</p>
-			  <div class="work-item-meta">
-				<span class="work-item-tag">Product Strategy</span>
-				<span class="work-item-tag">Analytics</span>
-			  </div>
-			</div>
-		  </article>
+          <div class="work-card" data-case="nike" data-modal="nike" style="--hue:340">
+            <div class="work-card-image">
+              <img src="/assets/work/NikeEmailLibrary_Overlay_v2-0_0006_05_Click_Overlay.png" alt="Nike Email Analytics Platform" />
+            </div>
+            <div class="work-card-content">
+              <div class="work-card-tag">Nike · 2021</div>
+              <h2 class="work-card-title">Email Marketing Analytics Platform</h2>
+              <p class="work-card-excerpt">3-panel workspace enabling Nike's global CRM team to build, preview, and measure campaigns in one tool.</p>
+            </div>
+          </div>
 
-		  <article class="work-item" data-modal="workflow-design">
-			<div class="work-item-thumb">
-			  <div class="work-thumb-placeholder"></div>
-			</div>
-			<div class="work-item-content">
-			  <h3 class="work-item-title">Workflow design for agents</h3>
-			  <p class="work-item-excerpt">Designing interfaces for complex, multi-step processes in high-stakes environments.</p>
-			  <div class="work-item-meta">
-				<span class="work-item-tag">Workflow</span>
-				<span class="work-item-tag">Enterprise UX</span>
-			  </div>
-			</div>
-		  </article>
-		</div>
-	  </section>
+          <div class="work-card" data-case="retail" data-modal="retail" style="--hue:210">
+            <div class="work-card-image">
+              <img src="/assets/work/retail-hero.png" alt="AT&T Omnichannel Retail" />
+            </div>
+            <div class="work-card-content">
+              <div class="work-card-tag">AT&amp;T · 2021</div>
+              <h2 class="work-card-title">Omnichannel Retail Experience</h2>
+              <p class="work-card-excerpt">End-to-end BOPIS experience across AT&amp;T's 5,000+ retail locations — 28% increase in order completion.</p>
+            </div>
+          </div>
 
-	  <section class="section panel">
-		<div class="about-panel">
-		  <h2 class="section-title" style="margin:0 0 6px;">In the meantime</h2>
-		  <p class="kicker">While I'm building out these case studies, check out my writing.</p>
-		  <p>
-			I write about practical UX: the incentives, operations, and constraints that shape outcomes.
-			<a href="/writing/writing.html">Read the essays →</a>
-		  </p>
-		</div>
-	  </section>
-	</div>
+        </div>
+      </section>
+
+    </div>
   </main>
+
+  <!-- Case study modals -->
+  <div class="case-modal-overlay" id="modal-overlay">
+    <div class="case-modal" id="active-modal">
+      <button class="case-modal-close" id="modal-close">✕</button>
+      <div class="case-modal-hero" id="modal-hero"></div>
+      <div class="case-modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <script>
+  const CASES = {
+    technology: {
+      tag: 'Lumen Technologies · Enterprise · ITSM',
+      title: 'Enterprise Service Orchestration',
+      img: '/assets/work/technology-hero.png',
+      hue: 265,
+      challenge: 'Siloed legacy tools created fragmented workflows across IT teams, leading to missed SLAs and repeated context-switching between 6+ separate systems.',
+      approach: 'Conducted 28 stakeholder interviews, mapped end-to-end service journeys, and designed a consolidated console with intelligent routing, real-time dashboards, and in-context knowledge panels.',
+      outcome: 'Reduced average ticket resolution time by 34%, decreased tool-switching by 71%, and increased team satisfaction scores from 3.1 to 4.6 out of 5.',
+      role: 'Lead UX Designer', duration: '14 months', year: '2025'
+    },
+    telecom: {
+      tag: 'Global Telecom Provider · B2B · Dashboard',
+      title: 'Internal Tool Suite for Network Operations',
+      img: '/assets/work/telecom-hero.png',
+      hue: 95,
+      challenge: 'Engineers toggled between 8 legacy systems with inconsistent data models, leading to missed alerts and duplicated troubleshooting across teams.',
+      approach: 'Mapped data flows across systems, designed a unified schema, and built a dashboard with customizable widgets, critical alert prioritization, and one-click incident escalation.',
+      outcome: 'Mean time to incident response dropped 42%. Engineers reported 52% less context-switching. System adoption reached 98% across all regions within 4 months.',
+      role: 'Senior UX Designer', duration: '10 months', year: '2022'
+    },
+    fintech: {
+      tag: 'Digital Finance Co. · Mobile · Investment',
+      title: 'Consumer Investment &amp; Trading Platform',
+      img: '/assets/work/finance-hero.png',
+      hue: 180,
+      challenge: 'New users abandoned account setup 60% of the time. Existing users found the portfolio dashboard overwhelming with too many data points and unclear actionable insights.',
+      approach: 'Conducted 30 user interviews across age groups, validated new IA with tree testing, and designed a progressive disclosure system that revealed insights based on user sophistication level.',
+      outcome: 'Onboarding completion improved from 40% to 89%. Daily active users increased 34% and average session length grew from 8 to 18 minutes within 6 months.',
+      role: 'Lead UX Designer', duration: '11 months', year: '2023'
+    },
+    nike: {
+      tag: 'Nike · CRM · Analytics',
+      title: 'Email Marketing Analytics Platform',
+      img: '/assets/work/NikeEmailLibrary_Overlay_v2-0_0006_05_Click_Overlay.png',
+      hue: 340,
+      challenge: 'Email marketers juggled 4 disconnected tools to manage campaign creation, preview, and performance — creating a fragmented process that slowed time-to-launch by days.',
+      approach: 'Ran contextual inquiry sessions with 14 marketers across North America and EMEA, synthesized workflows, and designed a unified 3-column interface with live preview and integrated metrics.',
+      outcome: 'Campaign creation time dropped from 3+ days to under 6 hours. Tool adoption reached 94% within 2 quarters of rollout.',
+      role: 'UX Lead', duration: '8 months', year: '2021'
+    },
+    retail: {
+      tag: 'AT&amp;T · Omnichannel · Mobile',
+      title: 'Omnichannel Retail Experience',
+      img: '/assets/work/retail-hero.png',
+      hue: 210,
+      challenge: 'Customers faced a disjointed experience between the AT&T app and in-store pickup — no real-time inventory visibility, unclear pickup instructions, and no status communication.',
+      approach: 'Ran moderated usability tests with 22 customers across 3 retail regions, co-designed flows with store associates, and built a prototype-to-pilot process in partnership with engineering.',
+      outcome: 'Pilot stores saw a 28% increase in BOPIS order completion rates and a 19-point NPS improvement for the pickup experience.',
+      role: 'Senior UX Designer', duration: '10 months', year: '2021'
+    }
+  };
+
+  const overlay = document.getElementById('modal-overlay');
+  const modalHero = document.getElementById('modal-hero');
+  const modalBody = document.getElementById('modal-body');
+  const activeModal = document.getElementById('active-modal');
+
+  function openModal(id) {
+    const c = CASES[id];
+    if (!c) return;
+    activeModal.style.setProperty('--hue', c.hue);
+    modalHero.innerHTML = `<img src="${c.img}" alt="${c.title.replace(/&amp;/g,'&')}" />`;
+    modalBody.innerHTML = `
+      <div class="case-modal-tag">${c.tag}</div>
+      <h2 class="case-modal-title">${c.title}</h2>
+      <div style="display:flex;gap:32px;flex-wrap:wrap;margin-bottom:32px;padding-bottom:32px;border-bottom:1px solid var(--border);font-size:13px;color:var(--muted)">
+        <div><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);margin-bottom:4px">Role</div>${c.role}</div>
+        <div><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);margin-bottom:4px">Duration</div>${c.duration}</div>
+        <div><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);margin-bottom:4px">Year</div>${c.year}</div>
+      </div>
+      <div class="case-section"><h2>Challenge</h2><p>${c.challenge}</p></div>
+      <div class="case-section"><h2>Approach</h2><p>${c.approach}</p></div>
+      <div class="case-section"><h2>Outcome</h2><p>${c.outcome}</p></div>
+    `;
+    overlay.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    history.replaceState(null, '', '#' + id);
+  }
+
+  function closeModal() {
+    overlay.classList.remove('is-open');
+    document.body.style.overflow = '';
+    history.replaceState(null, '', location.pathname);
+  }
+
+  document.querySelectorAll('.work-card').forEach(card => {
+    card.addEventListener('click', () => openModal(card.dataset.modal));
+  });
+
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // Open modal if page loaded with a hash anchor
+  const hash = location.hash.slice(1);
+  if (hash && CASES[hash]) {
+    setTimeout(() => openModal(hash), 100);
+  }
+  </script>
 </body>
 </html>
