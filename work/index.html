@@ -7,6 +7,65 @@
   <link rel="icon" href="/assets/favicon.svg" />
   <link rel="stylesheet" href="/styles.css" />
   <script defer src="/app.js"></script>
+  <style>
+    .work-hero-fan {
+      position: relative;
+      width: 420px;
+      height: 400px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .fan-card {
+      position: absolute;
+      width: 300px;
+      height: 210px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.14);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.7), 0 4px 16px rgba(0,0,0,0.4);
+      transform-origin: center center;
+    }
+
+    .fan-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      display: block;
+    }
+
+    .fan-card:nth-child(1) {
+      transform: rotate(-16deg) translate(-60px, 30px);
+      z-index: 1;
+      opacity: 0.85;
+    }
+    .fan-card:nth-child(2) {
+      transform: rotate(-6deg) translate(-20px, 10px);
+      z-index: 2;
+      opacity: 0.92;
+    }
+    .fan-card:nth-child(3) {
+      transform: rotate(5deg) translate(20px, -8px);
+      z-index: 3;
+    }
+
+    @media (max-width: 900px) {
+      .work-hero-fan {
+        width: 100%;
+        height: 260px;
+      }
+      .fan-card {
+        width: 220px;
+        height: 154px;
+      }
+      .fan-card:nth-child(1) { transform: rotate(-16deg) translate(-44px, 22px); }
+      .fan-card:nth-child(2) { transform: rotate(-6deg) translate(-14px, 8px); }
+      .fan-card:nth-child(3) { transform: rotate(5deg) translate(14px, -6px); }
+    }
+  </style>
 </head>
 
 <body>
@@ -14,10 +73,16 @@
     <div class="container">
 
       <section class="work-hero">
-        <div class="work-hero-monitor">
-          <img src="/assets/work/technology-hero.png" alt="Enterprise UX work sample" />
-          <div class="work-hero-moire"></div>
-          <div class="work-hero-fade"></div>
+        <div class="work-hero-fan">
+          <div class="fan-card">
+            <img src="/assets/work/finance-hero.png" alt="" />
+          </div>
+          <div class="fan-card">
+            <img src="/assets/work/Home - Overview 02.png" alt="" />
+          </div>
+          <div class="fan-card">
+            <img src="/assets/work/fintech-hero.png" alt="" />
+          </div>
         </div>
         <div class="work-hero-text">
           <h1 class="work-hero-title">Design that moves<br>people and numbers.</h1>
