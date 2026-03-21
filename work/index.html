@@ -167,7 +167,7 @@
       <section class="section">
         <div class="work-grid">
 
-          <div class="work-card" id="technology" data-case="technology" data-modal="technology" style="--hue:265">
+          <div class="work-card" id="technology" data-case="technology" data-work-modal="technology" style="--hue:265">
             <div class="work-card-image work-card-slideshow">
               <img class="slide slide-1" src="/assets/work/technology-hero.png" alt="Enterprise Service Orchestration" />
               <img class="slide slide-2" src="/assets/work/technology-2.png" alt="Enterprise Service Orchestration detail" />
@@ -179,7 +179,7 @@
             </div>
           </div>
 
-          <div class="work-card" id="telecom" data-case="telecom" data-modal="telecom" style="--hue:95">
+          <div class="work-card" id="telecom" data-case="telecom" data-work-modal="telecom" style="--hue:95">
             <div class="work-card-image work-card-slideshow">
               <img class="slide slide-1" src="/assets/work/telecom-hero.png" alt="Network Operations Dashboard" />
               <img class="slide slide-2" src="/assets/work/telecom-2.png" alt="Network Operations detail" />
@@ -191,7 +191,7 @@
             </div>
           </div>
 
-          <div class="work-card" id="fintech" data-case="fintech" data-modal="fintech" style="--hue:180">
+          <div class="work-card" id="fintech" data-case="fintech" data-work-modal="fintech" style="--hue:180">
             <div class="work-card-image work-card-slideshow">
               <img class="slide slide-1" src="/assets/work/finance-hero.png" alt="Consumer Investment Platform" />
               <img class="slide slide-2" src="/assets/work/finance-2.png" alt="Consumer Investment Platform detail" />
@@ -203,7 +203,7 @@
             </div>
           </div>
 
-          <div class="work-card" data-case="nike" data-modal="nike" style="--hue:340">
+          <div class="work-card" data-case="nike" data-work-modal="nike" style="--hue:340">
             <div class="work-card-image">
               <img src="/assets/work/NikeEmailLibrary_Overlay_v2-0_0006_05_Click_Overlay.png" alt="Nike Email Analytics Platform" />
             </div>
@@ -214,7 +214,7 @@
             </div>
           </div>
 
-          <div class="work-card" data-case="retail" data-modal="retail" style="--hue:210">
+          <div class="work-card" data-case="retail" data-work-modal="retail" style="--hue:210">
             <div class="work-card-image">
               <img src="/assets/work/retail-hero.png" alt="AT&T Omnichannel Retail" />
             </div>
@@ -396,7 +396,7 @@
   }
 
   document.querySelectorAll('.work-card').forEach(card => {
-    card.addEventListener('click', () => openModal(card.dataset.modal));
+    card.addEventListener('click', () => openModal(card.dataset.workModal));
   });
 
   document.getElementById('modal-close').addEventListener('click', closeModal);
@@ -404,7 +404,7 @@
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
   // Open modal if page loaded with a hash anchor
-  const hash = location.hash.slice(1);
+  const hash = location.hash.replace('#','');
   if (hash && CASES[hash]) {
     setTimeout(() => openModal(hash), 100);
   }
