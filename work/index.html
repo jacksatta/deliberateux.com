@@ -93,20 +93,15 @@
       transform: translateY(-20px);
     }
 
-    /* Modal slideshow */
-    .modal-slide {
-      position: absolute;
-      inset: 0;
+    /* Modal image pan + crossfade */
+    .modal-hero-img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: top center;
-      opacity: 0;
-      transition: opacity 0.9s ease-in-out;
+      object-position: center 0%;
       animation: modal-pan 9s ease-in-out infinite alternate;
+      transition: opacity 0.7s ease-in-out;
     }
-    .modal-slide.active { opacity: 1; }
-
     @keyframes modal-pan {
       from { object-position: center 0%; }
       to   { object-position: center 45%; }
@@ -324,17 +319,13 @@
     if (!c) return;
     activeModal.style.setProperty('--hue', c.hue);
 
-    // Build slideshow
     const imgs = c.imgs;
-    const slides = imgs.map((src, i) =>
-      `<img class="modal-slide${i === 0 ? ' active' : ''}" src="${src}" alt="" />`
-    ).join('');
     const dots = imgs.length > 1
       ? `<div class="modal-dots">${imgs.map((_, i) =>
           `<span class="modal-dot${i === 0 ? ' active' : ''}" data-idx="${i}"></span>`
         ).join('')}</div>`
       : '';
-    modalHero.innerHTML = slides + dots;
+    modalHero.innerHTML = `<img class="modal-hero-img" src="${imgs[0]}" alt="" />${dots}`;
 
     modalBody.innerHTML = `
       <div class="case-modal-tag">${c.tag}</div>
@@ -353,36 +344,42 @@
     document.body.style.overflow = 'hidden';
     history.replaceState(null, '', '#' + id);
 
-    // Start slideshow timer
+    // Crossfade by fading out, swapping src, fading in
     if (imgs.length > 1) {
       let current = 0;
-      slideshowTimer = setInterval(() => {
-        const allSlides = modalHero.querySelectorAll('.modal-slide');
+      const advance = () => {
+        const img = modalHero.querySelector('.modal-hero-img');
         const allDots = modalHero.querySelectorAll('.modal-dot');
-        allSlides[current].classList.remove('active');
-        allDots[current]?.classList.remove('active');
-        current = (current + 1) % imgs.length;
-        allSlides[current].classList.add('active');
-        allDots[current]?.classList.add('active');
-      }, 4000);
+        img.style.opacity = '0';
+        setTimeout(() => {
+          current = (current + 1) % imgs.length;
+          img.src = imgs[current];
+          img.style.animation = 'none';
+          img.offsetHeight; // reflow to restart animation
+          img.style.animation = '';
+          img.style.opacity = '1';
+          allDots.forEach((d, i) => d.classList.toggle('active', i === current));
+        }, 700);
+      };
+      slideshowTimer = setInterval(advance, 4500);
 
-      // Dot click navigation
       modalHero.querySelectorAll('.modal-dot').forEach(dot => {
         dot.addEventListener('click', () => {
           const idx = parseInt(dot.dataset.idx);
-          modalHero.querySelectorAll('.modal-slide').forEach((s, i) => s.classList.toggle('active', i === idx));
-          modalHero.querySelectorAll('.modal-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
-          current = idx;
+          if (idx === current) return;
           clearInterval(slideshowTimer);
-          slideshowTimer = setInterval(() => {
-            const allSlides = modalHero.querySelectorAll('.modal-slide');
-            const allDots = modalHero.querySelectorAll('.modal-dot');
-            allSlides[current].classList.remove('active');
-            allDots[current]?.classList.remove('active');
-            current = (current + 1) % imgs.length;
-            allSlides[current].classList.add('active');
-            allDots[current]?.classList.add('active');
-          }, 4000);
+          const img = modalHero.querySelector('.modal-hero-img');
+          img.style.opacity = '0';
+          setTimeout(() => {
+            current = idx;
+            img.src = imgs[current];
+            img.style.animation = 'none';
+            img.offsetHeight;
+            img.style.animation = '';
+            img.style.opacity = '1';
+            modalHero.querySelectorAll('.modal-dot').forEach((d, i) => d.classList.toggle('active', i === current));
+          }, 700);
+          slideshowTimer = setInterval(advance, 4500);
         });
       });
     }
