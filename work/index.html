@@ -93,6 +93,44 @@
       transform: translateY(-20px);
     }
 
+    /* Modal slideshow */
+    .modal-slide {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      opacity: 0;
+      transition: opacity 0.9s ease-in-out;
+      animation: modal-pan 9s ease-in-out infinite alternate;
+    }
+    .modal-slide.active { opacity: 1; }
+
+    @keyframes modal-pan {
+      from { object-position: center 0%; }
+      to   { object-position: center 45%; }
+    }
+
+    .modal-dots {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 7px;
+      z-index: 5;
+    }
+    .modal-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.35);
+      transition: background 300ms;
+      cursor: pointer;
+    }
+    .modal-dot.active { background: #fff; }
+
     @media (max-width: 900px) {
       .work-hero-fan {
         width: 100%;
@@ -212,7 +250,11 @@
     technology: {
       tag: 'Lumen Technologies · Enterprise · ITSM',
       title: 'Enterprise Service Orchestration',
-      img: '/assets/work/technology-hero.png',
+      imgs: [
+        '/assets/work/technology-hero.png',
+        '/assets/work/technology-2.png',
+        '/assets/work/fintech-hero.png'
+      ],
       hue: 265,
       challenge: 'Siloed legacy tools created fragmented workflows across IT teams, leading to missed SLAs and repeated context-switching between 6+ separate systems.',
       approach: 'Conducted 28 stakeholder interviews, mapped end-to-end service journeys, and designed a consolidated console with intelligent routing, real-time dashboards, and in-context knowledge panels.',
@@ -222,7 +264,11 @@
     telecom: {
       tag: 'Global Telecom Provider · B2B · Dashboard',
       title: 'Internal Tool Suite for Network Operations',
-      img: '/assets/work/telecom-hero.png',
+      imgs: [
+        '/assets/work/telecom-hero.png',
+        '/assets/work/telecom-2.png',
+        '/assets/work/telecom-3.png'
+      ],
       hue: 95,
       challenge: 'Engineers toggled between 8 legacy systems with inconsistent data models, leading to missed alerts and duplicated troubleshooting across teams.',
       approach: 'Mapped data flows across systems, designed a unified schema, and built a dashboard with customizable widgets, critical alert prioritization, and one-click incident escalation.',
@@ -232,7 +278,11 @@
     fintech: {
       tag: 'Digital Finance Co. · Mobile · Investment',
       title: 'Consumer Investment &amp; Trading Platform',
-      img: '/assets/work/finance-hero.png',
+      imgs: [
+        '/assets/work/finance-hero.png',
+        '/assets/work/finance-2.png',
+        '/assets/work/fintech-2.png'
+      ],
       hue: 180,
       challenge: 'New users abandoned account setup 60% of the time. Existing users found the portfolio dashboard overwhelming with too many data points and unclear actionable insights.',
       approach: 'Conducted 30 user interviews across age groups, validated new IA with tree testing, and designed a progressive disclosure system that revealed insights based on user sophistication level.',
@@ -242,7 +292,7 @@
     nike: {
       tag: 'Nike · CRM · Analytics',
       title: 'Email Marketing Analytics Platform',
-      img: '/assets/work/NikeEmailLibrary_Overlay_v2-0_0006_05_Click_Overlay.png',
+      imgs: ['/assets/work/NikeEmailLibrary_Overlay_v2-0_0006_05_Click_Overlay.png'],
       hue: 340,
       challenge: 'Email marketers juggled 4 disconnected tools to manage campaign creation, preview, and performance — creating a fragmented process that slowed time-to-launch by days.',
       approach: 'Ran contextual inquiry sessions with 14 marketers across North America and EMEA, synthesized workflows, and designed a unified 3-column interface with live preview and integrated metrics.',
@@ -252,7 +302,10 @@
     retail: {
       tag: 'AT&amp;T · Omnichannel · Mobile',
       title: 'Omnichannel Retail Experience',
-      img: '/assets/work/retail-hero.png',
+      imgs: [
+        '/assets/work/retail-hero.png',
+        '/assets/work/att-catalog-dynamic-filtering.png'
+      ],
       hue: 210,
       challenge: 'Customers faced a disjointed experience between the AT&T app and in-store pickup — no real-time inventory visibility, unclear pickup instructions, and no status communication.',
       approach: 'Ran moderated usability tests with 22 customers across 3 retail regions, co-designed flows with store associates, and built a prototype-to-pilot process in partnership with engineering.',
@@ -270,7 +323,19 @@
     const c = CASES[id];
     if (!c) return;
     activeModal.style.setProperty('--hue', c.hue);
-    modalHero.innerHTML = `<img src="${c.img}" alt="${c.title.replace(/&amp;/g,'&')}" />`;
+
+    // Build slideshow
+    const imgs = c.imgs;
+    const slides = imgs.map((src, i) =>
+      `<img class="modal-slide${i === 0 ? ' active' : ''}" src="${src}" alt="" />`
+    ).join('');
+    const dots = imgs.length > 1
+      ? `<div class="modal-dots">${imgs.map((_, i) =>
+          `<span class="modal-dot${i === 0 ? ' active' : ''}" data-idx="${i}"></span>`
+        ).join('')}</div>`
+      : '';
+    modalHero.innerHTML = slides + dots;
+
     modalBody.innerHTML = `
       <div class="case-modal-tag">${c.tag}</div>
       <h2 class="case-modal-title">${c.title}</h2>
@@ -283,15 +348,54 @@
       <div class="case-section"><h2>Approach</h2><p>${c.approach}</p></div>
       <div class="case-section"><h2>Outcome</h2><p>${c.outcome}</p></div>
     `;
+
     overlay.classList.add('is-open');
     document.body.style.overflow = 'hidden';
     history.replaceState(null, '', '#' + id);
+
+    // Start slideshow timer
+    if (imgs.length > 1) {
+      let current = 0;
+      slideshowTimer = setInterval(() => {
+        const allSlides = modalHero.querySelectorAll('.modal-slide');
+        const allDots = modalHero.querySelectorAll('.modal-dot');
+        allSlides[current].classList.remove('active');
+        allDots[current]?.classList.remove('active');
+        current = (current + 1) % imgs.length;
+        allSlides[current].classList.add('active');
+        allDots[current]?.classList.add('active');
+      }, 4000);
+
+      // Dot click navigation
+      modalHero.querySelectorAll('.modal-dot').forEach(dot => {
+        dot.addEventListener('click', () => {
+          const idx = parseInt(dot.dataset.idx);
+          modalHero.querySelectorAll('.modal-slide').forEach((s, i) => s.classList.toggle('active', i === idx));
+          modalHero.querySelectorAll('.modal-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+          current = idx;
+          clearInterval(slideshowTimer);
+          slideshowTimer = setInterval(() => {
+            const allSlides = modalHero.querySelectorAll('.modal-slide');
+            const allDots = modalHero.querySelectorAll('.modal-dot');
+            allSlides[current].classList.remove('active');
+            allDots[current]?.classList.remove('active');
+            current = (current + 1) % imgs.length;
+            allSlides[current].classList.add('active');
+            allDots[current]?.classList.add('active');
+          }, 4000);
+        });
+      });
+    }
   }
+
+  let slideshowTimer = null;
 
   function closeModal() {
     overlay.classList.remove('is-open');
     document.body.style.overflow = '';
     history.replaceState(null, '', location.pathname);
+    clearInterval(slideshowTimer);
+    slideshowTimer = null;
   }
 
   document.querySelectorAll('.work-card').forEach(card => {
