@@ -79,6 +79,20 @@
       animation: hero-text-in 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.5s both;
     }
 
+    /* Scroll reveal */
+    .work-card {
+      transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .work-card.scroll-hidden {
+      opacity: 0;
+      transform: translateY(28px);
+    }
+    .work-card.scroll-above {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+
     @media (max-width: 900px) {
       .work-hero-fan {
         width: 100%;
@@ -293,6 +307,25 @@
   if (hash && CASES[hash]) {
     setTimeout(() => openModal(hash), 100);
   }
+
+  // Scroll reveal — fade in below, fade out above
+  const cards = document.querySelectorAll('.work-card');
+  cards.forEach(c => c.classList.add('scroll-hidden'));
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const card = entry.target;
+      if (entry.isIntersecting) {
+        card.classList.remove('scroll-hidden', 'scroll-above');
+      } else {
+        const above = entry.boundingClientRect.top < 0;
+        card.classList.toggle('scroll-above', above);
+        card.classList.toggle('scroll-hidden', !above);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  cards.forEach(c => observer.observe(c));
   </script>
 </body>
 </html>

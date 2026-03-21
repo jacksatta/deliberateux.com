@@ -2631,7 +2631,7 @@ html[data-theme="light"] .panel--work .section-kicker {
 .work-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 40px;
+  gap: 64px 40px;
   margin-top: 40px;
   opacity: 1;
   transform: none;
