@@ -47,14 +47,21 @@ styles.css      → All site styles
 - Hero section with magnifying/zoom hover effect
 - Brand logo uses `.brand-wordmark` / `.wordmark-ux` classes
 
-### Cinematic page intro (home page, as of 2026-03-21)
-Sequence on `index.html`:
-1. Black curtain (`#page-curtain`) fades out over ~900ms
-2. `.site-header` slides down (delay 200ms) — header/footer first
-3. `.hero.hero-intro` fades up (delay 550ms) — main content a beat later
-4. Sections below (`.reveal` class) fade up on scroll via `IntersectionObserver`
-   - `.section-head` and card groups each get `reveal`; cards have `transition-delay: 120ms` for stagger
-- Pattern: structural reveals (header → main → scroll sections), not per-element micro-animations
+### Cinematic page intro (home page)
+Layered overlap — each layer starts halfway through the previous, total ~3s:
+| t= | Layer |
+|---|---|
+| 0ms | All black |
+| 0–1300ms | Gradient materializes (`#page-curtain` fades out, ease-in-out) |
+| 650ms | Header slides down + footer fades in (900ms duration) |
+| 1100ms | Hero image fades in (1000ms duration) |
+| 1350ms | Hero title slides R→L (950ms) |
+| 1600ms | Hero subtitle slides R→L, stacks below (900ms) |
+| 1900/2100/2300ms | Chips stagger in, last lands ~3000ms |
+
+- Scroll-reveal below hero: `.reveal` class + `IntersectionObserver` (inline script in index.html)
+- Section-head reveals first; card group has `transition-delay: 120ms` for stagger
+- To retune: edit delay/duration values in the cinematic block in styles.css
 
 ## Preferred Workflow
 - No need to confirm routine actions (commit, push, file edits)
