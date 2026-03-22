@@ -318,16 +318,24 @@ html[data-theme="light"] .panel.panel-soft {
 
 /* ================================
    Cinematic page intro
+   Layered overlap sequence:
+   t=0        → black
+   t=0–900ms  → gradient materializes (curtain lifts, ease-in-out)
+   t=450ms    → header + footer fade in (halfway through gradient)
+   t=700ms    → hero image fades in (halfway through header fade)
+   t=950ms    → hero title slides R→L
+   t=1150ms   → hero subtitle slides R→L, stacks below
+   t=1350ms+  → chips stagger in, stacking
 ================================= */
 
-/* Black curtain fades out, revealing gradient */
+/* Gradient materializes over 900ms */
 #page-curtain {
   position: fixed;
   inset: 0;
   background: #000;
   z-index: 9999;
   pointer-events: none;
-  animation: curtain-lift 900ms ease-out forwards;
+  animation: curtain-lift 900ms ease-in-out forwards;
 }
 
 @keyframes curtain-lift {
@@ -335,33 +343,72 @@ html[data-theme="light"] .panel.panel-soft {
   100% { opacity: 0; }
 }
 
-/* 1. Header slides down */
+/* Header + footer — start halfway through gradient (450ms) */
 .site-header {
-  animation: header-in 500ms ease-out 200ms both;
+  animation: intro-slide-down 650ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 450ms both;
 }
 
-@keyframes header-in {
-  from { opacity: 0; transform: translateY(-12px); }
+.site-footer {
+  animation: intro-fade 650ms ease-out 450ms both;
+}
+
+@keyframes intro-slide-down {
+  from { opacity: 0; transform: translateY(-14px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* 2. Hero fades up — a beat after header */
+@keyframes intro-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Hero image — halfway through header fade (450 + 325 = ~775ms) */
 .hero.hero-intro {
   opacity: 0;
-  animation: page-fade-up 650ms ease-out 550ms forwards;
+  animation: intro-fade 750ms ease-out 775ms forwards;
 }
 
-@keyframes page-fade-up {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
+/* Hero content container — keep positioned, animate children */
+.hero.hero-intro .hero-content {
+  opacity: 1;
+  transform: translateY(-50%);
+  animation: none;
+}
+
+/* Title — slides R→L, starts as image is revealing */
+.hero.hero-intro .hero-title {
+  opacity: 0;
+  animation: intro-slide-left 700ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 950ms forwards;
+}
+
+/* Subtitle — slides R→L, overlaps title, stacks below */
+.hero.hero-intro .hero-subtitle {
+  opacity: 0;
+  animation: intro-slide-left 650ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 1150ms forwards;
+}
+
+/* Chips — stagger in, stack below subtitle */
+.hero.hero-intro .hero-chips .chip {
+  opacity: 0;
+  animation: intro-slide-left 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+.hero.hero-intro .hero-chips .chip:nth-child(1) { animation-delay: 1350ms; }
+.hero.hero-intro .hero-chips .chip:nth-child(2) { animation-delay: 1480ms; }
+.hero.hero-intro .hero-chips .chip:nth-child(3) { animation-delay: 1610ms; }
+
+@keyframes intro-slide-left {
+  from { opacity: 0; transform: translateX(36px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
 /* ================================
    Scroll reveal — sections below
+   Sub-elements fade up on scroll;
+   heading first, cards 120ms after
 ================================= */
 .reveal {
   opacity: 0;
-  transform: translateY(24px);
+  transform: translateY(22px);
   transition: opacity 600ms ease-out, transform 600ms ease-out;
 }
 .reveal.is-visible {
