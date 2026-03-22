@@ -316,36 +316,83 @@ html[data-theme="light"] .panel.panel-soft {
   position: relative;
 }
 
-/* Hero entrance animations */
-.hero.hero-intro {
-  opacity: 0;
-  animation: heroCardFadeIn 400ms ease-out forwards;
+/* ================================
+   Cinematic page intro
+================================= */
+#page-curtain {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 9999;
+  pointer-events: none;
+  animation: curtain-lift 1000ms cubic-bezier(0.4, 0, 0.6, 1) 80ms forwards;
 }
 
-.hero.hero-intro .hero-content {
-  opacity: 0;
-  transform: translateY(-50%) translateX(calc(50vw - 50% - 28px));
-  animation: heroContentSlideIn 1200ms ease-out 300ms forwards;
+@keyframes curtain-lift {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
 }
+
+/* Hero card fades in while curtain is still lifting */
+.hero.hero-intro {
+  opacity: 0;
+  animation: heroCardFadeIn 700ms ease-out 250ms forwards;
+}
+
+/* Hero content container stays put — children animate individually */
+.hero.hero-intro .hero-content {
+  opacity: 1;
+  transform: translateY(-50%);
+  animation: none;
+}
+
+/* Title slides in from right */
+.hero.hero-intro .hero-title {
+  opacity: 0;
+  animation: hero-slide-in 900ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 600ms forwards;
+}
+
+/* Subtitle fades up */
+.hero.hero-intro .hero-subtitle {
+  opacity: 0;
+  animation: hero-fade-up 700ms ease-out 950ms forwards;
+}
+
+/* Chips stagger in */
+.hero.hero-intro .hero-chips .chip {
+  opacity: 0;
+  animation: hero-fade-up 500ms ease-out forwards;
+}
+.hero.hero-intro .hero-chips .chip:nth-child(1) { animation-delay: 1150ms; }
+.hero.hero-intro .hero-chips .chip:nth-child(2) { animation-delay: 1300ms; }
+.hero.hero-intro .hero-chips .chip:nth-child(3) { animation-delay: 1450ms; }
 
 @keyframes heroCardFadeIn {
   from { opacity: 0; }
-  to { opacity: 1; }
+  to   { opacity: 1; }
 }
 
-@keyframes heroContentSlideIn {
-  0% {
-    opacity: 0;
-    transform: translateY(-50%) translateX(calc(50vw - 50% - 28px));
-  }
-  40% {
-    opacity: 1;
-    transform: translateY(-50%) translateX(calc(50vw - 50% - 28px));
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(-50%) translateX(0);
-  }
+@keyframes hero-slide-in {
+  from { opacity: 0; transform: translateX(32px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes hero-fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ================================
+   Scroll reveal
+================================= */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 650ms ease-out, transform 650ms ease-out;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .hero-media {

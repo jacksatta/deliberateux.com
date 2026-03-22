@@ -16,10 +16,11 @@
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
+  <div id="page-curtain"></div>
   <main class="page">
 	<div class="container">
 
-	  <section class="hero">
+	  <section class="hero hero-intro">
 		<div class="hero-media">
 		  <img src="/assets/hero-aurora.jpeg" alt="" />
 		  <div class="hero-content">
@@ -41,7 +42,7 @@
 		  <div class="work-backdrop-moire"></div>
 		  <div class="work-backdrop-fade"></div>
 		</div>
-		<div class="section-head">
+		<div class="section-head reveal">
 		  <div>
 			<a href="/work/" class="section-title-link"><h2 class="section-title">Selected work</h2></a>
 			<p class="section-kicker">Case studies and practice notes.</p>
@@ -49,7 +50,7 @@
 		  <a class="card-cta-link" href="/work/">More work →</a>
 		</div>
 
-		<div class="cards">
+		<div class="cards reveal" style="transition-delay:120ms">
 		  <a class="card card--has-thumb" href="/work/#technology" data-thumb="technology">
 			<h3 class="card-title">Enterprise UX at scale</h3>
 			<p class="card-body">Design systems, agent workflows, and real-world constraints.</p>
@@ -72,7 +73,7 @@
 
 	  <!-- WRITING -->
 	  <section id="writing" class="section panel panel--writing">
-		<div class="section-head">
+		<div class="section-head reveal">
 		  <div>
 			<a href="/work/writing/" class="section-title-link"><h2 class="section-title">Writing</h2></a>
 			<p class="section-kicker">Essays on adoption, systems, and practical UX.</p>
@@ -80,7 +81,7 @@
 		  <a class="card-cta-link" href="/work/writing/">More writing →</a>
 		</div>
 
-		<div class="writing-cards">
+		<div class="writing-cards reveal" style="transition-delay:120ms">
 		  <a class="card card--writing" href="/work/writing/why-good-ux-still-fails.html">
 			<h3 class="card-title">Why good UX still fails</h3>
 			<p class="card-body">Great interaction design can still lose to incentives, operations, and time.</p>
@@ -103,7 +104,7 @@
 
 	  <!-- ABOUT -->
 	  <section id="about" class="section panel panel--about">
-		<div class="about-panel">
+		<div class="about-panel reveal">
 		  <h2 class="section-title" style="margin:0 0 6px;">About</h2>
 		  <p class="kicker">Practical UX: incentives, operations, and constraints that shape outcomes.</p>
 		  <p>
@@ -111,7 +112,7 @@
 			If your product is "usable" but still not adopted, that's the gap I'm interested in.
 		  </p>
 		</div>
-		<div class="about-illustration">
+		<div class="about-illustration reveal" style="transition-delay:100ms">
 		  <svg class="design-flowchart" viewBox="0 0 620 115" preserveAspectRatio="xMidYMid meet">
 			<defs>
 			  <marker id="arrowhead" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto">
@@ -192,5 +193,18 @@
   </main>
 
   <script src="/app.js" defer></script>
+  <script>
+    (function () {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            e.target.classList.add('is-visible');
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+    })();
+  </script>
 </body>
 </html>
