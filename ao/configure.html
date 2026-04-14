@@ -1,0 +1,774 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-9MSXWF3TX3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-9MSXWF3TX3');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Configure — AO Org Builder</title>
+  <meta name="description" content="Build your own AO agency. Choose roles, assign humans or agents, scale up or down. Every configuration includes built-in ethics guidance." />
+  <link rel="icon" href="/assets/favicon.svg" />
+  <style>
+    /* ── Reset + tokens (shared with AO) ──────────────────── */
+    :root {
+      --bg: #070812;
+      --bg2: #0b1021;
+      --panel: rgba(255,255,255,0.06);
+      --panel2: rgba(255,255,255,0.08);
+      --border: rgba(255,255,255,0.10);
+      --border2: rgba(255,255,255,0.14);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.68);
+      --faint: rgba(255,255,255,0.52);
+      --ghost: rgba(255,255,255,0.28);
+      --hairline: rgba(255,255,255,0.08);
+      --shadow-soft: 0 10px 30px rgba(0,0,0,0.35);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 10px;
+      --max: 1060px;
+      --pad: 28px;
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --ease: cubic-bezier(.2,.8,.2,1);
+      /* Role colors */
+      --c-admin: 168,139,250;
+      --c-mkt: 244,114,182;
+      --c-dev: 96,165,250;
+      --c-uxr: 52,211,153;
+      --c-qa: 251,191,36;
+      --c-biz: 147,197,253;
+      --c-cs: 110,231,183;
+      --c-ops: 248,113,113;
+      --c-data: 129,140,248;
+      --c-content: 232,121,249;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { height: 100%; }
+    body {
+      margin: 0;
+      min-height: 100%;
+      font-family: var(--font);
+      color: var(--text);
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(1200px 900px at 20% -10%, rgba(142,72,255,0.20), transparent 55%),
+        radial-gradient(900px 700px at 90% 0%, rgba(0,168,255,0.14), transparent 55%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      background-attachment: fixed;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--text); text-decoration: none; }
+    ::selection { background: rgba(140,90,255,0.35); }
+    .container { width: min(var(--max), calc(100% - 48px)); margin: 0 auto; }
+
+    /* ── Header ──────────────────────────────────────────── */
+    .cfg-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--hairline);
+      margin-bottom: 32px;
+    }
+    .cfg-logo {
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cfg-logo-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgb(var(--c-admin));
+      box-shadow: 0 0 8px rgba(var(--c-admin),0.5);
+    }
+    .cfg-nav { display: flex; gap: 24px; font-size: 0.875rem; }
+    .cfg-nav a { color: var(--muted); transition: color 0.2s; }
+    .cfg-nav a:hover { color: var(--text); }
+
+    /* ── Hero ────────────────────────────────────────────── */
+    .cfg-hero {
+      text-align: center;
+      padding: 48px 0 24px;
+    }
+    .cfg-hero h1 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin: 0 0 14px;
+    }
+    .cfg-hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, rgb(var(--c-admin)), rgb(var(--c-uxr)));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .cfg-hero .sub {
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.6;
+      max-width: 580px;
+      margin: 0 auto;
+    }
+
+    /* ── Stats bar ───────────────────────────────────────── */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 36px;
+      padding: 20px 0 28px;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--faint);
+    }
+    .stat-item strong {
+      color: var(--text);
+      font-size: 1.1rem;
+      display: block;
+      margin-bottom: 2px;
+      font-family: var(--font);
+    }
+
+    /* ── Template picker ─────────────────────────────────── */
+    .templates {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+    .tpl-btn {
+      font-family: var(--font);
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--muted);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+    }
+    .tpl-btn:hover { border-color: var(--border2); color: var(--text); }
+    .tpl-btn.active {
+      border-color: rgba(var(--c-admin),0.5);
+      background: rgba(var(--c-admin),0.1);
+      color: var(--text);
+    }
+
+    /* ── Role grid ───────────────────────────────────────── */
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .role-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 22px 20px 18px;
+      position: relative;
+      transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+      animation: cardIn 0.35s var(--ease) both;
+    }
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.97); }
+      to   { opacity: 1; transform: none; }
+    }
+    .role-card:hover {
+      border-color: var(--border2);
+      box-shadow: var(--shadow-soft);
+    }
+    .role-card.is-admin {
+      border-color: rgba(var(--c-admin),0.3);
+      background: rgba(var(--c-admin),0.04);
+    }
+
+    .role-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .role-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .role-info { flex: 1; min-width: 0; }
+    .role-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 1px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .role-label {
+      font-size: 0.75rem;
+      font-family: var(--mono);
+      color: var(--faint);
+    }
+
+    /* Operator toggle */
+    .operator-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      background: rgba(0,0,0,0.3);
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
+    }
+    .op-btn {
+      padding: 5px 12px;
+      cursor: pointer;
+      color: var(--ghost);
+      transition: all 0.2s var(--ease);
+      border: none;
+      background: none;
+      font-family: var(--font);
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .op-btn:hover { color: var(--muted); }
+    .op-btn.active-agent {
+      background: rgba(var(--c-dev),0.2);
+      color: rgb(var(--c-dev));
+    }
+    .op-btn.active-human {
+      background: rgba(var(--c-uxr),0.2);
+      color: rgb(var(--c-uxr));
+    }
+
+    /* Ethics badge */
+    .ethics-strip {
+      background: rgba(var(--c-admin),0.06);
+      border: 1px solid rgba(var(--c-admin),0.15);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+    .ethics-strip .ethics-icon {
+      font-weight: 700;
+      color: rgb(var(--c-admin));
+      margin-right: 4px;
+    }
+    .ethics-strip.ethics-primary {
+      background: rgba(var(--c-admin),0.1);
+      border-color: rgba(var(--c-admin),0.25);
+    }
+    .ethics-strip.ethics-primary .ethics-icon { font-size: 0.85rem; }
+
+    /* Remove button */
+    .role-remove {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      width: 24px; height: 24px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: var(--ghost);
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+    .role-remove:hover { background: rgba(255,60,60,0.15); color: #f87171; }
+
+    /* ── Add role bar ────────────────────────────────────── */
+    .add-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 12px 0 40px;
+    }
+    .add-btn {
+      font-family: var(--font);
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--faint);
+      background: none;
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+    }
+    .add-btn:hover {
+      border-color: var(--border2);
+      color: var(--text);
+      border-style: solid;
+      background: var(--panel);
+    }
+
+    /* ── Ethics manifesto ────────────────────────────────── */
+    .manifesto {
+      border-top: 1px solid var(--hairline);
+      padding: 48px 0 40px;
+    }
+    .manifesto h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin: 0 0 8px;
+    }
+    .manifesto .kicker {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      max-width: 640px;
+      margin: 0 0 28px;
+    }
+    .principles-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    @media (min-width: 640px) {
+      .principles-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .principle {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 18px 20px;
+    }
+    .principle h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin: 0 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .principle h4 .p-num {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: rgb(var(--c-admin));
+      background: rgba(var(--c-admin),0.12);
+      border-radius: 4px;
+      padding: 2px 6px;
+    }
+    .principle p {
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    /* ── Footer ──────────────────────────────────────────── */
+    .cfg-footer {
+      border-top: 1px solid var(--hairline);
+      padding: 20px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--faint);
+    }
+    .cfg-footer a { color: var(--muted); }
+    .cfg-footer a:hover { color: var(--text); }
+    .cfg-footer .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ghost);
+    }
+    .cfg-footer .badge .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #f59e0b;
+      box-shadow: 0 0 4px rgba(245,158,11,0.4);
+    }
+
+    /* ── Responsive ──────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .stats-bar { gap: 20px; flex-wrap: wrap; }
+      .role-grid { grid-template-columns: 1fr; }
+      .cfg-nav { gap: 14px; }
+    }
+
+    /* ── Reveal ──────────────────────────────────────────── */
+    .cfg-reveal {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    }
+    .cfg-reveal.in { opacity: 1; transform: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header class="cfg-header">
+      <div class="cfg-logo">
+        <span class="cfg-logo-dot"></span>
+        AO <span style="font-weight:400;color:var(--muted);margin-left:2px">/ Configure</span>
+      </div>
+      <nav class="cfg-nav">
+        <a href="/ao/">Overview</a>
+        <a href="/ao/#protocol">Protocol</a>
+        <a href="/products/">Products</a>
+        <a href="/">deliberateux.com</a>
+      </nav>
+    </header>
+
+    <!-- Hero -->
+    <section class="cfg-hero">
+      <h1>Build <em>your</em> agency</h1>
+      <p class="sub">Roles are slots, not fixed assignments. Fill them with AI agents or real people. Add new roles, remove what you don't need, and scale as your org evolves. Ethics guidance is built into every configuration.</p>
+    </section>
+
+    <!-- Stats -->
+    <div class="stats-bar" id="stats-bar">
+      <div class="stat-item"><strong id="stat-roles">7</strong>roles</div>
+      <div class="stat-item"><strong id="stat-agents">7</strong>agents</div>
+      <div class="stat-item"><strong id="stat-humans">0</strong>humans</div>
+      <div class="stat-item"><strong id="stat-ethics">7</strong>ethics rules</div>
+    </div>
+
+    <!-- Template picker -->
+    <div class="templates" id="templates">
+      <button class="tpl-btn active" data-tpl="solo">Solo operator</button>
+      <button class="tpl-btn" data-tpl="small-team">Small team (3 humans)</button>
+      <button class="tpl-btn" data-tpl="agency">Full agency</button>
+      <button class="tpl-btn" data-tpl="minimal">Minimal (3 roles)</button>
+    </div>
+
+    <!-- Role grid -->
+    <div class="role-grid" id="role-grid"></div>
+
+    <!-- Add role bar -->
+    <div class="add-bar" id="add-bar"></div>
+
+    <!-- Ethics manifesto -->
+    <section class="manifesto cfg-reveal" id="manifesto">
+      <h2>Ethics guidance manifesto</h2>
+      <p class="kicker">Every AO configuration ships with ethics built in — not as an afterthought, but as structural guardrails woven into roles. The lead admin always carries ethics oversight. Every role has context-specific ethical responsibilities.</p>
+
+      <div class="principles-grid">
+        <div class="principle">
+          <h4><span class="p-num">01</span> Human authority is final</h4>
+          <p>Agents propose; humans decide. Pricing, strategy, public communications, and any action affecting real people require human approval. No autonomous escalation past the human gate.</p>
+        </div>
+        <div class="principle">
+          <h4><span class="p-num">02</span> Transparency by default</h4>
+          <p>Every agent action is logged, every handoff is human-readable, every decision chain is auditable. If a human asks "why did this happen," the answer is always traceable.</p>
+        </div>
+        <div class="principle">
+          <h4><span class="p-num">03</span> Role-specific accountability</h4>
+          <p>Each role carries ethical guardrails matched to its domain. Marketing doesn't make misleading claims. Dev doesn't ship without QA. UXR doesn't ignore accessibility. The ethics travel with the role, whether filled by a human or an agent.</p>
+        </div>
+        <div class="principle">
+          <h4><span class="p-num">04</span> Fail safe, not fail silent</h4>
+          <p>When an agent encounters an ethical boundary, it stops and escalates — it doesn't route around the guardrail. Partial work is preserved, the human is notified, and the decision chain stays intact.</p>
+        </div>
+        <div class="principle">
+          <h4><span class="p-num">05</span> No concentration of unchecked power</h4>
+          <p>The lead admin carries ethics oversight, but ethics isn't centralized in one role. Every role has its own ethical scope. If a role is removed, its ethical responsibilities are redistributed, not deleted.</p>
+        </div>
+        <div class="principle">
+          <h4><span class="p-num">06</span> Humans can always step in</h4>
+          <p>Any agent role can be filled by a human at any time. The protocol doesn't change — handoffs, status updates, and quality gates work the same way whether the operator is human or AI.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="cfg-footer">
+      <div>
+        Built by <a href="/">Jack Satta</a> · <a href="/">Deliberate UX</a>
+      </div>
+      <span class="badge">
+        <span class="dot"></span>
+        Interactive Demo
+      </span>
+    </footer>
+
+  </div>
+
+  <script>
+    // ── Role definitions ──────────────────────────────────
+    const ROLE_CATALOG = {
+      admin: {
+        id: 'admin', name: 'Lead Admin', abbr: 'EA', color: 'var(--c-admin)',
+        label: 'orchestrator',
+        desc: 'Triages work, routes handoffs, synthesizes cross-agent status, and escalates blockers.',
+        ethics: 'Carries org-wide ethics oversight. Reviews all outward-facing decisions for ethical alignment. Cannot be removed — only reassigned.',
+        ethicsPrimary: true,
+        removable: false
+      },
+      mkt: {
+        id: 'mkt', name: 'Marketing Lead', abbr: 'Mkt', color: 'var(--c-mkt)',
+        label: 'marketing',
+        desc: 'Competitive scans, positioning, copy drafting, and launch planning.',
+        ethics: 'No misleading claims. All competitive comparisons must be verifiable. User testimonials require consent.',
+        removable: true
+      },
+      dev: {
+        id: 'dev', name: 'Dev Lead', abbr: 'Dev', color: 'var(--c-dev)',
+        label: 'engineering',
+        desc: 'Implements features, fixes bugs, manages the build pipeline.',
+        ethics: 'No shipping without QA sign-off. Security vulnerabilities are P0. User data handling follows privacy-by-design.',
+        removable: true
+      },
+      uxr: {
+        id: 'uxr', name: 'UX Researcher', abbr: 'UXR', color: 'var(--c-uxr)',
+        label: 'research',
+        desc: 'Heuristic evaluations, accessibility audits, and usability analysis.',
+        ethics: 'Accessibility is non-negotiable. Dark patterns are rejected. User research respects consent and privacy.',
+        removable: true
+      },
+      qa: {
+        id: 'qa', name: 'QA Guardian', abbr: 'QA', color: 'var(--c-qa)',
+        label: 'quality',
+        desc: 'End-to-end testing, regression checks, and release gates.',
+        ethics: 'Nothing ships without passing quality gates. Known defects are disclosed, not hidden. Test coverage is honest.',
+        removable: true
+      },
+      biz: {
+        id: 'biz', name: 'Biz Dev', abbr: 'Biz', color: 'var(--c-biz)',
+        label: 'business',
+        desc: 'Revenue model research, pricing analysis, and distribution strategy.',
+        ethics: 'Pricing must be fair and transparent. No predatory monetization. Partnership terms are honest.',
+        removable: true
+      },
+      cs: {
+        id: 'cs', name: 'Customer Service', abbr: 'CS', color: 'var(--c-cs)',
+        label: 'support',
+        desc: 'Inbox triage, bug reports, feature request routing, and reply drafting.',
+        ethics: 'User complaints are acknowledged, not dismissed. Escalation paths are clear. Responses are honest about limitations.',
+        removable: true
+      },
+      ops: {
+        id: 'ops', name: 'Operations', abbr: 'Ops', color: 'var(--c-ops)',
+        label: 'operations',
+        desc: 'Infrastructure management, deployment, monitoring, and incident response.',
+        ethics: 'Uptime commitments are honest. Incident reports are transparent. User data in logs is handled per policy.',
+        removable: true
+      },
+      data: {
+        id: 'data', name: 'Data Analyst', abbr: 'Data', color: 'var(--c-data)',
+        label: 'analytics',
+        desc: 'Metrics tracking, reporting, A/B test analysis, and insights synthesis.',
+        ethics: 'Metrics are reported honestly. P-hacking and cherry-picking are rejected. User privacy in analytics is paramount.',
+        removable: true
+      },
+      content: {
+        id: 'content', name: 'Content Lead', abbr: 'Con', color: 'var(--c-content)',
+        label: 'content',
+        desc: 'Blog posts, documentation, social media, and editorial calendar.',
+        ethics: 'All content is original or properly attributed. AI-generated content is labeled. No engagement bait or misinformation.',
+        removable: true
+      }
+    };
+
+    // ── Templates ─────────────────────────────────────────
+    const TEMPLATES = {
+      solo: {
+        roles: ['admin','mkt','dev','uxr','qa','biz','cs'],
+        operators: { admin:'agent', mkt:'agent', dev:'agent', uxr:'agent', qa:'agent', biz:'agent', cs:'agent' }
+      },
+      'small-team': {
+        roles: ['admin','mkt','dev','uxr','qa','biz','cs'],
+        operators: { admin:'human', mkt:'human', dev:'human', uxr:'agent', qa:'agent', biz:'agent', cs:'agent' }
+      },
+      agency: {
+        roles: ['admin','mkt','dev','uxr','qa','biz','cs','ops','data','content'],
+        operators: { admin:'human', mkt:'agent', dev:'agent', uxr:'agent', qa:'agent', biz:'agent', cs:'agent', ops:'agent', data:'agent', content:'agent' }
+      },
+      minimal: {
+        roles: ['admin','dev','qa'],
+        operators: { admin:'agent', dev:'agent', qa:'agent' }
+      }
+    };
+
+    // ── State ─────────────────────────────────────────────
+    let state = {
+      roles: [],       // array of role IDs
+      operators: {},   // roleId -> 'agent' | 'human'
+      template: 'solo'
+    };
+
+    // ── Render ────────────────────────────────────────────
+    function render() {
+      const grid = document.getElementById('role-grid');
+      grid.innerHTML = '';
+
+      state.roles.forEach((roleId, i) => {
+        const role = ROLE_CATALOG[roleId];
+        if (!role) return;
+        const op = state.operators[roleId] || 'agent';
+        const isAdmin = roleId === 'admin';
+
+        const card = document.createElement('div');
+        card.className = 'role-card' + (isAdmin ? ' is-admin' : '');
+        card.style.animationDelay = (i * 40) + 'ms';
+
+        card.innerHTML = `
+          <div class="role-top">
+            <div class="role-icon" style="background:rgba(${role.color.replace('var(--','').replace(')','')
+              .replace('c-admin','168,139,250').replace('c-mkt','244,114,182').replace('c-dev','96,165,250')
+              .replace('c-uxr','52,211,153').replace('c-qa','251,191,36').replace('c-biz','147,197,253')
+              .replace('c-cs','110,231,183').replace('c-ops','248,113,113').replace('c-data','129,140,248')
+              .replace('c-content','232,121,249')},0.15);color:rgba(${getColorRGB(roleId)},0.9)">
+              ${role.abbr}
+            </div>
+            <div class="role-info">
+              <div class="role-name">
+                ${role.name}
+                ${isAdmin ? '<span style="font-size:0.65rem;background:rgba(168,139,250,0.2);color:rgb(168,139,250);padding:1px 6px;border-radius:4px;font-weight:600">ETHICS LEAD</span>' : ''}
+              </div>
+              <div class="role-label">${role.label}</div>
+            </div>
+          </div>
+          <div class="operator-toggle">
+            <button class="op-btn ${op === 'agent' ? 'active-agent' : ''}" data-role="${roleId}" data-op="agent">Agent</button>
+            <button class="op-btn ${op === 'human' ? 'active-human' : ''}" data-role="${roleId}" data-op="human">Human</button>
+          </div>
+          <div style="font-size:0.84rem;color:var(--muted);line-height:1.5;margin-bottom:6px">${role.desc}</div>
+          <div class="ethics-strip ${role.ethicsPrimary ? 'ethics-primary' : ''}">
+            <span class="ethics-icon">${role.ethicsPrimary ? '◆' : '◇'}</span>
+            ${role.ethics}
+          </div>
+          ${role.removable ? '<button class="role-remove" data-role="' + roleId + '" title="Remove role">&times;</button>' : ''}
+        `;
+
+        grid.appendChild(card);
+      });
+
+      // Add-role buttons
+      const addBar = document.getElementById('add-bar');
+      const available = Object.keys(ROLE_CATALOG).filter(id => !state.roles.includes(id));
+      if (available.length > 0) {
+        addBar.innerHTML = '<span style="font-size:0.78rem;color:var(--ghost);margin-right:4px">Add role:</span>' +
+          available.map(id =>
+            `<button class="add-btn" data-add="${id}">+ ${ROLE_CATALOG[id].name}</button>`
+          ).join('');
+      } else {
+        addBar.innerHTML = '<span style="font-size:0.78rem;color:var(--ghost)">All available roles are active</span>';
+      }
+
+      updateStats();
+      bindEvents();
+    }
+
+    function getColorRGB(roleId) {
+      const map = {
+        admin:'168,139,250', mkt:'244,114,182', dev:'96,165,250', uxr:'52,211,153',
+        qa:'251,191,36', biz:'147,197,253', cs:'110,231,183', ops:'248,113,113',
+        data:'129,140,248', content:'232,121,249'
+      };
+      return map[roleId] || '255,255,255';
+    }
+
+    function updateStats() {
+      const agents = Object.values(state.operators).filter(v => v === 'agent').length;
+      const humans = Object.values(state.operators).filter(v => v === 'human').length;
+      document.getElementById('stat-roles').textContent = state.roles.length;
+      document.getElementById('stat-agents').textContent = agents;
+      document.getElementById('stat-humans').textContent = humans;
+      document.getElementById('stat-ethics').textContent = state.roles.length; // each role has ethics
+    }
+
+    function bindEvents() {
+      // Toggle agent/human
+      document.querySelectorAll('.op-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.operators[btn.dataset.role] = btn.dataset.op;
+          render();
+        });
+      });
+      // Remove role
+      document.querySelectorAll('.role-remove').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.role;
+          state.roles = state.roles.filter(r => r !== id);
+          delete state.operators[id];
+          // Clear active template
+          document.querySelectorAll('.tpl-btn').forEach(b => b.classList.remove('active'));
+          render();
+        });
+      });
+      // Add role
+      document.querySelectorAll('.add-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.add;
+          state.roles.push(id);
+          state.operators[id] = 'agent';
+          document.querySelectorAll('.tpl-btn').forEach(b => b.classList.remove('active'));
+          render();
+        });
+      });
+    }
+
+    // ── Template picker ───────────────────────────────────
+    document.getElementById('templates').addEventListener('click', (e) => {
+      const btn = e.target.closest('.tpl-btn');
+      if (!btn) return;
+      const tpl = btn.dataset.tpl;
+      const config = TEMPLATES[tpl];
+      if (!config) return;
+
+      document.querySelectorAll('.tpl-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      state.template = tpl;
+      state.roles = [...config.roles];
+      state.operators = { ...config.operators };
+      render();
+    });
+
+    // ── Init ──────────────────────────────────────────────
+    state.roles = [...TEMPLATES.solo.roles];
+    state.operators = { ...TEMPLATES.solo.operators };
+    render();
+
+    // Scroll reveal
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); }
+        });
+      }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+      document.querySelectorAll('.cfg-reveal').forEach(el => obs.observe(el));
+    } else {
+      document.querySelectorAll('.cfg-reveal').forEach(el => el.classList.add('in'));
+    }
+  </script>
+</body>
+</html>

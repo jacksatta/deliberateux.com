@@ -164,10 +164,11 @@
       text-align: center;
       margin: 0 0 20px;
     }
-    .ao-net-svg {
+    .ao-net-canvas {
       display: block;
       width: min(800px, 100%);
       margin: 0 auto;
+      border-radius: 12px;
     }
 
     /* ── Architecture section ─────────────────────────────── */
@@ -484,6 +485,7 @@
         <a href="#agents">Agents</a>
         <a href="#protocol">Protocol</a>
         <a href="#case-study">Case study</a>
+        <a href="/ao/configure.html">Configure</a>
         <a href="https://deliberateux.com">deliberateux.com</a>
       </nav>
     </header>
@@ -508,100 +510,10 @@
       </div>
     </section>
 
-    <!-- Live network graph -->
+    <!-- Live network graph (code-generated) -->
     <section class="ao-network-section" id="network">
       <h2>Live agent network</h2>
-      <svg class="ao-net-svg" viewBox="0 0 800 280" preserveAspectRatio="xMidYMid meet">
-        <defs>
-          <radialGradient id="ng-glow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="rgba(142,72,255,0.2)" />
-            <stop offset="100%" stop-color="transparent" />
-          </radialGradient>
-        </defs>
-
-        <ellipse cx="400" cy="140" rx="350" ry="120" fill="url(#ng-glow)" opacity="0.6">
-          <animate attributeName="opacity" values="0.4;0.7;0.4" dur="5s" repeatCount="indefinite" />
-        </ellipse>
-
-        <!-- Edges -->
-        <g stroke="rgba(255,255,255,0.07)" stroke-width="1">
-          <line x1="400" y1="60" x2="220" y2="120" />
-          <line x1="400" y1="60" x2="580" y2="120" />
-          <line x1="400" y1="60" x2="140" y2="195" />
-          <line x1="400" y1="60" x2="660" y2="195" />
-          <line x1="400" y1="60" x2="290" y2="230" />
-          <line x1="400" y1="60" x2="510" y2="230" />
-          <line x1="220" y1="120" x2="140" y2="195" />
-          <line x1="580" y1="120" x2="660" y2="195" />
-          <line x1="220" y1="120" x2="290" y2="230" />
-          <line x1="580" y1="120" x2="510" y2="230" />
-          <line x1="140" y1="195" x2="290" y2="230" />
-          <line x1="660" y1="195" x2="510" y2="230" />
-        </g>
-
-        <!-- Pulse flows -->
-        <circle r="3" fill="rgba(168,139,250,0.8)">
-          <animateMotion dur="2.8s" repeatCount="indefinite" begin="0s" path="M400,60 L220,120" />
-        </circle>
-        <circle r="3" fill="rgba(96,165,250,0.8)">
-          <animateMotion dur="3.2s" repeatCount="indefinite" begin="0.6s" path="M400,60 L580,120" />
-        </circle>
-        <circle r="2.5" fill="rgba(52,211,153,0.7)">
-          <animateMotion dur="3.8s" repeatCount="indefinite" begin="1s" path="M220,120 L290,230" />
-        </circle>
-        <circle r="2.5" fill="rgba(251,191,36,0.7)">
-          <animateMotion dur="3.5s" repeatCount="indefinite" begin="0.3s" path="M580,120 L510,230" />
-        </circle>
-        <circle r="2" fill="rgba(244,114,182,0.6)">
-          <animateMotion dur="4s" repeatCount="indefinite" begin="1.4s" path="M140,195 L400,60" />
-        </circle>
-        <circle r="2" fill="rgba(110,231,183,0.6)">
-          <animateMotion dur="3.6s" repeatCount="indefinite" begin="1.8s" path="M660,195 L400,60" />
-        </circle>
-        <circle r="2" fill="rgba(147,197,253,0.5)">
-          <animateMotion dur="4.2s" repeatCount="indefinite" begin="2.2s" path="M290,230 L400,60" />
-        </circle>
-
-        <!-- Nodes -->
-        <!-- EA (hub) -->
-        <circle cx="400" cy="60" r="28" fill="rgba(168,139,250,0.15)" stroke="rgba(168,139,250,0.5)" stroke-width="1.5" />
-        <circle cx="400" cy="60" r="28" fill="none" stroke="rgba(168,139,250,0.25)" stroke-width="1">
-          <animate attributeName="r" values="28;35;28" dur="3s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0.25;0;0.25" dur="3s" repeatCount="indefinite" />
-        </circle>
-        <text x="400" y="55" text-anchor="middle" fill="rgba(255,255,255,0.88)" font-size="13" font-weight="700" font-family="system-ui">EA</text>
-        <text x="400" y="69" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-size="8" font-family="monospace">orchestrator</text>
-
-        <!-- Mkt -->
-        <circle cx="220" cy="120" r="22" fill="rgba(244,114,182,0.12)" stroke="rgba(244,114,182,0.45)" stroke-width="1.2" />
-        <text x="220" y="116" text-anchor="middle" fill="rgba(255,255,255,0.82)" font-size="11" font-weight="600" font-family="system-ui">Mkt</text>
-        <text x="220" y="129" text-anchor="middle" fill="rgba(255,255,255,0.35)" font-size="7.5" font-family="monospace">marketing</text>
-
-        <!-- Dev -->
-        <circle cx="580" cy="120" r="22" fill="rgba(96,165,250,0.12)" stroke="rgba(96,165,250,0.45)" stroke-width="1.2" />
-        <text x="580" y="116" text-anchor="middle" fill="rgba(255,255,255,0.82)" font-size="11" font-weight="600" font-family="system-ui">Dev</text>
-        <text x="580" y="129" text-anchor="middle" fill="rgba(255,255,255,0.35)" font-size="7.5" font-family="monospace">dev lead</text>
-
-        <!-- UXR -->
-        <circle cx="140" cy="195" r="20" fill="rgba(52,211,153,0.12)" stroke="rgba(52,211,153,0.4)" stroke-width="1.2" />
-        <text x="140" y="192" text-anchor="middle" fill="rgba(255,255,255,0.78)" font-size="10.5" font-weight="600" font-family="system-ui">UXR</text>
-        <text x="140" y="204" text-anchor="middle" fill="rgba(255,255,255,0.32)" font-size="7" font-family="monospace">research</text>
-
-        <!-- QA -->
-        <circle cx="660" cy="195" r="20" fill="rgba(251,191,36,0.12)" stroke="rgba(251,191,36,0.4)" stroke-width="1.2" />
-        <text x="660" y="192" text-anchor="middle" fill="rgba(255,255,255,0.78)" font-size="10.5" font-weight="600" font-family="system-ui">QA</text>
-        <text x="660" y="204" text-anchor="middle" fill="rgba(255,255,255,0.32)" font-size="7" font-family="monospace">guardian</text>
-
-        <!-- BizDev -->
-        <circle cx="290" cy="230" r="18" fill="rgba(147,197,253,0.1)" stroke="rgba(147,197,253,0.35)" stroke-width="1" />
-        <text x="290" y="227" text-anchor="middle" fill="rgba(255,255,255,0.72)" font-size="10" font-weight="600" font-family="system-ui">Biz</text>
-        <text x="290" y="239" text-anchor="middle" fill="rgba(255,255,255,0.28)" font-size="6.5" font-family="monospace">biz dev</text>
-
-        <!-- CS -->
-        <circle cx="510" cy="230" r="18" fill="rgba(110,231,183,0.1)" stroke="rgba(110,231,183,0.35)" stroke-width="1" />
-        <text x="510" y="227" text-anchor="middle" fill="rgba(255,255,255,0.72)" font-size="10" font-weight="600" font-family="system-ui">CS</text>
-        <text x="510" y="239" text-anchor="middle" fill="rgba(255,255,255,0.28)" font-size="6.5" font-family="monospace">support</text>
-      </svg>
+      <canvas class="ao-net-canvas" id="net-canvas"></canvas>
     </section>
 
     <!-- Architecture -->
@@ -787,7 +699,177 @@
   </div>
 
   <script>
-    // Scroll reveal
+    // ── Code-generated agent network ──────────────────────
+    (function () {
+      var canvas = document.getElementById('net-canvas');
+      if (!canvas) return;
+      var ctx = canvas.getContext('2d');
+      var dpr = window.devicePixelRatio || 1;
+      var W = 800, H = 280;
+
+      function resize() {
+        var rect = canvas.parentElement.getBoundingClientRect();
+        var w = Math.min(800, rect.width);
+        var scale = w / W;
+        canvas.width = w * dpr;
+        canvas.height = H * scale * dpr;
+        canvas.style.width = w + 'px';
+        canvas.style.height = (H * scale) + 'px';
+        ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      // Agent node definitions — data-driven, easy to add/remove
+      var agents = [
+        { id: 'ea',  abbr: 'EA',  label: 'orchestrator', r: 28, baseX: 400, baseY: 60,  color: [168,139,250], hub: true },
+        { id: 'mkt', abbr: 'Mkt', label: 'marketing',    r: 22, baseX: 220, baseY: 120, color: [244,114,182] },
+        { id: 'dev', abbr: 'Dev', label: 'dev lead',      r: 22, baseX: 580, baseY: 120, color: [96,165,250] },
+        { id: 'uxr', abbr: 'UXR', label: 'research',      r: 20, baseX: 140, baseY: 195, color: [52,211,153] },
+        { id: 'qa',  abbr: 'QA',  label: 'guardian',       r: 20, baseX: 660, baseY: 195, color: [251,191,36] },
+        { id: 'biz', abbr: 'Biz', label: 'biz dev',        r: 18, baseX: 290, baseY: 230, color: [147,197,253] },
+        { id: 'cs',  abbr: 'CS',  label: 'support',         r: 18, baseX: 510, baseY: 230, color: [110,231,183] }
+      ];
+
+      // Compute live positions with gentle drift
+      agents.forEach(function (a, i) {
+        a.x = a.baseX;
+        a.y = a.baseY;
+        a.phase = i * 1.3;
+        a.driftX = 2 + Math.random() * 2;
+        a.driftY = 1.5 + Math.random() * 1.5;
+        a.speedX = 0.3 + Math.random() * 0.2;
+        a.speedY = 0.25 + Math.random() * 0.15;
+        a.pulsePhase = i * 0.9;
+      });
+
+      // Edges: all connect to hub + neighbor pairs
+      var edges = [];
+      for (var i = 1; i < agents.length; i++) {
+        edges.push([0, i]); // hub to each agent
+      }
+      // Neighbor ring connections
+      edges.push([1, 3]); // Mkt-UXR
+      edges.push([2, 4]); // Dev-QA
+      edges.push([1, 5]); // Mkt-Biz
+      edges.push([2, 6]); // Dev-CS
+      edges.push([3, 5]); // UXR-Biz
+      edges.push([4, 6]); // QA-CS
+
+      // Pulse particles traveling along edges
+      var pulses = [];
+      function spawnPulse() {
+        var edge = edges[Math.floor(Math.random() * edges.length)];
+        var fromIdx = Math.random() > 0.5 ? edge[0] : edge[1];
+        var toIdx = fromIdx === edge[0] ? edge[1] : edge[0];
+        pulses.push({
+          from: fromIdx, to: toIdx,
+          t: 0,
+          speed: 0.004 + Math.random() * 0.004,
+          color: agents[fromIdx].color,
+          size: 1.5 + Math.random() * 1.5
+        });
+      }
+      // Seed initial pulses
+      for (var p = 0; p < 5; p++) spawnPulse();
+
+      var t = 0;
+      var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function draw() {
+        t += 0.016;
+        ctx.clearRect(0, 0, W, H);
+
+        // Update node positions with drift
+        if (!reducedMotion) {
+          agents.forEach(function (a) {
+            a.x = a.baseX + Math.sin(t * a.speedX + a.phase) * a.driftX;
+            a.y = a.baseY + Math.cos(t * a.speedY + a.phase) * a.driftY;
+          });
+        }
+
+        // Background glow
+        var grd = ctx.createRadialGradient(400, 140, 20, 400, 140, 320);
+        grd.addColorStop(0, 'rgba(142,72,255,0.15)');
+        grd.addColorStop(1, 'transparent');
+        ctx.fillStyle = grd;
+        ctx.fillRect(0, 0, W, H);
+
+        // Draw edges
+        edges.forEach(function (e) {
+          var a = agents[e[0]], b = agents[e[1]];
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        });
+
+        // Draw pulses
+        if (!reducedMotion) {
+          for (var i = pulses.length - 1; i >= 0; i--) {
+            var pl = pulses[i];
+            pl.t += pl.speed;
+            if (pl.t > 1) {
+              pulses.splice(i, 1);
+              spawnPulse();
+              continue;
+            }
+            var fa = agents[pl.from], ta = agents[pl.to];
+            var px = fa.x + (ta.x - fa.x) * pl.t;
+            var py = fa.y + (ta.y - fa.y) * pl.t;
+            var alpha = pl.t < 0.1 ? pl.t / 0.1 : pl.t > 0.9 ? (1 - pl.t) / 0.1 : 1;
+            ctx.beginPath();
+            ctx.arc(px, py, pl.size, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(' + pl.color.join(',') + ',' + (0.7 * alpha).toFixed(2) + ')';
+            ctx.fill();
+          }
+        }
+
+        // Draw nodes
+        agents.forEach(function (a) {
+          var c = a.color;
+
+          // Hub pulse ring
+          if (a.hub && !reducedMotion) {
+            var pulse = Math.sin(t * 2 + a.pulsePhase) * 0.5 + 0.5;
+            var pr = a.r + 4 + pulse * 7;
+            ctx.beginPath();
+            ctx.arc(a.x, a.y, pr, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(' + c.join(',') + ',' + (0.18 * (1 - pulse)).toFixed(2) + ')';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+
+          // Node circle
+          ctx.beginPath();
+          ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(' + c.join(',') + ',0.12)';
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(' + c.join(',') + ',0.45)';
+          ctx.lineWidth = a.hub ? 1.5 : 1.2;
+          ctx.stroke();
+
+          // Abbreviation label
+          ctx.fillStyle = 'rgba(255,255,255,' + (a.hub ? '0.88' : '0.80') + ')';
+          ctx.font = (a.hub ? '700 13px' : '600 11px') + ' system-ui, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(a.abbr, a.x, a.y - 5);
+
+          // Role label
+          ctx.fillStyle = 'rgba(255,255,255,' + (a.hub ? '0.38' : '0.30') + ')';
+          ctx.font = (a.hub ? '8px' : '7px') + ' monospace';
+          ctx.fillText(a.label, a.x, a.y + 8);
+        });
+
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
+    // ── Scroll reveal ─────────────────────────────────────
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       var io = new IntersectionObserver(function (entries) {
         entries.forEach(function (e) {
@@ -802,7 +884,7 @@
       document.querySelectorAll('.ao-reveal').forEach(function (el) { el.classList.add('in'); });
     }
 
-    // Smooth scroll for nav links
+    // ── Smooth scroll for nav links ───────────────────────
     document.querySelectorAll('.ao-header-links a[href^="#"]').forEach(function (a) {
       a.addEventListener('click', function (e) {
         var target = document.querySelector(this.getAttribute('href'));

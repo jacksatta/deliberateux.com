@@ -67,3 +67,7 @@ Layered overlap — each layer starts halfway through the previous, total ~3s:
 - No need to confirm routine actions (commit, push, file edits)
 - Push automatically after committing
 - Keep work section and standalone portfolio in sync
+
+## Asset Guidelines
+### Case study card images
+When selecting or cropping preview images for case study cards, avoid tight crops that are too abstract or zoomed in. The crop should show enough context to be legible at a glance — a recognizable UI section, not a close-up of a single element. Prioritize crops that show the overall layout or a key interaction area, not decorative details.
