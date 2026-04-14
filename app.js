@@ -106,6 +106,7 @@
 		  <div class="nav-right">
 			<ul class="nav-links">
 			  <li><a href="/work/">Work</a></li>
+			  <li><a href="/products/">Products</a></li>
 			  <li><a href="/work/writing/">Writing</a></li>
 			  <li><a href="/#about">About</a></li>
 			</ul>

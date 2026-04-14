@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-9MSXWF3TX3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-9MSXWF3TX3');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Products — Deliberate UX</title>
+  <meta name="description" content="Products built by a one-person AI agency. Theme Builder for design tokens. AO for autonomous operations. One human, seven agents, real products shipping." />
+  <link rel="icon" href="/assets/favicon.svg" />
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    /* ── Products page styles ──────────────────────────────────── */
+    .products-intro {
+      text-align: center;
+      padding: 80px 0 40px;
+    }
+    .products-intro h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .products-intro .kicker {
+      color: var(--muted);
+      font-size: 1.125rem;
+      max-width: 560px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 28px;
+      padding: 20px 0 60px;
+    }
+    @media (min-width: 720px) {
+      .product-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    .product-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 36px 32px 32px;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease), transform 0.25s var(--ease);
+      position: relative;
+      overflow: hidden;
+    }
+    .product-card:hover {
+      border-color: var(--border2);
+      box-shadow: var(--shadow-soft);
+      transform: translateY(-2px);
+    }
+
+    .product-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .product-badge .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .dot--live { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .dot--beta { background: #f59e0b; box-shadow: 0 0 6px rgba(245,158,11,0.5); }
+
+    .product-card h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+    .product-card .desc {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      flex: 1;
+      margin-bottom: 20px;
+    }
+
+    .product-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .meta-chip {
+      font-size: 0.78rem;
+      font-family: var(--mono);
+      color: var(--faint);
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 10px;
+    }
+
+    .product-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .product-actions a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 8px 18px;
+      border-radius: 8px;
+      transition: all 0.2s var(--ease);
+    }
+    .btn-primary-product {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid var(--border2);
+      color: var(--text);
+    }
+    .btn-primary-product:hover {
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(255,255,255,0.25);
+    }
+    .btn-ghost {
+      color: var(--muted);
+      border: 1px solid transparent;
+    }
+    .btn-ghost:hover { color: var(--text); }
+
+    /* ── Agency model section ──────────────────────────────────── */
+    .agency-section {
+      padding: 40px 0 60px;
+      border-top: 1px solid var(--hairline);
+    }
+    .agency-section h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+    .agency-section .kicker {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      max-width: 640px;
+      margin-bottom: 28px;
+    }
+
+    .agent-roster {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 10px;
+    }
+    .agent-chip {
+      font-size: 0.82rem;
+      font-family: var(--mono);
+      color: var(--faint);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      text-align: center;
+      transition: border-color 0.2s var(--ease);
+    }
+    .agent-chip:hover {
+      border-color: var(--border2);
+      color: var(--muted);
+    }
+    .agent-chip .agent-name {
+      display: block;
+      font-weight: 600;
+      font-family: var(--font);
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+
+    /* ── Reveal animation ──────────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+    }
+    .reveal.in {
+      opacity: 1;
+      transform: none;
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="container">
+
+      <section class="products-intro reveal">
+        <h1>Products</h1>
+        <p class="kicker">Built by one human and seven AI agents. Each product is designed, developed, tested, and shipped by the agency — AO is the system that makes it possible.</p>
+      </section>
+
+      <div class="product-grid">
+
+        <!-- AO -->
+        <div class="product-card reveal" style="transition-delay:80ms">
+          <div class="product-badge">
+            <span class="dot dot--beta"></span>
+            Private Beta
+          </div>
+          <h2>AO — Autonomous Operations</h2>
+          <p class="desc">The agent operating system for one-person companies. Seven specialized agents — marketing, dev, QA, UX research, biz dev, customer service, and an executive assistant — running on a shared protocol with time budgets, self-healing, and quality gates.</p>
+          <div class="product-meta">
+            <span class="meta-chip">7 agents</span>
+            <span class="meta-chip">AOS v2 protocol</span>
+            <span class="meta-chip">ReAct loops</span>
+            <span class="meta-chip">self-healing</span>
+          </div>
+          <div class="product-actions">
+            <a href="https://ao-beta.pages.dev" class="btn-primary-product">View AO beta →</a>
+            <a href="https://ao-beta.pages.dev#architecture" class="btn-ghost">How it works</a>
+          </div>
+        </div>
+
+        <!-- Theme Builder -->
+        <div class="product-card reveal" style="transition-delay:160ms">
+          <div class="product-badge">
+            <span class="dot dot--live"></span>
+            Live · Free tier
+          </div>
+          <h2>Theme Builder</h2>
+          <p class="desc">Visual design token generator. Drag sliders, see tokens update in real-time. Export CSS custom properties, Tailwind config, or JSON tokens. The first product shipped entirely by the AO agency — proof the system works.</p>
+          <div class="product-meta">
+            <span class="meta-chip">design tokens</span>
+            <span class="meta-chip">CSS / Tailwind / JSON</span>
+            <span class="meta-chip">3-tier gating</span>
+            <span class="meta-chip">a11y audited</span>
+          </div>
+          <div class="product-actions">
+            <a href="https://openclaw-vps.tailc8723d.ts.net/theme-studio.html" class="btn-primary-product">Try Theme Builder →</a>
+            <a href="https://ao-beta.pages.dev#case-study" class="btn-ghost">Case study</a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Agency model -->
+      <section class="agency-section reveal" style="transition-delay:240ms">
+        <h2>The agency behind the products</h2>
+        <p class="kicker">Every product is built by a virtual agency of AI agents, each with a defined role, boot sequence, and quality gates. One human makes the decisions. The agents do everything else.</p>
+
+        <div class="agent-roster">
+          <div class="agent-chip">
+            <span class="agent-name">EA</span>
+            Exec Assistant
+          </div>
+          <div class="agent-chip">
+            <span class="agent-name">Mkt</span>
+            Marketing
+          </div>
+          <div class="agent-chip">
+            <span class="agent-name">Dev</span>
+            Dev Lead
+          </div>
+          <div class="agent-chip">
+            <span class="agent-name">UXR</span>
+            UX Research
+          </div>
+          <div class="agent-chip">
+            <span class="agent-name">BizDev</span>
+            Biz Dev
+          </div>
+          <div class="agent-chip">
+            <span class="agent-name">CS</span>
+            Customer Svc
+          </div>
+          <div class="agent-chip">
+            <span class="agent-name">QA</span>
+            QA Guardian
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script src="/app.js"></script>
+  <script>
+    // Scroll reveal
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+      document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+    } else {
+      document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+    }
+  </script>
+</body>
+</html>
