@@ -1,0 +1,815 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-9MSXWF3TX3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-9MSXWF3TX3');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AO — Autonomous Operations</title>
+  <meta name="description" content="The agent operating system for one-person companies. Seven AI agents, one protocol, real products shipping." />
+  <link rel="icon" href="/assets/favicon.svg" />
+  <style>
+    /* ── Reset + tokens ─────────────────────────────────────── */
+    :root {
+      --bg: #070812;
+      --bg2: #0b1021;
+      --panel: rgba(255,255,255,0.06);
+      --panel2: rgba(255,255,255,0.08);
+      --border: rgba(255,255,255,0.10);
+      --border2: rgba(255,255,255,0.14);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.68);
+      --faint: rgba(255,255,255,0.52);
+      --ghost: rgba(255,255,255,0.28);
+      --hairline: rgba(255,255,255,0.08);
+      --shadow-soft: 0 10px 30px rgba(0,0,0,0.35);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --max: 960px;
+      --pad: 28px;
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --ease: cubic-bezier(.2,.8,.2,1);
+      /* Agent colors */
+      --c-ea: 168,139,250;
+      --c-mkt: 244,114,182;
+      --c-dev: 96,165,250;
+      --c-uxr: 52,211,153;
+      --c-qa: 251,191,36;
+      --c-biz: 147,197,253;
+      --c-cs: 110,231,183;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      color: var(--text);
+      background:
+        radial-gradient(1200px 900px at 20% -10%, rgba(142,72,255,0.25), transparent 55%),
+        radial-gradient(900px 700px at 90% 0%, rgba(0,168,255,0.18), transparent 55%),
+        radial-gradient(900px 900px at 70% 90%, rgba(255,88,198,0.12), transparent 55%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      background-attachment: fixed;
+      -webkit-font-smoothing: antialiased;
+    }
+    img { max-width: 100%; display: block; }
+    a { color: var(--text); text-decoration: none; }
+    ::selection { background: rgba(140,90,255,0.35); }
+    .container { width: min(var(--max), calc(100% - 64px)); margin: 0 auto; }
+
+    /* ── Header ────────────────────────────────────────────── */
+    .ao-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--hairline);
+      margin-bottom: 40px;
+    }
+    .ao-logo {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .ao-logo-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgb(var(--c-ea));
+      box-shadow: 0 0 8px rgba(var(--c-ea),0.5);
+      animation: ao-logo-pulse 2.5s ease-in-out infinite;
+    }
+    @keyframes ao-logo-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .ao-header-links {
+      display: flex;
+      gap: 20px;
+      font-size: 0.85rem;
+    }
+    .ao-header-links a {
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+    .ao-header-links a:hover { color: var(--text); }
+
+    /* ── Hero ──────────────────────────────────────────────── */
+    .ao-hero {
+      text-align: center;
+      padding: 60px 0 50px;
+    }
+    .ao-hero h1 {
+      font-size: clamp(2.4rem, 6vw, 3.6rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin: 0 0 16px;
+    }
+    .ao-hero h1 span {
+      background: linear-gradient(135deg, rgb(var(--c-ea)), rgb(var(--c-dev)), rgb(var(--c-uxr)));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .ao-hero .sub {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto 28px;
+      line-height: 1.6;
+    }
+    .ao-hero .stats-row {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-bottom: 32px;
+    }
+    .stat { text-align: center; }
+    .stat-val {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .stat-label {
+      font-size: 0.78rem;
+      color: var(--faint);
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Network graph ────────────────────────────────────── */
+    .ao-network-section {
+      padding: 30px 0 60px;
+    }
+    .ao-network-section h2 {
+      font-size: 0.78rem;
+      font-family: var(--mono);
+      color: var(--faint);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      text-align: center;
+      margin: 0 0 20px;
+    }
+    .ao-net-svg {
+      display: block;
+      width: min(800px, 100%);
+      margin: 0 auto;
+    }
+
+    /* ── Architecture section ─────────────────────────────── */
+    .ao-arch {
+      padding: 50px 0;
+      border-top: 1px solid var(--hairline);
+    }
+    .ao-arch h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin: 0 0 8px;
+    }
+    .ao-arch .kicker {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      max-width: 640px;
+      margin: 0 0 32px;
+    }
+
+    .arch-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    @media (min-width: 640px) {
+      .arch-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .arch-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      transition: border-color 0.25s var(--ease);
+    }
+    .arch-card:hover { border-color: var(--border2); }
+    .arch-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .arch-card h3 .icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+    }
+    .arch-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.55;
+    }
+
+    /* ── Agent roster ─────────────────────────────────────── */
+    .ao-roster {
+      padding: 50px 0;
+      border-top: 1px solid var(--hairline);
+    }
+    .ao-roster h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin: 0 0 8px;
+    }
+    .ao-roster .kicker {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      max-width: 640px;
+      margin: 0 0 28px;
+    }
+
+    .roster-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    @media (min-width: 540px) {
+      .roster-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (min-width: 780px) {
+      .roster-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .roster-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+    }
+    .roster-card:hover {
+      border-color: var(--border2);
+      box-shadow: var(--shadow-soft);
+    }
+    .roster-card .agent-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .agent-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .roster-card h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    .roster-card .agent-role {
+      font-size: 0.78rem;
+      font-family: var(--mono);
+      color: var(--faint);
+      margin: 0 0 8px;
+    }
+    .roster-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    /* ── Protocol section ─────────────────────────────────── */
+    .ao-protocol {
+      padding: 50px 0;
+      border-top: 1px solid var(--hairline);
+    }
+    .ao-protocol h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin: 0 0 8px;
+    }
+    .ao-protocol .kicker {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      max-width: 640px;
+      margin: 0 0 28px;
+    }
+
+    .protocol-flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+    .pf-step {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-size: 0.85rem;
+      font-family: var(--mono);
+      color: var(--muted);
+    }
+    .pf-arrow {
+      color: var(--ghost);
+      font-size: 1.2rem;
+    }
+
+    .protocol-details {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    @media (min-width: 640px) {
+      .protocol-details { grid-template-columns: 1fr 1fr; }
+    }
+    .pd-item {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+    .pd-item h4 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin: 0 0 4px;
+    }
+    .pd-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+
+    /* ── Case study teaser ────────────────────────────────── */
+    .ao-case {
+      padding: 50px 0;
+      border-top: 1px solid var(--hairline);
+    }
+    .ao-case h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 0 8px;
+    }
+    .ao-case .kicker {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      max-width: 640px;
+      margin: 0 0 24px;
+    }
+    .case-timeline {
+      border-left: 2px solid var(--border);
+      padding-left: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .case-event {
+      position: relative;
+    }
+    .case-event::before {
+      content: '';
+      position: absolute;
+      left: -30px;
+      top: 6px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border2);
+      border: 2px solid var(--bg);
+    }
+    .case-event h4 {
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin: 0 0 2px;
+    }
+    .case-event .meta {
+      font-size: 0.75rem;
+      font-family: var(--mono);
+      color: var(--faint);
+      margin-bottom: 4px;
+    }
+    .case-event p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    /* ── Footer ───────────────────────────────────────────── */
+    .ao-footer {
+      padding: 30px 0;
+      border-top: 1px solid var(--hairline);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .ao-footer .left {
+      font-size: 0.82rem;
+      color: var(--faint);
+    }
+    .ao-footer .left a { color: var(--muted); }
+    .ao-footer .left a:hover { color: var(--text); }
+    .ao-footer .badge {
+      font-size: 0.72rem;
+      font-family: var(--mono);
+      color: var(--ghost);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ao-footer .badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #f59e0b;
+      box-shadow: 0 0 4px rgba(245,158,11,0.4);
+    }
+
+    /* ── Reveal animations ────────────────────────────────── */
+    .ao-reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.55s ease-out, transform 0.55s ease-out;
+    }
+    .ao-reveal.in {
+      opacity: 1;
+      transform: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header class="ao-header">
+      <div class="ao-logo">
+        <span class="ao-logo-dot"></span>
+        AO
+      </div>
+      <nav class="ao-header-links">
+        <a href="#architecture">Architecture</a>
+        <a href="#agents">Agents</a>
+        <a href="#protocol">Protocol</a>
+        <a href="#case-study">Case study</a>
+        <a href="https://deliberateux.com">deliberateux.com</a>
+      </nav>
+    </header>
+
+    <!-- Hero -->
+    <section class="ao-hero">
+      <h1>The operating system for<br><span>one-person companies</span></h1>
+      <p class="sub">Seven specialized AI agents running on a shared protocol — with time budgets, self-healing, handoff chains, and quality gates. One human makes the decisions. The agents do everything else.</p>
+      <div class="stats-row">
+        <div class="stat">
+          <div class="stat-val">7</div>
+          <div class="stat-label">Agents</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val">1</div>
+          <div class="stat-label">Human</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val">v2</div>
+          <div class="stat-label">Protocol</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live network graph -->
+    <section class="ao-network-section" id="network">
+      <h2>Live agent network</h2>
+      <svg class="ao-net-svg" viewBox="0 0 800 280" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <radialGradient id="ng-glow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="rgba(142,72,255,0.2)" />
+            <stop offset="100%" stop-color="transparent" />
+          </radialGradient>
+        </defs>
+
+        <ellipse cx="400" cy="140" rx="350" ry="120" fill="url(#ng-glow)" opacity="0.6">
+          <animate attributeName="opacity" values="0.4;0.7;0.4" dur="5s" repeatCount="indefinite" />
+        </ellipse>
+
+        <!-- Edges -->
+        <g stroke="rgba(255,255,255,0.07)" stroke-width="1">
+          <line x1="400" y1="60" x2="220" y2="120" />
+          <line x1="400" y1="60" x2="580" y2="120" />
+          <line x1="400" y1="60" x2="140" y2="195" />
+          <line x1="400" y1="60" x2="660" y2="195" />
+          <line x1="400" y1="60" x2="290" y2="230" />
+          <line x1="400" y1="60" x2="510" y2="230" />
+          <line x1="220" y1="120" x2="140" y2="195" />
+          <line x1="580" y1="120" x2="660" y2="195" />
+          <line x1="220" y1="120" x2="290" y2="230" />
+          <line x1="580" y1="120" x2="510" y2="230" />
+          <line x1="140" y1="195" x2="290" y2="230" />
+          <line x1="660" y1="195" x2="510" y2="230" />
+        </g>
+
+        <!-- Pulse flows -->
+        <circle r="3" fill="rgba(168,139,250,0.8)">
+          <animateMotion dur="2.8s" repeatCount="indefinite" begin="0s" path="M400,60 L220,120" />
+        </circle>
+        <circle r="3" fill="rgba(96,165,250,0.8)">
+          <animateMotion dur="3.2s" repeatCount="indefinite" begin="0.6s" path="M400,60 L580,120" />
+        </circle>
+        <circle r="2.5" fill="rgba(52,211,153,0.7)">
+          <animateMotion dur="3.8s" repeatCount="indefinite" begin="1s" path="M220,120 L290,230" />
+        </circle>
+        <circle r="2.5" fill="rgba(251,191,36,0.7)">
+          <animateMotion dur="3.5s" repeatCount="indefinite" begin="0.3s" path="M580,120 L510,230" />
+        </circle>
+        <circle r="2" fill="rgba(244,114,182,0.6)">
+          <animateMotion dur="4s" repeatCount="indefinite" begin="1.4s" path="M140,195 L400,60" />
+        </circle>
+        <circle r="2" fill="rgba(110,231,183,0.6)">
+          <animateMotion dur="3.6s" repeatCount="indefinite" begin="1.8s" path="M660,195 L400,60" />
+        </circle>
+        <circle r="2" fill="rgba(147,197,253,0.5)">
+          <animateMotion dur="4.2s" repeatCount="indefinite" begin="2.2s" path="M290,230 L400,60" />
+        </circle>
+
+        <!-- Nodes -->
+        <!-- EA (hub) -->
+        <circle cx="400" cy="60" r="28" fill="rgba(168,139,250,0.15)" stroke="rgba(168,139,250,0.5)" stroke-width="1.5" />
+        <circle cx="400" cy="60" r="28" fill="none" stroke="rgba(168,139,250,0.25)" stroke-width="1">
+          <animate attributeName="r" values="28;35;28" dur="3s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.25;0;0.25" dur="3s" repeatCount="indefinite" />
+        </circle>
+        <text x="400" y="55" text-anchor="middle" fill="rgba(255,255,255,0.88)" font-size="13" font-weight="700" font-family="system-ui">EA</text>
+        <text x="400" y="69" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-size="8" font-family="monospace">orchestrator</text>
+
+        <!-- Mkt -->
+        <circle cx="220" cy="120" r="22" fill="rgba(244,114,182,0.12)" stroke="rgba(244,114,182,0.45)" stroke-width="1.2" />
+        <text x="220" y="116" text-anchor="middle" fill="rgba(255,255,255,0.82)" font-size="11" font-weight="600" font-family="system-ui">Mkt</text>
+        <text x="220" y="129" text-anchor="middle" fill="rgba(255,255,255,0.35)" font-size="7.5" font-family="monospace">marketing</text>
+
+        <!-- Dev -->
+        <circle cx="580" cy="120" r="22" fill="rgba(96,165,250,0.12)" stroke="rgba(96,165,250,0.45)" stroke-width="1.2" />
+        <text x="580" y="116" text-anchor="middle" fill="rgba(255,255,255,0.82)" font-size="11" font-weight="600" font-family="system-ui">Dev</text>
+        <text x="580" y="129" text-anchor="middle" fill="rgba(255,255,255,0.35)" font-size="7.5" font-family="monospace">dev lead</text>
+
+        <!-- UXR -->
+        <circle cx="140" cy="195" r="20" fill="rgba(52,211,153,0.12)" stroke="rgba(52,211,153,0.4)" stroke-width="1.2" />
+        <text x="140" y="192" text-anchor="middle" fill="rgba(255,255,255,0.78)" font-size="10.5" font-weight="600" font-family="system-ui">UXR</text>
+        <text x="140" y="204" text-anchor="middle" fill="rgba(255,255,255,0.32)" font-size="7" font-family="monospace">research</text>
+
+        <!-- QA -->
+        <circle cx="660" cy="195" r="20" fill="rgba(251,191,36,0.12)" stroke="rgba(251,191,36,0.4)" stroke-width="1.2" />
+        <text x="660" y="192" text-anchor="middle" fill="rgba(255,255,255,0.78)" font-size="10.5" font-weight="600" font-family="system-ui">QA</text>
+        <text x="660" y="204" text-anchor="middle" fill="rgba(255,255,255,0.32)" font-size="7" font-family="monospace">guardian</text>
+
+        <!-- BizDev -->
+        <circle cx="290" cy="230" r="18" fill="rgba(147,197,253,0.1)" stroke="rgba(147,197,253,0.35)" stroke-width="1" />
+        <text x="290" y="227" text-anchor="middle" fill="rgba(255,255,255,0.72)" font-size="10" font-weight="600" font-family="system-ui">Biz</text>
+        <text x="290" y="239" text-anchor="middle" fill="rgba(255,255,255,0.28)" font-size="6.5" font-family="monospace">biz dev</text>
+
+        <!-- CS -->
+        <circle cx="510" cy="230" r="18" fill="rgba(110,231,183,0.1)" stroke="rgba(110,231,183,0.35)" stroke-width="1" />
+        <text x="510" y="227" text-anchor="middle" fill="rgba(255,255,255,0.72)" font-size="10" font-weight="600" font-family="system-ui">CS</text>
+        <text x="510" y="239" text-anchor="middle" fill="rgba(255,255,255,0.28)" font-size="6.5" font-family="monospace">support</text>
+      </svg>
+    </section>
+
+    <!-- Architecture -->
+    <section class="ao-arch ao-reveal" id="architecture">
+      <h2>How it works</h2>
+      <p class="kicker">AO is a protocol, not a platform. Each agent boots from a shared spec, reads handoffs from other agents, runs its tasks within a time budget, and writes structured output for the next agent in the chain.</p>
+
+      <div class="arch-grid">
+        <div class="arch-card">
+          <h3><span class="icon" style="background:rgba(var(--c-ea),0.15);color:rgb(var(--c-ea))">1</span> Boot sequence</h3>
+          <p>Each agent loads its role spec, reads STATUS.md for current state, and checks for handoffs addressed to it. No shared memory — all context is explicit.</p>
+        </div>
+        <div class="arch-card">
+          <h3><span class="icon" style="background:rgba(var(--c-dev),0.15);color:rgb(var(--c-dev))">2</span> Time budgets</h3>
+          <p>Every agent run has a wall-clock budget. If it can't finish, it writes a partial handoff and yields. No runaway loops, no infinite retries.</p>
+        </div>
+        <div class="arch-card">
+          <h3><span class="icon" style="background:rgba(var(--c-uxr),0.15);color:rgb(var(--c-uxr))">3</span> Handoff chain</h3>
+          <p>Agents communicate via markdown handoff files — structured, auditable, and human-readable. The EA routes work; specialists execute.</p>
+        </div>
+        <div class="arch-card">
+          <h3><span class="icon" style="background:rgba(var(--c-qa),0.15);color:rgb(var(--c-qa))">4</span> Quality gates</h3>
+          <p>QA reviews every outward-facing output before it ships. UXR audits interfaces. Nothing reaches users without passing at least one gate.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Agent roster -->
+    <section class="ao-roster ao-reveal" id="agents">
+      <h2>The seven agents</h2>
+      <p class="kicker">Each agent has a defined role, tools, and quality bar. They run independently but coordinate through the handoff protocol.</p>
+
+      <div class="roster-grid">
+        <div class="roster-card">
+          <div class="agent-head">
+            <span class="agent-dot" style="background:rgb(var(--c-ea));box-shadow:0 0 6px rgba(var(--c-ea),0.5)"></span>
+            <h3>Executive Assistant</h3>
+          </div>
+          <div class="agent-role">EA &middot; orchestrator</div>
+          <p>Triages work, routes handoffs, synthesizes cross-agent status, and escalates blockers to the human. The hub of the network.</p>
+        </div>
+
+        <div class="roster-card">
+          <div class="agent-head">
+            <span class="agent-dot" style="background:rgb(var(--c-mkt));box-shadow:0 0 6px rgba(var(--c-mkt),0.5)"></span>
+            <h3>Marketing Lead</h3>
+          </div>
+          <div class="agent-role">Mkt &middot; marketing</div>
+          <p>Competitive scans, positioning, copy drafting, and launch planning. Blocked on pricing decisions from the human.</p>
+        </div>
+
+        <div class="roster-card">
+          <div class="agent-head">
+            <span class="agent-dot" style="background:rgb(var(--c-dev));box-shadow:0 0 6px rgba(var(--c-dev),0.5)"></span>
+            <h3>Dev Lead</h3>
+          </div>
+          <div class="agent-role">Dev &middot; dev lead</div>
+          <p>Implements features, fixes bugs, manages the build pipeline. Receives P0 briefs from UXR and QA for priority work.</p>
+        </div>
+
+        <div class="roster-card">
+          <div class="agent-head">
+            <span class="agent-dot" style="background:rgb(var(--c-uxr));box-shadow:0 0 6px rgba(var(--c-uxr),0.5)"></span>
+            <h3>UX Researcher</h3>
+          </div>
+          <div class="agent-role">UXR &middot; research</div>
+          <p>Heuristic evaluations, accessibility audits, and usability analysis. Writes briefs for Dev with severity ratings and evidence.</p>
+        </div>
+
+        <div class="roster-card">
+          <div class="agent-head">
+            <span class="agent-dot" style="background:rgb(var(--c-qa));box-shadow:0 0 6px rgba(var(--c-qa),0.5)"></span>
+            <h3>QA Guardian</h3>
+          </div>
+          <div class="agent-role">QA &middot; guardian</div>
+          <p>End-to-end testing, regression checks, and release gates. Nothing ships without QA sign-off.</p>
+        </div>
+
+        <div class="roster-card">
+          <div class="agent-head">
+            <span class="agent-dot" style="background:rgb(var(--c-biz));box-shadow:0 0 6px rgba(var(--c-biz),0.5)"></span>
+            <h3>Biz Dev</h3>
+          </div>
+          <div class="agent-role">Biz &middot; biz dev</div>
+          <p>Revenue model research, pricing analysis, payment platform evaluation, and distribution strategy.</p>
+        </div>
+
+        <div class="roster-card">
+          <div class="agent-head">
+            <span class="agent-dot" style="background:rgb(var(--c-cs));box-shadow:0 0 6px rgba(var(--c-cs),0.5)"></span>
+            <h3>Customer Service</h3>
+          </div>
+          <div class="agent-role">CS &middot; support</div>
+          <p>Inbox triage, bug reports from users, feature request routing, and reply drafting. Escalates to EA when blocked.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Protocol -->
+    <section class="ao-protocol ao-reveal" id="protocol">
+      <h2>The AOS v2 protocol</h2>
+      <p class="kicker">Every agent follows the same lifecycle. The protocol is file-based, human-auditable, and designed for async coordination without shared state.</p>
+
+      <div class="protocol-flow">
+        <span class="pf-step">Boot</span>
+        <span class="pf-arrow">&rarr;</span>
+        <span class="pf-step">Read STATUS</span>
+        <span class="pf-arrow">&rarr;</span>
+        <span class="pf-step">Check handoffs</span>
+        <span class="pf-arrow">&rarr;</span>
+        <span class="pf-step">Execute tasks</span>
+        <span class="pf-arrow">&rarr;</span>
+        <span class="pf-step">Write output</span>
+        <span class="pf-arrow">&rarr;</span>
+        <span class="pf-step">Update STATUS</span>
+      </div>
+
+      <div class="protocol-details">
+        <div class="pd-item">
+          <h4>Handoff format</h4>
+          <p>Markdown files with structured frontmatter: agent ID, timestamp, priority, and target agent. Human-readable and git-trackable.</p>
+        </div>
+        <div class="pd-item">
+          <h4>STATUS.md</h4>
+          <p>Single source of truth for the entire agency. Each agent reads it on boot and updates its section on completion. The EA synthesizes cross-agent state.</p>
+        </div>
+        <div class="pd-item">
+          <h4>Self-healing</h4>
+          <p>If an agent fails mid-run, its partial output is preserved. The next run detects incomplete work and resumes or re-routes.</p>
+        </div>
+        <div class="pd-item">
+          <h4>Human-in-the-loop</h4>
+          <p>The human approves pricing, strategy, and release decisions. Everything else is autonomous. The EA surfaces decision points proactively.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Case study -->
+    <section class="ao-case ao-reveal" id="case-study">
+      <h2>First sprint: Theme Builder</h2>
+      <p class="kicker">The first product built entirely by the AO agency — from competitive research to live deployment in one sprint.</p>
+
+      <div class="case-timeline">
+        <div class="case-event">
+          <h4>Biz Dev: Revenue model research</h4>
+          <div class="meta">Day 1 &middot; 10:03 AM</div>
+          <p>Analyzed 6 competitors, compared 4 payment platforms. Recommended $9/mo subscription with Polar.sh as MoR. Identified Figma plugin distribution channel.</p>
+        </div>
+        <div class="case-event">
+          <h4>Marketing: Competitive scan</h4>
+          <div class="meta">Day 1 &middot; 10:15 AM</div>
+          <p>No direct competitor in "CSS token generator without Figma" niche. Confirmed positioning gap. Coolors Pro at $3/mo sets the low anchor.</p>
+        </div>
+        <div class="case-event">
+          <h4>UX Research: Heuristic evaluation</h4>
+          <div class="meta">Day 1 &middot; 11:30 AM</div>
+          <p>Found 2 critical issues (zero ARIA labels on 68 sliders, possible gating bug), 3 major issues (no numeric values, duplicate labels). Filed P0 brief to Dev.</p>
+        </div>
+        <div class="case-event">
+          <h4>EA: Cross-agent synthesis</h4>
+          <div class="meta">Day 1 &middot; 2:00 PM</div>
+          <p>Routed the P0 accessibility brief to Dev, pricing research to Marketing. Updated STATUS.md. Identified Gmail integration blocker for CS.</p>
+        </div>
+        <div class="case-event">
+          <h4>Result</h4>
+          <div class="meta">Day 1 complete</div>
+          <p>Full competitive landscape mapped. Revenue model proposed. Critical accessibility bugs identified and prioritized. All agents coordinating through handoffs — zero direct communication needed.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="ao-footer">
+      <div class="left">
+        Built by <a href="https://deliberateux.com">Jack Satta</a> &middot; <a href="https://deliberateux.com">Deliberate UX</a>
+      </div>
+      <span class="badge">
+        <span class="dot"></span>
+        Private Beta
+      </span>
+    </footer>
+
+  </div>
+
+  <script>
+    // Scroll reveal
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            e.target.classList.add('in');
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+      document.querySelectorAll('.ao-reveal').forEach(function (el) { io.observe(el); });
+    } else {
+      document.querySelectorAll('.ao-reveal').forEach(function (el) { el.classList.add('in'); });
+    }
+
+    // Smooth scroll for nav links
+    document.querySelectorAll('.ao-header-links a[href^="#"]').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        var target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -402,6 +402,111 @@ html[data-theme="light"] .panel.panel-soft {
 }
 
 /* ================================
+   AO agent network — above hero
+================================= */
+.ao-network {
+  text-align: center;
+  padding: 36px 0 0;
+  opacity: 0;
+  animation: intro-fade 1200ms ease-out 800ms forwards;
+}
+
+.ao-graph {
+  width: min(680px, 100%);
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Ambient glow breathes */
+.ao-ambient {
+  animation: ao-breathe 6s ease-in-out infinite;
+}
+@keyframes ao-breathe {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.85; }
+}
+
+/* Edges fade in staggered */
+.ao-edge {
+  opacity: 0;
+  animation: ao-edge-in 800ms ease-out forwards;
+}
+.ao-edge:nth-child(1)  { animation-delay: 1000ms; }
+.ao-edge:nth-child(2)  { animation-delay: 1080ms; }
+.ao-edge:nth-child(3)  { animation-delay: 1160ms; }
+.ao-edge:nth-child(4)  { animation-delay: 1240ms; }
+.ao-edge:nth-child(5)  { animation-delay: 1320ms; }
+.ao-edge:nth-child(6)  { animation-delay: 1400ms; }
+.ao-edge:nth-child(7)  { animation-delay: 1500ms; }
+.ao-edge:nth-child(8)  { animation-delay: 1560ms; }
+.ao-edge:nth-child(9)  { animation-delay: 1620ms; }
+.ao-edge:nth-child(10) { animation-delay: 1680ms; }
+.ao-edge:nth-child(11) { animation-delay: 1740ms; }
+.ao-edge:nth-child(12) { animation-delay: 1800ms; }
+
+@keyframes ao-edge-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Nodes scale in */
+.ao-node {
+  opacity: 0;
+  transform-origin: center;
+  animation: ao-node-in 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+.ao-node-ea  { animation-delay: 900ms; }
+.ao-node-mkt { animation-delay: 1100ms; }
+.ao-node-dev { animation-delay: 1200ms; }
+.ao-node-uxr { animation-delay: 1350ms; }
+.ao-node-qa  { animation-delay: 1450ms; }
+.ao-node-biz { animation-delay: 1550ms; }
+.ao-node-cs  { animation-delay: 1650ms; }
+
+@keyframes ao-node-in {
+  from { opacity: 0; transform: scale(0.5); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Ring pulse on EA hub */
+.ao-ring {
+  animation: ao-ring-pulse 3s ease-in-out infinite 2s;
+}
+@keyframes ao-ring-pulse {
+  0%, 100% { r: 22; opacity: 0.3; }
+  50%      { r: 28; opacity: 0; }
+}
+
+/* Data flow pulses hidden until network is drawn */
+.ao-pulses {
+  opacity: 0;
+  animation: intro-fade 600ms ease-out 2200ms forwards;
+}
+
+/* CTA link */
+.ao-link {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 0.82rem;
+  font-family: var(--mono);
+  color: var(--faint);
+  letter-spacing: 0.04em;
+  transition: color 0.2s var(--ease);
+  opacity: 0;
+  animation: intro-fade 600ms ease-out 2400ms forwards;
+}
+.ao-link:hover {
+  color: var(--text);
+}
+
+/* Responsive: compact on mobile */
+@media (max-width: 540px) {
+  .ao-network { padding: 20px 0 0; }
+  .ao-graph { width: 100%; }
+}
+
+/* ================================
    Scroll reveal — sections below
    Sub-elements fade up on scroll;
    heading first, cards 120ms after

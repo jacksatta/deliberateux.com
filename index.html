@@ -20,6 +20,118 @@
   <main class="page">
 	<div class="container">
 
+	  <!-- AO agent network — above hero -->
+	  <section class="ao-network" aria-label="Autonomous Operations agent network">
+		<svg class="ao-graph" viewBox="0 0 720 220" preserveAspectRatio="xMidYMid meet">
+		  <defs>
+			<radialGradient id="ao-glow" cx="50%" cy="50%" r="50%">
+			  <stop offset="0%" stop-color="rgba(142,72,255,0.25)" />
+			  <stop offset="100%" stop-color="transparent" />
+			</radialGradient>
+			<!-- Pulse dot for data flow -->
+			<circle id="ao-pulse" r="3" fill="rgba(255,255,255,0.9)" />
+		  </defs>
+
+		  <!-- Ambient glow -->
+		  <ellipse cx="360" cy="110" rx="300" ry="90" fill="url(#ao-glow)" class="ao-ambient" />
+
+		  <!-- Connection lines (drawn behind nodes) -->
+		  <g class="ao-edges" stroke="rgba(255,255,255,0.08)" stroke-width="1">
+			<!-- EA hub connections -->
+			<line class="ao-edge" x1="360" y1="58" x2="200" y2="90" />
+			<line class="ao-edge" x1="360" y1="58" x2="520" y2="90" />
+			<line class="ao-edge" x1="360" y1="58" x2="140" y2="150" />
+			<line class="ao-edge" x1="360" y1="58" x2="580" y2="150" />
+			<line class="ao-edge" x1="360" y1="58" x2="260" y2="175" />
+			<line class="ao-edge" x1="360" y1="58" x2="460" y2="175" />
+			<!-- Cross-connections -->
+			<line class="ao-edge" x1="200" y1="90" x2="140" y2="150" />
+			<line class="ao-edge" x1="520" y1="90" x2="580" y2="150" />
+			<line class="ao-edge" x1="200" y1="90" x2="260" y2="175" />
+			<line class="ao-edge" x1="520" y1="90" x2="460" y2="175" />
+			<line class="ao-edge" x1="140" y1="150" x2="260" y2="175" />
+			<line class="ao-edge" x1="580" y1="150" x2="460" y2="175" />
+		  </g>
+
+		  <!-- Data-flow pulses (animated circles along edges) -->
+		  <g class="ao-pulses">
+			<circle r="2.5" fill="rgba(168,139,250,0.8)" class="ao-flow ao-flow-1">
+			  <animateMotion dur="3s" repeatCount="indefinite" begin="0s" path="M360,58 L200,90" />
+			</circle>
+			<circle r="2.5" fill="rgba(96,165,250,0.8)" class="ao-flow ao-flow-2">
+			  <animateMotion dur="3.4s" repeatCount="indefinite" begin="0.8s" path="M360,58 L520,90" />
+			</circle>
+			<circle r="2" fill="rgba(52,211,153,0.7)" class="ao-flow ao-flow-3">
+			  <animateMotion dur="4s" repeatCount="indefinite" begin="1.2s" path="M200,90 L260,175" />
+			</circle>
+			<circle r="2" fill="rgba(251,191,36,0.7)" class="ao-flow ao-flow-4">
+			  <animateMotion dur="3.6s" repeatCount="indefinite" begin="0.4s" path="M520,90 L460,175" />
+			</circle>
+			<circle r="2" fill="rgba(244,114,182,0.7)" class="ao-flow ao-flow-5">
+			  <animateMotion dur="4.2s" repeatCount="indefinite" begin="1.6s" path="M140,150 L360,58" />
+			</circle>
+			<circle r="2" fill="rgba(168,139,250,0.6)" class="ao-flow ao-flow-6">
+			  <animateMotion dur="3.8s" repeatCount="indefinite" begin="2s" path="M580,150 L360,58" />
+			</circle>
+		  </g>
+
+		  <!-- Agent nodes -->
+		  <!-- EA (center top — hub) -->
+		  <g class="ao-node ao-node-ea">
+			<circle cx="360" cy="58" r="22" fill="rgba(168,139,250,0.15)" stroke="rgba(168,139,250,0.5)" stroke-width="1.5" />
+			<circle cx="360" cy="58" r="22" fill="none" stroke="rgba(168,139,250,0.3)" stroke-width="1" class="ao-ring" />
+			<text x="360" y="53" text-anchor="middle" fill="rgba(255,255,255,0.85)" font-size="11" font-weight="600" font-family="var(--font)">EA</text>
+			<text x="360" y="65" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-size="7" font-family="var(--mono)">orchestrator</text>
+		  </g>
+
+		  <!-- Marketing (upper left) -->
+		  <g class="ao-node ao-node-mkt">
+			<circle cx="200" cy="90" r="18" fill="rgba(244,114,182,0.12)" stroke="rgba(244,114,182,0.45)" stroke-width="1.2" />
+			<text x="200" y="86" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10" font-weight="600" font-family="var(--font)">Mkt</text>
+			<text x="200" y="97" text-anchor="middle" fill="rgba(255,255,255,0.35)" font-size="6.5" font-family="var(--mono)">marketing</text>
+		  </g>
+
+		  <!-- Dev (upper right) -->
+		  <g class="ao-node ao-node-dev">
+			<circle cx="520" cy="90" r="18" fill="rgba(96,165,250,0.12)" stroke="rgba(96,165,250,0.45)" stroke-width="1.2" />
+			<text x="520" y="86" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10" font-weight="600" font-family="var(--font)">Dev</text>
+			<text x="520" y="97" text-anchor="middle" fill="rgba(255,255,255,0.35)" font-size="6.5" font-family="var(--mono)">dev lead</text>
+		  </g>
+
+		  <!-- UXR (lower left) -->
+		  <g class="ao-node ao-node-uxr">
+			<circle cx="140" cy="150" r="16" fill="rgba(52,211,153,0.12)" stroke="rgba(52,211,153,0.4)" stroke-width="1.2" />
+			<text x="140" y="147" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-size="9.5" font-weight="600" font-family="var(--font)">UXR</text>
+			<text x="140" y="158" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-size="6" font-family="var(--mono)">research</text>
+		  </g>
+
+		  <!-- QA (lower right) -->
+		  <g class="ao-node ao-node-qa">
+			<circle cx="580" cy="150" r="16" fill="rgba(251,191,36,0.12)" stroke="rgba(251,191,36,0.4)" stroke-width="1.2" />
+			<text x="580" y="147" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-size="9.5" font-weight="600" font-family="var(--font)">QA</text>
+			<text x="580" y="158" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-size="6" font-family="var(--mono)">guardian</text>
+		  </g>
+
+		  <!-- BizDev (bottom left) -->
+		  <g class="ao-node ao-node-biz">
+			<circle cx="260" cy="175" r="15" fill="rgba(96,165,250,0.1)" stroke="rgba(96,165,250,0.35)" stroke-width="1" />
+			<text x="260" y="172" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9" font-weight="600" font-family="var(--font)">Biz</text>
+			<text x="260" y="182" text-anchor="middle" fill="rgba(255,255,255,0.28)" font-size="6" font-family="var(--mono)">biz dev</text>
+		  </g>
+
+		  <!-- CS (bottom right) -->
+		  <g class="ao-node ao-node-cs">
+			<circle cx="460" cy="175" r="15" fill="rgba(52,211,153,0.1)" stroke="rgba(52,211,153,0.35)" stroke-width="1" />
+			<text x="460" y="172" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9" font-weight="600" font-family="var(--font)">CS</text>
+			<text x="460" y="182" text-anchor="middle" fill="rgba(255,255,255,0.28)" font-size="6" font-family="var(--mono)">support</text>
+		  </g>
+
+		  <!-- "AO" label -->
+		  <text x="360" y="210" text-anchor="middle" fill="rgba(255,255,255,0.22)" font-size="10" font-family="var(--mono)" letter-spacing="0.15em">AUTONOMOUS OPERATIONS</text>
+		</svg>
+		<a href="/products/" class="ao-link">View AO →</a>
+	  </section>
+
 	  <section class="hero hero-intro">
 		<div class="hero-media">
 		  <img src="/assets/hero-aurora.jpeg" alt="" />
