@@ -33,19 +33,47 @@
       background: var(--warm-bg);
       color: var(--warm-text);
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       line-height: 1.6;
-      /* Subtle paper texture via CSS noise */
       background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
     }
+
+    /* ── AO top bar ────────────────────────────────────────── */
+    .ao-nav {
+      position: sticky; top: 0; z-index: 200;
+      background: #070812;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .ao-nav-inner {
+      width: min(960px, calc(100% - 48px));
+      margin: 0 auto;
+      display: flex; align-items: center; height: 50px;
+    }
+    .ao-nav-logo {
+      font-size: 0.9rem; font-weight: 700;
+      display: flex; align-items: center; gap: 8px;
+      color: rgba(255,255,255,0.9); text-decoration: none;
+      margin-right: auto;
+    }
+    .ao-nav-context { font-weight: 400; color: rgba(255,255,255,0.45); margin-left: 2px; }
+    .ao-nav-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: rgb(168,139,250);
+      box-shadow: 0 0 6px rgba(168,139,250,0.6);
+      animation: navDotPulse 2.5s ease-in-out infinite; flex-shrink: 0;
+    }
+    @keyframes navDotPulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+    .ao-nav-back {
+      font-size: 0.82rem; color: rgba(255,255,255,0.45);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .ao-nav-back:hover { color: rgba(255,255,255,0.8); }
 
     /* ── Layout ────────────────────────────────────────────── */
     .onboard-shell {
       width: 100%;
       max-width: 640px;
-      padding: 40px 24px 60px;
+      padding: 32px 24px 60px;
+      margin: 0 auto;
     }
 
     .onboard-header {
@@ -368,11 +396,18 @@
 </head>
 <body>
 
+<nav class="ao-nav">
+  <div class="ao-nav-inner">
+    <a href="/ao/" class="ao-nav-logo"><span class="ao-nav-dot"></span>AO<span class="ao-nav-context">/ Setup</span></a>
+    <a href="/ao/" class="ao-nav-back">← Back to overview</a>
+  </div>
+</nav>
+
 <div class="onboard-shell">
 
   <!-- Header -->
   <div class="onboard-header">
-    <div class="onboard-logo">AO / Autonomous Operations</div>
+    <div class="onboard-logo">New organization</div>
     <h1>Let's set up your organization</h1>
     <p>Answer a few quick questions and we'll configure the right agents, roles, and guardrails for you.</p>
   </div>
@@ -723,15 +758,32 @@
     btn.textContent = 'Launching...';
     btn.disabled = true;
 
-    // Simulate agent boot sequence
     setTimeout(function () {
       btn.style.background = 'var(--warm-green)';
       btn.textContent = 'Organization launched';
 
-      // Redirect to configure page with state
+      // Save org to localStorage
+      var slug = state.orgName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      var orgs = JSON.parse(localStorage.getItem('ao_orgs') || '[]');
+      var existing = orgs.findIndex(function(o) { return o.slug === slug; });
+      var entry = {
+        slug: slug,
+        name: state.orgName,
+        type: state.type,
+        focus: state.focus,
+        autonomy: state.autonomy,
+        roles: [],
+        operators: {},
+        createdAt: new Date().toISOString().split('T')[0],
+        status: 'draft'
+      };
+      if (existing > -1) orgs[existing] = entry; else orgs.push(entry);
+      localStorage.setItem('ao_orgs', JSON.stringify(orgs));
+
+      // Redirect to configure page
       setTimeout(function () {
         var params = new URLSearchParams({
-          org: state.orgName,
+          org: slug,
           type: state.type,
           focus: state.focus.join(','),
           autonomy: state.autonomy

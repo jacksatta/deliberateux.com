@@ -66,45 +66,62 @@
     ::selection { background: rgba(140,90,255,0.35); }
     .container { width: min(var(--max), calc(100% - 64px)); margin: 0 auto; }
 
-    /* ── Header ────────────────────────────────────────────── */
-    .ao-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 0;
-      border-bottom: 1px solid var(--hairline);
-      margin-bottom: 40px;
+    /* ── Shared sticky nav ───────────────────────────────── */
+    .ao-nav {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(7,8,18,0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
     }
-    .ao-logo {
-      font-size: 1rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    .ao-nav-inner {
+      width: min(960px, calc(100% - 48px));
+      margin: 0 auto;
+      display: flex; align-items: center; height: 54px;
     }
-    .ao-logo-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
+    .ao-nav-logo {
+      font-size: 0.95rem; font-weight: 700;
+      display: flex; align-items: center; gap: 8px;
+      color: var(--text); text-decoration: none;
+      margin-right: auto; flex-shrink: 0;
+    }
+    .ao-nav-context { font-weight: 400; color: var(--muted); margin-left: 2px; }
+    .ao-nav-dot {
+      width: 7px; height: 7px; border-radius: 50%;
       background: rgb(var(--c-ea));
-      box-shadow: 0 0 8px rgba(var(--c-ea),0.5);
-      animation: ao-logo-pulse 2.5s ease-in-out infinite;
+      box-shadow: 0 0 7px rgba(var(--c-ea),0.6);
+      flex-shrink: 0;
+      animation: navDotPulse 2.5s ease-in-out infinite;
     }
-    @keyframes ao-logo-pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
+    @keyframes navDotPulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+    .ao-nav-links { display: flex; gap: 22px; font-size: 0.84rem; margin-right: 20px; }
+    .ao-nav-links a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .ao-nav-links a:hover, .ao-nav-links a.current { color: var(--text); }
+    .ao-nav-cta {
+      font-size: 0.8rem; font-weight: 600;
+      padding: 6px 14px; border-radius: 8px;
+      background: rgba(var(--c-ea),0.12);
+      border: 1px solid rgba(var(--c-ea),0.25);
+      color: rgb(var(--c-ea)); text-decoration: none;
+      transition: all 0.2s; white-space: nowrap;
     }
-    .ao-header-links {
-      display: flex;
-      gap: 20px;
-      font-size: 0.85rem;
+    .ao-nav-cta:hover { background: rgba(var(--c-ea),0.22); color: rgb(var(--c-ea)); }
+    .ao-nav-admin {
+      font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 5px 11px; border-radius: 6px;
+      background: rgba(245,158,11,0.1);
+      border: 1px solid rgba(245,158,11,0.25);
+      color: #f59e0b; text-decoration: none;
+      margin-left: 8px; transition: all 0.2s;
+      display: none; align-items: center;
     }
-    .ao-header-links a {
-      color: var(--muted);
-      transition: color 0.2s;
+    .ao-nav-admin.visible { display: inline-flex; }
+    .ao-nav-admin:hover { background: rgba(245,158,11,0.2); }
+    @media (max-width: 600px) {
+      .ao-nav-links { gap: 12px; }
+      .ao-nav-links a:nth-last-child(-n+2) { display: none; }
     }
-    .ao-header-links a:hover { color: var(--text); }
 
     /* ── Hero ──────────────────────────────────────────────── */
     .ao-hero {
@@ -473,23 +490,20 @@
   </style>
 </head>
 <body>
-  <div class="container">
-
-    <header class="ao-header">
-      <div class="ao-logo">
-        <span class="ao-logo-dot"></span>
-        AO
-      </div>
-      <nav class="ao-header-links">
+  <nav class="ao-nav">
+    <div class="ao-nav-inner">
+      <a href="/ao/" class="ao-nav-logo"><span class="ao-nav-dot"></span>AO</a>
+      <div class="ao-nav-links">
         <a href="#architecture">Architecture</a>
         <a href="#agents">Agents</a>
         <a href="#protocol">Protocol</a>
-        <a href="#case-study">Case study</a>
         <a href="/ao/configure.html">Configure</a>
-        <a href="#request-access" style="color:rgb(168,139,250);">Request access</a>
-        <a href="https://deliberateux.com">deliberateux.com</a>
-      </nav>
-    </header>
+      </div>
+      <a href="#request-access" class="ao-nav-cta">Request access</a>
+      <a href="/ao/dashboard.html" class="ao-nav-admin" id="admin-pill">Admin</a>
+    </div>
+  </nav>
+  <div class="container">
 
     <!-- Hero -->
     <section class="ao-hero">
@@ -917,8 +931,14 @@
       document.querySelectorAll('.ao-reveal').forEach(function (el) { el.classList.add('in'); });
     }
 
+    // ── Admin detection ───────────────────────────────────
+    if (new URLSearchParams(window.location.search).has('admin') || localStorage.getItem('ao_admin') === '1') {
+      localStorage.setItem('ao_admin', '1');
+      document.getElementById('admin-pill').classList.add('visible');
+    }
+
     // ── Smooth scroll for nav links ───────────────────────
-    document.querySelectorAll('.ao-header-links a[href^="#"]').forEach(function (a) {
+    document.querySelectorAll('.ao-nav-links a[href^="#"]').forEach(function (a) {
       a.addEventListener('click', function (e) {
         var target = document.querySelector(this.getAttribute('href'));
         if (target) {

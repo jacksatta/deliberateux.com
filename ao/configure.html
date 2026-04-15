@@ -68,30 +68,96 @@
     ::selection { background: rgba(140,90,255,0.35); }
     .container { width: min(var(--max), calc(100% - 48px)); margin: 0 auto; }
 
-    /* ── Header ──────────────────────────────────────────── */
-    .cfg-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 0;
-      border-bottom: 1px solid var(--hairline);
-      margin-bottom: 32px;
+    /* ── Shared sticky nav ───────────────────────────────── */
+    .ao-nav {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(7,8,18,0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
     }
-    .cfg-logo {
-      font-size: 1rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .ao-nav-inner {
+      width: min(1060px, calc(100% - 48px));
+      margin: 0 auto;
+      display: flex; align-items: center; height: 54px;
     }
-    .cfg-logo-dot {
-      width: 8px; height: 8px; border-radius: 50%;
+    .ao-nav-logo {
+      font-size: 0.95rem; font-weight: 700;
+      display: flex; align-items: center; gap: 8px;
+      color: var(--text); text-decoration: none;
+      margin-right: auto; flex-shrink: 0;
+    }
+    .ao-nav-context { font-weight: 400; color: var(--muted); margin-left: 2px; }
+    .ao-nav-dot {
+      width: 7px; height: 7px; border-radius: 50%;
       background: rgb(var(--c-admin));
-      box-shadow: 0 0 8px rgba(var(--c-admin),0.5);
+      box-shadow: 0 0 7px rgba(var(--c-admin),0.6);
+      flex-shrink: 0;
+      animation: navDotPulse 2.5s ease-in-out infinite;
     }
-    .cfg-nav { display: flex; gap: 24px; font-size: 0.875rem; }
-    .cfg-nav a { color: var(--muted); transition: color 0.2s; }
-    .cfg-nav a:hover { color: var(--text); }
+    @keyframes navDotPulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+    .ao-nav-links { display: flex; gap: 22px; font-size: 0.84rem; margin-right: 20px; }
+    .ao-nav-links a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .ao-nav-links a:hover, .ao-nav-links a.current { color: var(--text); }
+    .ao-nav-cta {
+      font-size: 0.8rem; font-weight: 600;
+      padding: 6px 14px; border-radius: 8px;
+      background: rgba(var(--c-admin),0.12);
+      border: 1px solid rgba(var(--c-admin),0.25);
+      color: rgb(var(--c-admin)); text-decoration: none;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .ao-nav-cta:hover { background: rgba(var(--c-admin),0.22); color: rgb(var(--c-admin)); }
+    .ao-nav-admin {
+      font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 5px 11px; border-radius: 6px;
+      background: rgba(245,158,11,0.1);
+      border: 1px solid rgba(245,158,11,0.25);
+      color: #f59e0b; text-decoration: none;
+      margin-left: 8px; transition: all 0.2s; white-space: nowrap;
+      display: none; align-items: center;
+    }
+    .ao-nav-admin.visible { display: inline-flex; }
+    .ao-nav-admin:hover { background: rgba(245,158,11,0.2); }
+    /* ── Admin banner ─────────────────────────────────────── */
+    .admin-banner {
+      background: rgba(245,158,11,0.06);
+      border: 1px solid rgba(245,158,11,0.16);
+      border-radius: 12px; padding: 12px 18px;
+      margin-bottom: 28px;
+      display: none; align-items: center;
+      justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    }
+    .admin-banner.visible { display: flex; }
+    .admin-tag {
+      font-size: 0.68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: #f59e0b; background: rgba(245,158,11,0.12);
+      border: 1px solid rgba(245,158,11,0.2);
+      border-radius: 4px; padding: 2px 7px; margin-right: 8px;
+    }
+    .admin-org { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+    .admin-save-btn {
+      font-family: var(--font); font-size: 0.82rem; font-weight: 600;
+      padding: 7px 15px; border-radius: 8px;
+      border: 1px solid rgba(245,158,11,0.28);
+      background: rgba(245,158,11,0.1); color: #f59e0b;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .admin-save-btn:hover { background: rgba(245,158,11,0.2); }
+    .admin-run-btn {
+      font-size: 0.82rem; font-weight: 600;
+      padding: 7px 15px; border-radius: 8px;
+      background: rgba(245,158,11,0.18);
+      border: 1px solid rgba(245,158,11,0.3);
+      color: #f59e0b; text-decoration: none; transition: all 0.2s;
+    }
+    .admin-run-btn:hover { background: rgba(245,158,11,0.28); }
+    @media (max-width: 600px) {
+      .ao-nav-links { gap: 12px; }
+      .ao-nav-links a:nth-last-child(-n+2) { display: none; }
+    }
 
     /* ── Hero ────────────────────────────────────────────── */
     .cfg-hero {
@@ -500,20 +566,32 @@
   </style>
 </head>
 <body>
+  <nav class="ao-nav">
+    <div class="ao-nav-inner">
+      <a href="/ao/" class="ao-nav-logo"><span class="ao-nav-dot"></span>AO<span class="ao-nav-context">/ Configure</span></a>
+      <div class="ao-nav-links">
+        <a href="/ao/">Overview</a>
+        <a href="/ao/onboard.html">Get started</a>
+        <a href="/ao/configure.html" class="current">Configure</a>
+        <a href="/products/">Products</a>
+      </div>
+      <a href="/ao/#request-access" class="ao-nav-cta">Request access</a>
+      <a href="/ao/dashboard.html" class="ao-nav-admin" id="admin-pill">Admin</a>
+    </div>
+  </nav>
   <div class="container">
 
-    <header class="cfg-header">
-      <div class="cfg-logo">
-        <span class="cfg-logo-dot"></span>
-        AO <span style="font-weight:400;color:var(--muted);margin-left:2px">/ Configure</span>
+    <!-- Admin banner (shown in admin mode) -->
+    <div id="admin-banner" class="admin-banner">
+      <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px">
+        <span class="admin-tag">Admin</span>
+        <span class="admin-org" id="admin-org-name">—</span>
       </div>
-      <nav class="cfg-nav">
-        <a href="/ao/">Overview</a>
-        <a href="/ao/#protocol">Protocol</a>
-        <a href="/products/">Products</a>
-        <a href="/">deliberateux.com</a>
-      </nav>
-    </header>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="admin-save-btn" onclick="saveConfig()">Save config</button>
+        <a href="/ao/dashboard.html" class="admin-run-btn">Run org →</a>
+      </div>
+    </div>
 
     <!-- Hero -->
     <section class="cfg-hero">
@@ -550,7 +628,7 @@
         <p>You've configured your team. Request access to AO and we'll reach out when your org type enters beta.</p>
       </div>
       <div class="cfg-cta-actions">
-        <a class="cta-btn-primary" href="/ao/#request-access">Request beta access →</a>
+        <a class="cta-btn-primary" id="cta-primary-btn" href="/ao/#request-access">Request beta access →</a>
         <button class="cta-btn-secondary" id="copy-config-btn">Copy config link</button>
       </div>
     </div>
@@ -833,10 +911,80 @@
       render();
     });
 
-    // ── Init ──────────────────────────────────────────────
-    state.roles = [...TEMPLATES.solo.roles];
-    state.operators = { ...TEMPLATES.solo.operators };
-    render();
+    // ── Init from URL params + localStorage ──────────────
+    (function() {
+      const params = new URLSearchParams(window.location.search);
+      const orgSlug = params.get('org');
+      const orgType = params.get('type');
+      const isAdmin = params.has('admin') || localStorage.getItem('ao_admin') === '1';
+
+      // Load saved org from localStorage, or fall back to URL type param
+      if (orgSlug) {
+        const orgs = JSON.parse(localStorage.getItem('ao_orgs') || '[]');
+        const saved = orgs.find(o => o.slug === orgSlug);
+        if (saved) {
+          state.roles = [...saved.roles];
+          state.operators = { ...saved.operators };
+          state.template = saved.type || 'custom';
+        } else if (orgType && TEMPLATES[orgType]) {
+          state.template = orgType;
+          state.roles = [...TEMPLATES[orgType].roles];
+          state.operators = { ...TEMPLATES[orgType].operators };
+        } else {
+          state.roles = [...TEMPLATES.solo.roles];
+          state.operators = { ...TEMPLATES.solo.operators };
+        }
+        // Sync template button highlight
+        document.querySelectorAll('.tpl-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.tpl === state.template);
+        });
+      } else {
+        state.roles = [...TEMPLATES.solo.roles];
+        state.operators = { ...TEMPLATES.solo.operators };
+      }
+
+      render();
+
+      // Admin mode
+      if (isAdmin) {
+        localStorage.setItem('ao_admin', '1');
+        document.getElementById('admin-pill').classList.add('visible');
+        const banner = document.getElementById('admin-banner');
+        banner.classList.add('visible');
+        document.getElementById('admin-org-name').textContent = orgSlug || 'Untitled org';
+        // Swap CTA for admin
+        const ctaHeading = document.querySelector('.cfg-cta h3');
+        const ctaBody = document.querySelector('.cfg-cta p');
+        const ctaPrimary = document.getElementById('cta-primary-btn');
+        if (ctaHeading) ctaHeading.textContent = 'Configuration ready.';
+        if (ctaBody) ctaBody.textContent = 'Save this config to lock it in, then head to the dashboard to run your org.';
+        if (ctaPrimary) { ctaPrimary.textContent = 'Go to dashboard →'; ctaPrimary.href = '/ao/dashboard.html'; }
+      }
+    })();
+
+    // ── Save config to localStorage ───────────────────────
+    function saveConfig() {
+      const params = new URLSearchParams(window.location.search);
+      const orgSlug = params.get('org') || ('org-' + Date.now());
+      const orgs = JSON.parse(localStorage.getItem('ao_orgs') || '[]');
+      const idx = orgs.findIndex(o => o.slug === orgSlug);
+      const entry = {
+        slug: orgSlug,
+        name: orgSlug,
+        type: state.template || 'custom',
+        roles: [...state.roles],
+        operators: { ...state.operators },
+        updatedAt: new Date().toISOString().split('T')[0],
+        status: 'active'
+      };
+      if (idx > -1) orgs[idx] = entry; else orgs.push(entry);
+      localStorage.setItem('ao_orgs', JSON.stringify(orgs));
+      const btn = document.querySelector('.admin-save-btn');
+      const orig = btn.textContent;
+      btn.textContent = 'Saved ✓';
+      btn.style.color = 'rgb(52,211,153)';
+      setTimeout(() => { btn.textContent = orig; btn.style.color = '#f59e0b'; }, 2000);
+    }
 
     // ── Copy config link ──────────────────────────────────
     document.getElementById('copy-config-btn').addEventListener('click', function() {

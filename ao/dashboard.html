@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard — AO Admin</title>
+  <meta name="description" content="AO admin dashboard. Manage organizations, monitor agents, run ops." />
+  <link rel="icon" href="/assets/favicon.svg" />
+  <style>
+    :root {
+      --bg: #070812;
+      --bg2: #0b1021;
+      --panel: rgba(255,255,255,0.05);
+      --panel2: rgba(255,255,255,0.08);
+      --border: rgba(255,255,255,0.09);
+      --border2: rgba(255,255,255,0.14);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.58);
+      --faint: rgba(255,255,255,0.38);
+      --ghost: rgba(255,255,255,0.22);
+      --hairline: rgba(255,255,255,0.07);
+      --amber: 245,158,11;
+      --purple: 168,139,250;
+      --green: 52,211,153;
+      --blue: 96,165,250;
+      --pink: 244,114,182;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 8px;
+      --max: 1060px;
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --ease: cubic-bezier(.2,.8,.2,1);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { height: 100%; }
+    body {
+      margin: 0; min-height: 100%;
+      font-family: var(--font); color: var(--text);
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(1000px 700px at 15% -5%, rgba(245,158,11,0.08), transparent 50%),
+        radial-gradient(800px 600px at 90% 5%, rgba(168,139,250,0.10), transparent 50%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      background-attachment: fixed;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--text); text-decoration: none; }
+    ::selection { background: rgba(245,158,11,0.25); }
+
+    /* ── Nav ─────────────────────────────────────────────── */
+    .ao-nav {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(7,8,18,0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .ao-nav-inner {
+      width: min(var(--max), calc(100% - 48px));
+      margin: 0 auto;
+      display: flex; align-items: center; height: 54px;
+    }
+    .ao-nav-logo {
+      font-size: 0.95rem; font-weight: 700;
+      display: flex; align-items: center; gap: 8px;
+      color: var(--text); text-decoration: none;
+      margin-right: auto; flex-shrink: 0;
+    }
+    .ao-nav-context { font-weight: 400; color: var(--muted); margin-left: 2px; }
+    .ao-nav-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: rgb(var(--amber));
+      box-shadow: 0 0 7px rgba(var(--amber),0.6);
+      flex-shrink: 0;
+      animation: dotPulse 2.5s ease-in-out infinite;
+    }
+    @keyframes dotPulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+    .ao-nav-links { display: flex; gap: 22px; font-size: 0.84rem; margin-right: 20px; }
+    .ao-nav-links a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .ao-nav-links a:hover { color: var(--text); }
+    .ao-nav-links a.current { color: var(--text); }
+    .ao-nav-admin {
+      font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 5px 11px; border-radius: 6px;
+      background: rgba(var(--amber),0.14);
+      border: 1px solid rgba(var(--amber),0.28);
+      color: rgb(var(--amber));
+    }
+    @media (max-width: 600px) {
+      .ao-nav-links { gap: 12px; }
+      .ao-nav-links a:nth-last-child(-n+1) { display: none; }
+    }
+
+    /* ── Container ───────────────────────────────────────── */
+    .container { width: min(var(--max), calc(100% - 48px)); margin: 0 auto; }
+
+    /* ── Page header ─────────────────────────────────────── */
+    .dash-header {
+      display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap;
+      gap: 16px; padding: 36px 0 28px;
+    }
+    .dash-header h1 {
+      font-size: clamp(1.4rem, 3vw, 1.9rem);
+      font-weight: 700; letter-spacing: -0.02em; margin: 0;
+    }
+    .dash-header p { color: var(--muted); font-size: 0.9rem; margin: 4px 0 0; }
+    .btn-new-org {
+      font-family: var(--font); font-size: 0.88rem; font-weight: 600;
+      padding: 10px 20px; border-radius: var(--radius-sm);
+      background: rgba(var(--amber),0.14);
+      border: 1px solid rgba(var(--amber),0.28);
+      color: rgb(var(--amber)); cursor: pointer;
+      text-decoration: none; transition: all 0.2s var(--ease);
+      white-space: nowrap;
+    }
+    .btn-new-org:hover { background: rgba(var(--amber),0.22); }
+
+    /* ── Stats row ───────────────────────────────────────── */
+    .stats-row {
+      display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 32px;
+    }
+    .stat-pill {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 12px 18px;
+      display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 100px;
+    }
+    .stat-pill strong {
+      font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em;
+      line-height: 1; color: var(--text);
+    }
+    .stat-pill span { font-size: 0.75rem; color: var(--faint); font-family: var(--mono); }
+
+    /* ── Org grid ────────────────────────────────────────── */
+    .org-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px; margin-bottom: 48px;
+    }
+    .org-card {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 22px 20px 18px;
+      display: flex; flex-direction: column; gap: 0;
+      transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+      animation: cardIn 0.3s var(--ease) both;
+    }
+    @keyframes cardIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+    .org-card:hover { border-color: var(--border2); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+    .org-card-top {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 12px; margin-bottom: 10px;
+    }
+    .org-name { font-size: 1rem; font-weight: 600; margin-bottom: 2px; }
+    .org-type { font-size: 0.75rem; color: var(--faint); font-family: var(--mono); }
+    .org-status {
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; padding: 3px 8px; border-radius: 4px; flex-shrink: 0;
+    }
+    .org-status.active {
+      background: rgba(var(--green),0.12); color: rgb(var(--green));
+      border: 1px solid rgba(var(--green),0.2);
+    }
+    .org-status.draft {
+      background: rgba(var(--amber),0.1); color: rgb(var(--amber));
+      border: 1px solid rgba(var(--amber),0.2);
+    }
+    .org-focus {
+      display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 14px;
+    }
+    .focus-tag {
+      font-size: 0.72rem; padding: 3px 9px; border-radius: 20px;
+      background: rgba(var(--purple),0.1); color: rgba(var(--purple),0.9);
+      border: 1px solid rgba(var(--purple),0.18);
+    }
+    .org-meta {
+      display: flex; gap: 16px; margin-bottom: 16px;
+      font-size: 0.8rem; color: var(--faint); font-family: var(--mono);
+    }
+    .org-meta .m-dot {
+      display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+      margin-right: 5px; vertical-align: middle;
+    }
+    .org-actions { display: flex; gap: 8px; margin-top: auto; }
+    .btn-manage {
+      flex: 1; font-family: var(--font); font-size: 0.82rem; font-weight: 600;
+      padding: 9px 14px; border-radius: var(--radius-sm); text-align: center;
+      background: rgba(var(--purple),0.12); border: 1px solid rgba(var(--purple),0.22);
+      color: rgb(var(--purple)); text-decoration: none; transition: all 0.2s var(--ease);
+    }
+    .btn-manage:hover { background: rgba(var(--purple),0.2); }
+    .btn-run {
+      flex: 1; font-family: var(--font); font-size: 0.82rem; font-weight: 600;
+      padding: 9px 14px; border-radius: var(--radius-sm); text-align: center;
+      background: rgba(var(--amber),0.12); border: 1px solid rgba(var(--amber),0.22);
+      color: rgb(var(--amber)); text-decoration: none; transition: all 0.2s var(--ease);
+    }
+    .btn-run:hover { background: rgba(var(--amber),0.2); }
+
+    /* ── Empty state ─────────────────────────────────────── */
+    .empty-state {
+      grid-column: 1 / -1; text-align: center;
+      padding: 60px 24px; border: 1px dashed var(--border);
+      border-radius: var(--radius-lg); color: var(--faint);
+    }
+    .empty-state h3 { font-size: 1rem; font-weight: 600; color: var(--muted); margin: 0 0 8px; }
+    .empty-state p { font-size: 0.875rem; margin: 0 0 20px; }
+
+    /* ── Footer ──────────────────────────────────────────── */
+    .dash-footer {
+      border-top: 1px solid var(--hairline); padding: 20px 0;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.78rem; color: var(--faint); margin-top: 0;
+    }
+    .dash-footer a { color: var(--muted); }
+    .dash-footer a:hover { color: var(--text); }
+    .admin-badge {
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: rgb(var(--amber));
+      background: rgba(var(--amber),0.1); border: 1px solid rgba(var(--amber),0.2);
+      border-radius: 4px; padding: 2px 7px;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="ao-nav">
+    <div class="ao-nav-inner">
+      <a href="/ao/" class="ao-nav-logo">
+        <span class="ao-nav-dot"></span>AO<span class="ao-nav-context">/ Admin</span>
+      </a>
+      <div class="ao-nav-links">
+        <a href="/ao/">Overview</a>
+        <a href="/ao/onboard.html">New org</a>
+        <a href="/ao/configure.html">Configure</a>
+        <a href="/ao/dashboard.html" class="current">Dashboard</a>
+      </div>
+      <span class="ao-nav-admin">Admin</span>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <div class="dash-header">
+      <div>
+        <h1>Organizations</h1>
+        <p>Manage and run your AO-powered orgs.</p>
+      </div>
+      <a href="/ao/onboard.html" class="btn-new-org">+ New org</a>
+    </div>
+
+    <div class="stats-row" id="stats-row">
+      <div class="stat-pill"><strong id="stat-orgs">0</strong><span>orgs</span></div>
+      <div class="stat-pill"><strong id="stat-active">0</strong><span>active</span></div>
+      <div class="stat-pill"><strong id="stat-agents">0</strong><span>agents</span></div>
+      <div class="stat-pill"><strong id="stat-humans">0</strong><span>humans</span></div>
+    </div>
+
+    <div class="org-grid" id="org-grid"></div>
+
+    <footer class="dash-footer">
+      <div><a href="/ao/">AO Overview</a> · <a href="/">deliberateux.com</a></div>
+      <span class="admin-badge">Admin</span>
+    </footer>
+
+  </div>
+
+  <script>
+    // ── Mark admin session ────────────────────────────────
+    localStorage.setItem('ao_admin', '1');
+
+    // ── Load orgs ─────────────────────────────────────────
+    var orgs = JSON.parse(localStorage.getItem('ao_orgs') || '[]');
+
+    // ── Stats ─────────────────────────────────────────────
+    var totalAgents = 0, totalHumans = 0, activeCount = 0;
+    orgs.forEach(function(o) {
+      if (o.status === 'active') activeCount++;
+      Object.values(o.operators || {}).forEach(function(v) {
+        if (v === 'agent') totalAgents++; else totalHumans++;
+      });
+    });
+    document.getElementById('stat-orgs').textContent = orgs.length;
+    document.getElementById('stat-active').textContent = activeCount;
+    document.getElementById('stat-agents').textContent = totalAgents;
+    document.getElementById('stat-humans').textContent = totalHumans;
+
+    // ── Render orgs ───────────────────────────────────────
+    var grid = document.getElementById('org-grid');
+
+    if (orgs.length === 0) {
+      grid.innerHTML = '<div class="empty-state">' +
+        '<h3>No organizations yet</h3>' +
+        '<p>Set up your first org to get started.</p>' +
+        '<a href="/ao/onboard.html" style="display:inline-flex;align-items:center;gap:6px;font-size:0.88rem;font-weight:600;padding:10px 20px;border-radius:8px;background:rgba(245,158,11,0.14);border:1px solid rgba(245,158,11,0.28);color:rgb(245,158,11);text-decoration:none;">+ Create your first org</a>' +
+        '</div>';
+    } else {
+      var TYPE_LABELS = {
+        solo: 'Solo operator', 'small-team': 'Small team',
+        agency: 'Agency / studio', startup: 'Startup', creative: 'Creative practice'
+      };
+
+      orgs.forEach(function(org, i) {
+        var agents = Object.values(org.operators || {}).filter(function(v){return v==='agent';}).length;
+        var humans = Object.values(org.operators || {}).filter(function(v){return v==='human';}).length;
+        var focusTags = (org.focus || []).slice(0, 4).map(function(f) {
+          return '<span class="focus-tag">' + f.replace(/-/g,' ') + '</span>';
+        }).join('');
+        var statusClass = org.status === 'active' ? 'active' : 'draft';
+        var statusLabel = org.status === 'active' ? 'Active' : 'Draft';
+        var typeLabel = TYPE_LABELS[org.type] || org.type || '—';
+        var updated = org.updatedAt || org.createdAt || '—';
+
+        var card = document.createElement('div');
+        card.className = 'org-card';
+        card.style.animationDelay = (i * 50) + 'ms';
+        card.innerHTML =
+          '<div class="org-card-top">' +
+            '<div>' +
+              '<div class="org-name">' + escHtml(org.name || org.slug) + '</div>' +
+              '<div class="org-type">' + escHtml(typeLabel) + '</div>' +
+            '</div>' +
+            '<span class="org-status ' + statusClass + '">' + statusLabel + '</span>' +
+          '</div>' +
+          (focusTags ? '<div class="org-focus">' + focusTags + '</div>' : '') +
+          '<div class="org-meta">' +
+            '<span><span class="m-dot" style="background:rgb(96,165,250)"></span>' + agents + ' agents</span>' +
+            '<span><span class="m-dot" style="background:rgb(52,211,153)"></span>' + humans + ' humans</span>' +
+            '<span style="margin-left:auto;font-size:0.72rem;">' + updated + '</span>' +
+          '</div>' +
+          '<div class="org-actions">' +
+            '<a class="btn-manage" href="/ao/configure.html?org=' + encodeURIComponent(org.slug) + '&admin=1">Edit config</a>' +
+            '<a class="btn-run" href="/ao/configure.html?org=' + encodeURIComponent(org.slug) + '&admin=1">Run →</a>' +
+          '</div>';
+        grid.appendChild(card);
+      });
+    }
+
+    function escHtml(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+  </script>
+
+</body>
+</html>
