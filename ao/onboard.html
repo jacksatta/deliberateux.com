@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Set up your organization — AO</title>
+  <meta name="description" content="Spin up your AI-powered organization in under a minute. Choose your structure, pick your focus, and AO configures the right agents for you." />
+  <link rel="icon" href="/assets/favicon.svg" />
+  <style>
+    /* ── Reset & base ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --warm-bg: #faf6f1;
+      --warm-bg2: #f3ede4;
+      --warm-surface: #fff;
+      --warm-border: #e5ddd2;
+      --warm-text: #2c2418;
+      --warm-muted: #8a7e6e;
+      --warm-accent: #c47a2a;
+      --warm-accent-soft: rgba(196,122,42,0.12);
+      --warm-accent-hover: #a86520;
+      --warm-purple: #7c5cbf;
+      --warm-green: #4a8c5c;
+      --warm-radius: 12px;
+      --warm-shadow: 0 2px 12px rgba(44,36,24,0.08);
+      --mono: 'SF Mono', 'Fira Code', monospace;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--warm-bg);
+      color: var(--warm-text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.6;
+      /* Subtle paper texture via CSS noise */
+      background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    }
+
+    /* ── Layout ────────────────────────────────────────────── */
+    .onboard-shell {
+      width: 100%;
+      max-width: 640px;
+      padding: 40px 24px 60px;
+    }
+
+    .onboard-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .onboard-logo {
+      font-size: 0.8rem;
+      font-family: var(--mono);
+      color: var(--warm-muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .onboard-header h1 {
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--warm-text);
+      margin-bottom: 8px;
+    }
+    .onboard-header p {
+      color: var(--warm-muted);
+      font-size: 1rem;
+      max-width: 440px;
+      margin: 0 auto;
+    }
+
+    /* ── Progress bar ─────────────────────────────────────── */
+    .progress-track {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 36px;
+    }
+    .progress-pip {
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--warm-border);
+      transition: background 0.4s ease;
+    }
+    .progress-pip.active {
+      background: var(--warm-accent);
+    }
+    .progress-pip.done {
+      background: var(--warm-green);
+    }
+
+    /* ── Step container ────────────────────────────────────── */
+    .step {
+      display: none;
+      animation: stepIn 0.4s ease;
+    }
+    .step.active { display: block; }
+
+    @keyframes stepIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .step-label {
+      font-size: 0.75rem;
+      font-family: var(--mono);
+      color: var(--warm-accent);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+    .step h2 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+    .step .step-desc {
+      color: var(--warm-muted);
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+    }
+
+    /* ── Choice cards ──────────────────────────────────────── */
+    .choice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 480px) {
+      .choice-grid { grid-template-columns: 1fr; }
+    }
+    .choice-card {
+      background: var(--warm-surface);
+      border: 2px solid var(--warm-border);
+      border-radius: var(--warm-radius);
+      padding: 18px 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+    }
+    .choice-card:hover {
+      border-color: var(--warm-accent);
+      box-shadow: var(--warm-shadow);
+      transform: translateY(-1px);
+    }
+    .choice-card.selected {
+      border-color: var(--warm-accent);
+      background: var(--warm-accent-soft);
+    }
+    .choice-card .card-emoji {
+      font-size: 1.5rem;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .choice-card .card-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 2px;
+    }
+    .choice-card .card-desc {
+      font-size: 0.82rem;
+      color: var(--warm-muted);
+      line-height: 1.5;
+    }
+
+    /* ── Tag cloud ─────────────────────────────────────────── */
+    .tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tag-pill {
+      font-size: 0.85rem;
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1.5px solid var(--warm-border);
+      background: var(--warm-surface);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+    .tag-pill:hover {
+      border-color: var(--warm-accent);
+    }
+    .tag-pill.selected {
+      background: var(--warm-accent);
+      color: #fff;
+      border-color: var(--warm-accent);
+    }
+
+    /* ── Slider (human involvement) ────────────────────────── */
+    .slider-wrap {
+      background: var(--warm-surface);
+      border: 1px solid var(--warm-border);
+      border-radius: var(--warm-radius);
+      padding: 28px 24px;
+    }
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--warm-muted);
+      margin-bottom: 16px;
+    }
+    .slider-track {
+      position: relative;
+      width: 100%;
+    }
+    .slider-track input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: linear-gradient(to right, var(--warm-purple), var(--warm-accent), var(--warm-green));
+      outline: none;
+    }
+    .slider-track input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--warm-surface);
+      border: 2px solid var(--warm-accent);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+      cursor: pointer;
+    }
+    .slider-value {
+      text-align: center;
+      margin-top: 14px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--warm-accent);
+    }
+
+    /* ── Text input ────────────────────────────────────────── */
+    .onboard-input {
+      width: 100%;
+      font-size: 1.1rem;
+      padding: 14px 18px;
+      border: 2px solid var(--warm-border);
+      border-radius: var(--warm-radius);
+      background: var(--warm-surface);
+      color: var(--warm-text);
+      font-family: var(--font);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .onboard-input:focus {
+      border-color: var(--warm-accent);
+    }
+    .onboard-input::placeholder {
+      color: #c4b9a8;
+    }
+
+    /* ── Summary / launch ──────────────────────────────────── */
+    .summary-card {
+      background: var(--warm-surface);
+      border: 1px solid var(--warm-border);
+      border-radius: var(--warm-radius);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .summary-card h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .agent-roster-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .agent-chip-s {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      font-family: var(--mono);
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--warm-border);
+      background: var(--warm-bg2);
+    }
+    .agent-chip-s .dot-s {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--warm-green);
+    }
+    .agent-chip-s.human .dot-s {
+      background: var(--warm-purple);
+    }
+
+    /* ── Buttons ───────────────────────────────────────────── */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 28px;
+    }
+    .btn {
+      padding: 12px 24px;
+      border-radius: var(--warm-radius);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      font-family: var(--font);
+    }
+    .btn-back {
+      background: transparent;
+      border: 1.5px solid var(--warm-border);
+      color: var(--warm-muted);
+    }
+    .btn-back:hover {
+      border-color: var(--warm-text);
+      color: var(--warm-text);
+    }
+    .btn-next {
+      background: var(--warm-accent);
+      color: #fff;
+      flex: 1;
+    }
+    .btn-next:hover {
+      background: var(--warm-accent-hover);
+    }
+    .btn-next:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .btn-launch {
+      background: var(--warm-green);
+      color: #fff;
+      flex: 1;
+      font-size: 1rem;
+      padding: 14px 28px;
+    }
+    .btn-launch:hover {
+      background: #3d7a4d;
+    }
+
+    /* ── Ethics badge ──────────────────────────────────────── */
+    .ethics-note {
+      margin-top: 20px;
+      padding: 14px 18px;
+      background: rgba(124,92,191,0.06);
+      border: 1px solid rgba(124,92,191,0.15);
+      border-radius: var(--warm-radius);
+      font-size: 0.82rem;
+      color: var(--warm-muted);
+      line-height: 1.6;
+    }
+    .ethics-note strong {
+      color: var(--warm-purple);
+    }
+
+    /* ── Transition wrapper ─────────────────────────────────── */
+    .step-inner {
+      animation: stepIn 0.35s ease;
+    }
+  </style>
+</head>
+<body>
+
+<div class="onboard-shell">
+
+  <!-- Header -->
+  <div class="onboard-header">
+    <div class="onboard-logo">AO / Autonomous Operations</div>
+    <h1>Let's set up your organization</h1>
+    <p>Answer a few quick questions and we'll configure the right agents, roles, and guardrails for you.</p>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-track" id="progress">
+    <div class="progress-pip active" data-step="0"></div>
+    <div class="progress-pip" data-step="1"></div>
+    <div class="progress-pip" data-step="2"></div>
+    <div class="progress-pip" data-step="3"></div>
+    <div class="progress-pip" data-step="4"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       STEP 0 — What are you building?
+       ═══════════════════════════════════════════════════════ -->
+  <div class="step active" id="step-0">
+    <div class="step-inner">
+      <div class="step-label">Step 1 of 5</div>
+      <h2>What are you building?</h2>
+      <p class="step-desc">Pick the structure closest to what you have in mind. You can always change this later.</p>
+
+      <div class="choice-grid" id="type-choices">
+        <div class="choice-card" data-value="solo">
+          <span class="card-emoji">&#x1f9d1;&#x200d;&#x1f4bb;</span>
+          <div class="card-title">Solo operator</div>
+          <div class="card-desc">One person running a business with AI agents handling the rest.</div>
+        </div>
+        <div class="choice-card" data-value="small-team">
+          <span class="card-emoji">&#x1f465;</span>
+          <div class="card-title">Small team</div>
+          <div class="card-desc">2-5 humans plus agents filling skill gaps and scaling output.</div>
+        </div>
+        <div class="choice-card" data-value="agency">
+          <span class="card-emoji">&#x1f3e2;</span>
+          <div class="card-title">Agency / studio</div>
+          <div class="card-desc">Client-facing work with agents supporting every department.</div>
+        </div>
+        <div class="choice-card" data-value="startup">
+          <span class="card-emoji">&#x1f680;</span>
+          <div class="card-title">Startup</div>
+          <div class="card-desc">Move fast with a lean human core and agents everywhere else.</div>
+        </div>
+        <div class="choice-card" data-value="creative">
+          <span class="card-emoji">&#x1f3a8;</span>
+          <div class="card-title">Creative practice</div>
+          <div class="card-desc">Design, writing, art, or media production with AI collaborators.</div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-next" id="btn-next-0" disabled>Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       STEP 1 — What's your focus?
+       ═══════════════════════════════════════════════════════ -->
+  <div class="step" id="step-1">
+    <div class="step-inner">
+      <div class="step-label">Step 2 of 5</div>
+      <h2>What areas matter most?</h2>
+      <p class="step-desc">Select all that apply. We'll prioritize agents for these areas.</p>
+
+      <div class="tag-cloud" id="focus-tags">
+        <span class="tag-pill" data-tag="marketing">Marketing</span>
+        <span class="tag-pill" data-tag="development">Development</span>
+        <span class="tag-pill" data-tag="design">Design / UX</span>
+        <span class="tag-pill" data-tag="content">Content</span>
+        <span class="tag-pill" data-tag="research">Research</span>
+        <span class="tag-pill" data-tag="sales">Sales</span>
+        <span class="tag-pill" data-tag="operations">Operations</span>
+        <span class="tag-pill" data-tag="customer-service">Customer service</span>
+        <span class="tag-pill" data-tag="data">Data / analytics</span>
+        <span class="tag-pill" data-tag="finance">Finance</span>
+        <span class="tag-pill" data-tag="legal">Legal / compliance</span>
+        <span class="tag-pill" data-tag="hr">People / HR</span>
+        <span class="tag-pill" data-tag="strategy">Strategy</span>
+        <span class="tag-pill" data-tag="partnerships">Partnerships</span>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-back" onclick="goStep(0)">Back</button>
+        <button class="btn btn-next" id="btn-next-1" disabled>Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       STEP 2 — Human involvement
+       ═══════════════════════════════════════════════════════ -->
+  <div class="step" id="step-2">
+    <div class="step-inner">
+      <div class="step-label">Step 3 of 5</div>
+      <h2>How hands-on do you want to be?</h2>
+      <p class="step-desc">Agents can run autonomously or wait for your approval at every step. You set the dial.</p>
+
+      <div class="slider-wrap">
+        <div class="slider-labels">
+          <span>Agents lead</span>
+          <span>Balanced</span>
+          <span>Human leads</span>
+        </div>
+        <div class="slider-track">
+          <input type="range" id="autonomy-slider" min="0" max="4" value="2" step="1" />
+        </div>
+        <div class="slider-value" id="autonomy-label">Balanced collaboration</div>
+      </div>
+
+      <div class="ethics-note">
+        <strong>Ethics lead is always on.</strong> Regardless of autonomy level, a dedicated ethics guardian reviews agent outputs for bias, safety, and alignment with your values. This role cannot be removed.
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-back" onclick="goStep(1)">Back</button>
+        <button class="btn btn-next" id="btn-next-2">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       STEP 3 — Name your org
+       ═══════════════════════════════════════════════════════ -->
+  <div class="step" id="step-3">
+    <div class="step-inner">
+      <div class="step-label">Step 4 of 5</div>
+      <h2>Name your organization</h2>
+      <p class="step-desc">This is what your agents will call home. Make it yours.</p>
+
+      <input type="text" class="onboard-input" id="org-name" placeholder="e.g. Bright Studio, Nomad Labs, The Workshop..." maxlength="60" autofocus />
+
+      <div class="btn-row">
+        <button class="btn btn-back" onclick="goStep(2)">Back</button>
+        <button class="btn btn-next" id="btn-next-3" disabled>Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       STEP 4 — Summary + Launch
+       ═══════════════════════════════════════════════════════ -->
+  <div class="step" id="step-4">
+    <div class="step-inner">
+      <div class="step-label">Step 5 of 5</div>
+      <h2>Here's your team</h2>
+      <p class="step-desc">Review your configuration. You can adjust any role after launch.</p>
+
+      <div class="summary-card">
+        <h3 id="summary-org-name">Your Organization</h3>
+        <div style="font-size:0.88rem;color:var(--warm-muted);margin-bottom:4px;" id="summary-type"></div>
+        <div style="font-size:0.88rem;color:var(--warm-muted);" id="summary-autonomy"></div>
+      </div>
+
+      <div class="summary-card">
+        <h3>Agent roster</h3>
+        <div style="font-size:0.85rem;color:var(--warm-muted);margin-bottom:8px;">Green = AI agent &middot; Purple = human role</div>
+        <div class="agent-roster-summary" id="summary-agents"></div>
+      </div>
+
+      <div class="summary-card">
+        <h3>Focus areas</h3>
+        <div class="tag-cloud" id="summary-focus" style="pointer-events:none;"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-back" onclick="goStep(3)">Back</button>
+        <button class="btn btn-launch" id="btn-launch">Launch organization</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  // ── State ───────────────────────────────────────────────
+  var state = {
+    step: 0,
+    type: null,
+    focus: [],
+    autonomy: 2,
+    orgName: ''
+  };
+
+  var AUTONOMY_LABELS = [
+    'Full autopilot — agents run, you review summaries',
+    'Mostly autonomous — agents run, flag edge cases',
+    'Balanced collaboration — agents propose, you approve',
+    'Human-guided — you direct, agents execute',
+    'Full control — every action needs your sign-off'
+  ];
+
+  // Agent catalog: which agents to spin up per focus area
+  var AGENT_MAP = {
+    marketing: { name: 'Marketing', abbr: 'Mkt', human: false },
+    development: { name: 'Dev Lead', abbr: 'Dev', human: false },
+    design: { name: 'UX / Design', abbr: 'UXR', human: false },
+    content: { name: 'Content', abbr: 'Content', human: false },
+    research: { name: 'Research', abbr: 'Research', human: false },
+    sales: { name: 'Biz Dev', abbr: 'BizDev', human: false },
+    operations: { name: 'Operations', abbr: 'Ops', human: false },
+    'customer-service': { name: 'Customer Svc', abbr: 'CS', human: false },
+    data: { name: 'Data', abbr: 'Data', human: false },
+    finance: { name: 'Finance', abbr: 'Fin', human: true },
+    legal: { name: 'Legal', abbr: 'Legal', human: true },
+    hr: { name: 'People', abbr: 'HR', human: true },
+    strategy: { name: 'Strategy', abbr: 'Strat', human: false },
+    partnerships: { name: 'Partnerships', abbr: 'Partners', human: false }
+  };
+
+  // Always-on agents
+  var CORE_AGENTS = [
+    { name: 'Lead Admin', abbr: 'Admin', human: true, note: 'Ethics lead' },
+    { name: 'Exec Assistant', abbr: 'EA', human: false }
+  ];
+
+  // ── Navigation ─────────────────────────────────────────
+  window.goStep = function (n) {
+    if (n === 4) buildSummary();
+    var steps = document.querySelectorAll('.step');
+    steps.forEach(function (s) { s.classList.remove('active'); });
+    document.getElementById('step-' + n).classList.add('active');
+
+    var pips = document.querySelectorAll('.progress-pip');
+    pips.forEach(function (p, i) {
+      p.classList.remove('active', 'done');
+      if (i < n) p.classList.add('done');
+      if (i === n) p.classList.add('active');
+    });
+    state.step = n;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // ── Step 0: Type selection ─────────────────────────────
+  var typeCards = document.querySelectorAll('#type-choices .choice-card');
+  typeCards.forEach(function (card) {
+    card.addEventListener('click', function () {
+      typeCards.forEach(function (c) { c.classList.remove('selected'); });
+      card.classList.add('selected');
+      state.type = card.dataset.value;
+      document.getElementById('btn-next-0').disabled = false;
+    });
+  });
+  document.getElementById('btn-next-0').addEventListener('click', function () {
+    if (state.type) goStep(1);
+  });
+
+  // ── Step 1: Focus tags ─────────────────────────────────
+  var tags = document.querySelectorAll('#focus-tags .tag-pill');
+  tags.forEach(function (tag) {
+    tag.addEventListener('click', function () {
+      tag.classList.toggle('selected');
+      var t = tag.dataset.tag;
+      var idx = state.focus.indexOf(t);
+      if (idx > -1) state.focus.splice(idx, 1);
+      else state.focus.push(t);
+      document.getElementById('btn-next-1').disabled = state.focus.length === 0;
+    });
+  });
+  document.getElementById('btn-next-1').addEventListener('click', function () {
+    if (state.focus.length > 0) goStep(2);
+  });
+
+  // ── Step 2: Autonomy slider ────────────────────────────
+  var slider = document.getElementById('autonomy-slider');
+  var label = document.getElementById('autonomy-label');
+  slider.addEventListener('input', function () {
+    state.autonomy = parseInt(slider.value);
+    label.textContent = AUTONOMY_LABELS[state.autonomy];
+  });
+  document.getElementById('btn-next-2').addEventListener('click', function () {
+    goStep(3);
+  });
+
+  // ── Step 3: Org name ───────────────────────────────────
+  var nameInput = document.getElementById('org-name');
+  nameInput.addEventListener('input', function () {
+    state.orgName = nameInput.value.trim();
+    document.getElementById('btn-next-3').disabled = state.orgName.length === 0;
+  });
+  document.getElementById('btn-next-3').addEventListener('click', function () {
+    if (state.orgName) goStep(4);
+  });
+  nameInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && state.orgName) goStep(4);
+  });
+
+  // ── Step 4: Build summary ──────────────────────────────
+  function buildSummary() {
+    var typeLabels = {
+      solo: 'Solo operator',
+      'small-team': 'Small team (2-5 people)',
+      agency: 'Agency / studio',
+      startup: 'Startup',
+      creative: 'Creative practice'
+    };
+
+    document.getElementById('summary-org-name').textContent = state.orgName;
+    document.getElementById('summary-type').textContent = typeLabels[state.type] || state.type;
+    document.getElementById('summary-autonomy').textContent = AUTONOMY_LABELS[state.autonomy];
+
+    // Build agent roster
+    var roster = document.getElementById('summary-agents');
+    roster.innerHTML = '';
+
+    // Core agents first
+    CORE_AGENTS.forEach(function (a) {
+      roster.appendChild(makeAgentChip(a));
+    });
+
+    // Focus-driven agents
+    state.focus.forEach(function (f) {
+      var def = AGENT_MAP[f];
+      if (def) {
+        // At high autonomy, some human roles become agent roles
+        var agent = Object.assign({}, def);
+        if (state.autonomy <= 1 && agent.human) agent.human = false;
+        roster.appendChild(makeAgentChip(agent));
+      }
+    });
+
+    // QA always included
+    roster.appendChild(makeAgentChip({ name: 'QA Guardian', abbr: 'QA', human: false }));
+
+    // Focus tags
+    var focusEl = document.getElementById('summary-focus');
+    focusEl.innerHTML = '';
+    state.focus.forEach(function (f) {
+      var pill = document.createElement('span');
+      pill.className = 'tag-pill selected';
+      pill.textContent = f.replace(/-/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+      focusEl.appendChild(pill);
+    });
+  }
+
+  function makeAgentChip(agent) {
+    var el = document.createElement('div');
+    el.className = 'agent-chip-s' + (agent.human ? ' human' : '');
+    el.innerHTML = '<span class="dot-s"></span>' + agent.abbr +
+      (agent.note ? ' <span style="font-family:var(--font);font-size:0.72rem;color:var(--warm-purple);">(' + agent.note + ')</span>' : '');
+    return el;
+  }
+
+  // ── Launch ─────────────────────────────────────────────
+  document.getElementById('btn-launch').addEventListener('click', function () {
+    var btn = this;
+    btn.textContent = 'Launching...';
+    btn.disabled = true;
+
+    // Simulate agent boot sequence
+    setTimeout(function () {
+      btn.style.background = 'var(--warm-green)';
+      btn.textContent = 'Organization launched';
+
+      // Redirect to configure page with state
+      setTimeout(function () {
+        var params = new URLSearchParams({
+          org: state.orgName,
+          type: state.type,
+          focus: state.focus.join(','),
+          autonomy: state.autonomy
+        });
+        window.location.href = '/ao/configure.html?' + params.toString();
+      }, 1200);
+    }, 1500);
+  });
+
+})();
+</script>
+
+</body>
+</html>
