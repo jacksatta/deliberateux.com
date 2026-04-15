@@ -332,6 +332,74 @@
       background: var(--panel);
     }
 
+    /* ── CTA block ───────────────────────────────────────── */
+    .cfg-cta {
+      border: 1px solid rgba(var(--c-admin),0.2);
+      background: rgba(var(--c-admin),0.05);
+      border-radius: var(--radius-lg);
+      padding: 36px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+    @media (max-width: 640px) {
+      .cfg-cta { flex-direction: column; align-items: flex-start; }
+    }
+    .cfg-cta-copy h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 0 0 6px;
+      letter-spacing: -0.01em;
+    }
+    .cfg-cta-copy p {
+      color: var(--muted);
+      font-size: 0.875rem;
+      line-height: 1.6;
+      margin: 0;
+      max-width: 420px;
+    }
+    .cfg-cta-actions {
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+    .cta-btn-primary {
+      font-family: var(--font);
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 11px 22px;
+      border-radius: 10px;
+      border: none;
+      background: rgb(var(--c-admin));
+      color: #0a0616;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: opacity 0.2s var(--ease);
+      white-space: nowrap;
+    }
+    .cta-btn-primary:hover { opacity: 0.88; }
+    .cta-btn-secondary {
+      font-family: var(--font);
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 11px 18px;
+      border-radius: 10px;
+      border: 1px solid var(--border2);
+      background: none;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+      white-space: nowrap;
+    }
+    .cta-btn-secondary:hover { color: var(--text); border-color: rgba(var(--c-admin),0.4); }
+    .cta-btn-secondary.copied { color: rgb(var(--c-uxr)); border-color: rgba(var(--c-uxr),0.4); }
+
     /* ── Ethics manifesto ────────────────────────────────── */
     .manifesto {
       border-top: 1px solid var(--hairline);
@@ -474,6 +542,18 @@
 
     <!-- Add role bar -->
     <div class="add-bar" id="add-bar"></div>
+
+    <!-- CTA -->
+    <div class="cfg-cta cfg-reveal">
+      <div class="cfg-cta-copy">
+        <h3>Ready to run this org?</h3>
+        <p>You've configured your team. Request access to AO and we'll reach out when your org type enters beta.</p>
+      </div>
+      <div class="cfg-cta-actions">
+        <a class="cta-btn-primary" href="/ao/#request-access">Request beta access →</a>
+        <button class="cta-btn-secondary" id="copy-config-btn">Copy config link</button>
+      </div>
+    </div>
 
     <!-- Ethics manifesto -->
     <section class="manifesto cfg-reveal" id="manifesto">
@@ -757,6 +837,25 @@
     state.roles = [...TEMPLATES.solo.roles];
     state.operators = { ...TEMPLATES.solo.operators };
     render();
+
+    // ── Copy config link ──────────────────────────────────
+    document.getElementById('copy-config-btn').addEventListener('click', function() {
+      const params = new URLSearchParams({
+        type: state.template || 'custom',
+        roles: state.roles.join(','),
+        ops: Object.entries(state.operators).map(([k,v]) => k + ':' + v).join(',')
+      });
+      const url = window.location.origin + '/ao/configure.html?' + params.toString();
+      navigator.clipboard.writeText(url).then(() => {
+        const btn = document.getElementById('copy-config-btn');
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copy config link';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    });
 
     // Scroll reveal
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
