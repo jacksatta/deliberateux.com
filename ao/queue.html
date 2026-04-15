@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Work Queue — AO</title>
+  <meta name="description" content="Live work queue for AO agent operations. Watch tasks flow through agents with auto-heal on failures." />
+  <link rel="icon" href="/assets/favicon.svg" />
+  <style>
+    :root {
+      --bg: #070812; --bg2: #0b1021;
+      --panel: rgba(255,255,255,0.05); --panel2: rgba(255,255,255,0.08);
+      --border: rgba(255,255,255,0.09); --border2: rgba(255,255,255,0.14);
+      --text: rgba(255,255,255,0.92); --muted: rgba(255,255,255,0.58);
+      --faint: rgba(255,255,255,0.38); --ghost: rgba(255,255,255,0.22);
+      --hairline: rgba(255,255,255,0.07);
+      --max: 860px;
+      --font: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+      --mono: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      --ease: cubic-bezier(.2,.8,.2,1);
+      /* agent colors */
+      --c-admin: 168,139,250; --c-mkt: 244,114,182; --c-dev: 96,165,250;
+      --c-uxr: 52,211,153; --c-qa: 251,191,36; --c-biz: 147,197,253;
+      --c-cs: 110,231,183; --c-ops: 248,113,113;
+      /* status */
+      --s-done: 52,211,153; --s-progress: 96,165,250;
+      --s-queued: 255,255,255; --s-blocked: 248,113,113;
+      --s-healing: 245,158,11;
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html{height:100%}
+    body{
+      margin:0;min-height:100%;font-family:var(--font);color:var(--text);
+      background:var(--bg);
+      background-image:
+        radial-gradient(900px 700px at 30% -5%,rgba(96,165,250,0.08),transparent 50%),
+        radial-gradient(700px 500px at 80% 5%,rgba(248,113,113,0.06),transparent 50%),
+        linear-gradient(180deg,var(--bg2),var(--bg));
+      background-attachment:fixed;-webkit-font-smoothing:antialiased;
+    }
+    a{color:var(--text);text-decoration:none}
+    ::selection{background:rgba(96,165,250,0.25)}
+
+    /* ── Nav ──────────────────────────────────────────── */
+    .ao-nav{position:sticky;top:0;z-index:200;background:rgba(7,8,18,0.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.07)}
+    .ao-nav-inner{width:min(var(--max),calc(100% - 48px));margin:0 auto;display:flex;align-items:center;height:54px}
+    .ao-nav-logo{font-size:0.95rem;font-weight:700;display:flex;align-items:center;gap:8px;color:var(--text);text-decoration:none;margin-right:auto}
+    .ao-nav-context{font-weight:400;color:var(--muted);margin-left:2px}
+    .ao-nav-dot{width:7px;height:7px;border-radius:50%;background:rgb(var(--c-dev));box-shadow:0 0 7px rgba(var(--c-dev),0.6);animation:dp 2.5s ease-in-out infinite}
+    @keyframes dp{0%,100%{opacity:1}50%{opacity:0.35}}
+    .ao-nav-links{display:flex;gap:22px;font-size:0.84rem;margin-right:20px}
+    .ao-nav-links a{color:var(--muted);text-decoration:none;transition:color 0.2s}
+    .ao-nav-links a:hover,.ao-nav-links a.current{color:var(--text)}
+    .ao-nav-cta{font-size:0.8rem;font-weight:600;padding:6px 14px;border-radius:8px;background:rgba(var(--c-admin),0.12);border:1px solid rgba(var(--c-admin),0.25);color:rgb(var(--c-admin));text-decoration:none;transition:all 0.2s;white-space:nowrap}
+    .ao-nav-cta:hover{background:rgba(var(--c-admin),0.22)}
+
+    /* ── Layout ───────────────────────────────────────── */
+    .container{width:min(var(--max),calc(100% - 48px));margin:0 auto}
+    .page-header{padding:36px 0 12px}
+    .page-header h1{font-size:clamp(1.3rem,3vw,1.7rem);font-weight:700;letter-spacing:-0.02em;margin:0 0 4px}
+    .page-header p{color:var(--muted);font-size:0.88rem;margin:0}
+
+    /* ── Stats strip ──────────────────────────────────── */
+    .q-stats{display:flex;gap:24px;padding:18px 0 24px;font-family:var(--mono);font-size:0.78rem;color:var(--faint);flex-wrap:wrap}
+    .q-stats strong{color:var(--text);font-size:1rem;display:block;margin-bottom:1px;font-family:var(--font)}
+
+    /* ── Filters ──────────────────────────────────────── */
+    .q-filters{display:flex;gap:6px;padding-bottom:20px;flex-wrap:wrap}
+    .q-filter{font-family:var(--font);font-size:0.78rem;font-weight:500;padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:none;color:var(--faint);cursor:pointer;transition:all 0.15s}
+    .q-filter:hover{border-color:var(--border2);color:var(--muted)}
+    .q-filter.active{border-color:rgba(var(--c-dev),0.4);background:rgba(var(--c-dev),0.1);color:rgb(var(--c-dev))}
+
+    /* ── Task list ────────────────────────────────────── */
+    .q-list{display:flex;flex-direction:column;gap:6px;padding-bottom:48px}
+    .q-item{
+      display:flex;align-items:flex-start;gap:12px;
+      padding:14px 16px;background:var(--panel);border:1px solid var(--border);
+      border-radius:12px;transition:all 0.25s var(--ease);
+      animation:itemIn 0.3s var(--ease) both;
+      position:relative;overflow:hidden;
+    }
+    @keyframes itemIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    .q-item:hover{border-color:var(--border2)}
+    .q-item.status-blocked{border-color:rgba(var(--s-blocked),0.25);background:rgba(var(--s-blocked),0.04)}
+    .q-item.status-healing{border-color:rgba(var(--s-healing),0.3);background:rgba(var(--s-healing),0.04)}
+    .q-item.status-healed{border-color:rgba(var(--s-done),0.25);background:rgba(var(--s-done),0.04)}
+    .q-item.heal-flash{animation:healFlash 0.6s ease}
+    @keyframes healFlash{0%{background:rgba(var(--s-done),0.15)}100%{background:rgba(var(--s-done),0.04)}}
+
+    .q-agent{
+      width:32px;height:32px;border-radius:8px;flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;
+      font-size:0.7rem;font-weight:700;font-family:var(--mono);
+    }
+    .q-body{flex:1;min-width:0}
+    .q-task{font-size:0.88rem;font-weight:500;line-height:1.4;margin-bottom:2px}
+    .q-meta{display:flex;align-items:center;gap:10px;font-size:0.75rem;color:var(--faint);font-family:var(--mono)}
+    .q-status{
+      font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;
+      padding:2px 8px;border-radius:4px;white-space:nowrap;
+    }
+    .q-status.done{background:rgba(var(--s-done),0.12);color:rgb(var(--s-done))}
+    .q-status.progress{background:rgba(var(--s-progress),0.12);color:rgb(var(--s-progress))}
+    .q-status.queued{background:rgba(255,255,255,0.06);color:var(--faint)}
+    .q-status.blocked{background:rgba(var(--s-blocked),0.15);color:rgb(var(--s-blocked))}
+    .q-status.healing,.q-status.diagnosing{background:rgba(var(--s-healing),0.15);color:rgb(var(--s-healing));animation:pulse 1.5s ease-in-out infinite}
+    .q-status.healed{background:rgba(var(--s-done),0.15);color:rgb(var(--s-done))}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+
+    /* heal sub-line */
+    .q-heal{font-size:0.78rem;color:rgb(var(--s-healing));margin-top:5px;line-height:1.4;animation:healIn 0.3s ease}
+    .q-heal.resolved{color:rgb(var(--s-done))}
+    @keyframes healIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+    .q-ts{margin-left:auto;font-size:0.72rem;color:var(--ghost);white-space:nowrap;flex-shrink:0;padding-top:2px}
+
+    /* ── Footer ───────────────────────────────────────── */
+    .q-footer{border-top:1px solid var(--hairline);padding:20px 0;font-size:0.78rem;color:var(--faint);display:flex;justify-content:space-between;align-items:center}
+    .q-footer a{color:var(--muted)}.q-footer a:hover{color:var(--text)}
+    .q-footer .badge{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--ghost);display:flex;align-items:center;gap:5px}
+    .q-footer .badge .dot{width:6px;height:6px;border-radius:50%;background:rgb(var(--s-done));box-shadow:0 0 4px rgba(var(--s-done),0.4)}
+
+    @media(max-width:600px){
+      .ao-nav-links{gap:12px}.ao-nav-links a:nth-last-child(-n+1){display:none}
+      .q-ts{display:none}.q-stats{gap:16px}
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="ao-nav">
+    <div class="ao-nav-inner">
+      <a href="/ao/" class="ao-nav-logo"><span class="ao-nav-dot"></span>AO<span class="ao-nav-context">/ Queue</span></a>
+      <div class="ao-nav-links">
+        <a href="/ao/">Overview</a>
+        <a href="/ao/configure.html">Configure</a>
+        <a href="/ao/queue.html" class="current">Queue</a>
+        <a href="/ao/dashboard.html">Dashboard</a>
+      </div>
+      <a href="/ao/#request-access" class="ao-nav-cta">Request access</a>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <div class="page-header">
+      <h1>Work queue</h1>
+      <p>Tasks flowing through your AO agents. Blocked tasks auto-heal.</p>
+    </div>
+
+    <div class="q-stats" id="q-stats">
+      <div><strong id="stat-total">0</strong>total</div>
+      <div><strong id="stat-done">0</strong>done</div>
+      <div><strong id="stat-active">0</strong>active</div>
+      <div><strong id="stat-blocked">0</strong>blocked</div>
+      <div><strong id="stat-healed">0</strong>auto-healed</div>
+    </div>
+
+    <div class="q-filters" id="q-filters">
+      <button class="q-filter active" data-filter="all">All</button>
+      <button class="q-filter" data-filter="progress">In progress</button>
+      <button class="q-filter" data-filter="blocked">Blocked</button>
+      <button class="q-filter" data-filter="done">Done</button>
+      <button class="q-filter" data-filter="healed">Healed</button>
+    </div>
+
+    <div class="q-list" id="q-list"></div>
+
+    <footer class="q-footer">
+      <div><a href="/ao/">AO Overview</a> · <a href="/">deliberateux.com</a></div>
+      <span class="badge"><span class="dot"></span>Live simulation</span>
+    </footer>
+
+  </div>
+
+<script>
+(function() {
+  // ── Agent definitions ────────────────────────────────
+  var AGENTS = {
+    admin: { abbr:'EA',  rgb:'168,139,250' },
+    dev:   { abbr:'Dev', rgb:'96,165,250'  },
+    qa:    { abbr:'QA',  rgb:'251,191,36'  },
+    mkt:   { abbr:'Mkt', rgb:'244,114,182' },
+    uxr:   { abbr:'UXR', rgb:'52,211,153'  },
+    cs:    { abbr:'CS',  rgb:'110,231,183' },
+    biz:   { abbr:'Biz', rgb:'147,197,253' },
+    ops:   { abbr:'Ops', rgb:'248,113,113' }
+  };
+
+  // ── Task pool (AO building itself) ───────────────────
+  var TASK_POOL = [
+    { agent:'dev', task:'Implement dashboard org card rendering' },
+    { agent:'dev', task:'Add localStorage persistence for configs' },
+    { agent:'dev', task:'Build work queue visualization widget' },
+    { agent:'dev', task:'Optimize nav backdrop-filter for Safari' },
+    { agent:'dev', task:'Wire onboard wizard state to configure' },
+    { agent:'dev', task:'Refactor role-grid template rendering' },
+    { agent:'qa',  task:'Regression test: template picker sync' },
+    { agent:'qa',  task:'Cross-browser test: sticky nav on iOS' },
+    { agent:'qa',  task:'Verify admin mode URL param flow' },
+    { agent:'qa',  task:'Test copy-config-link clipboard API' },
+    { agent:'qa',  task:'Visual diff: configure page after redesign' },
+    { agent:'mkt', task:'Draft AO product page launch copy' },
+    { agent:'mkt', task:'Competitive scan: agent platform landscape' },
+    { agent:'mkt', task:'Write beta access announcement email' },
+    { agent:'mkt', task:'Position AO vs. traditional agency model' },
+    { agent:'uxr', task:'Accessibility audit: configure role cards' },
+    { agent:'uxr', task:'Heuristic eval: onboard wizard flow' },
+    { agent:'uxr', task:'Review CTA placement on configure page' },
+    { agent:'uxr', task:'Color contrast check: admin amber on dark' },
+    { agent:'cs',  task:'Process inbound beta request — inbox API' },
+    { agent:'cs',  task:'Triage: user reports configure page error' },
+    { agent:'cs',  task:'Draft reply: partnership inquiry from VC' },
+    { agent:'cs',  task:'Route feature request to dev backlog' },
+    { agent:'admin', task:'Synthesize weekly cross-agent status' },
+    { agent:'admin', task:'Review ethics alignment on new marketing copy' },
+    { agent:'admin', task:'Redistribute QA ethics scope after role change' },
+    { agent:'biz', task:'Pricing model analysis: per-seat vs per-org' },
+    { agent:'biz', task:'Distribution research: marketplace listing' },
+    { agent:'ops', task:'Monitor page load time after nav changes' },
+    { agent:'ops', task:'SSL cert check: deliberateux.com via Cloudflare' },
+  ];
+
+  // ── Auto-heal reasons ────────────────────────────────
+  var HEAL_REASONS = [
+    { cause:'Inbox API timeout (provider rate limit)', fix:'Switched to fallback IMAP endpoint' },
+    { cause:'Dependency stale: waiting on QA sign-off >15min', fix:'Auto-escalated to admin, QA fast-tracked' },
+    { cause:'External API 503: analytics provider down', fix:'Cached last known data, flagged for retry' },
+    { cause:'Token budget exceeded mid-task', fix:'Split into sub-tasks, resumed with fresh budget' },
+    { cause:'Handoff format mismatch from upstream agent', fix:'Auto-normalized payload, notified admin' },
+  ];
+
+  // ── State ────────────────────────────────────────────
+  var tasks = [];
+  var nextId = 1;
+  var healedCount = 0;
+  var currentFilter = 'all';
+  var poolIdx = 0;
+
+  // Shuffle pool
+  for (var i = TASK_POOL.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = TASK_POOL[i]; TASK_POOL[i] = TASK_POOL[j]; TASK_POOL[j] = t;
+  }
+
+  // ── Seed initial tasks ───────────────────────────────
+  function seedTasks() {
+    // 4 done, 2 in progress, 1 blocked (CS), 1 queued
+    addTask('done', -180);
+    addTask('done', -140);
+    addTask('done', -100);
+    addTask('done', -65);
+    addTask('progress', -30);
+    addTask('progress', -15);
+    // Force a CS blocked task
+    var csTask = { agent:'cs', task:'Process inbound beta request — inbox API timeout' };
+    tasks.push({
+      id: nextId++, agent: csTask.agent, task: csTask.task,
+      status: 'blocked', born: Date.now() - 25000,
+      healState: null, healReason: null
+    });
+    addTask('queued', -3);
+  }
+
+  function addTask(status, ageSeconds) {
+    var tpl = TASK_POOL[poolIdx % TASK_POOL.length]; poolIdx++;
+    tasks.push({
+      id: nextId++, agent: tpl.agent, task: tpl.task,
+      status: status || 'queued',
+      born: Date.now() + (ageSeconds || 0) * 1000,
+      healState: null, healReason: null
+    });
+  }
+
+  // ── Render ───────────────────────────────────────────
+  var listEl = document.getElementById('q-list');
+
+  function render() {
+    var filtered = tasks;
+    if (currentFilter !== 'all') {
+      filtered = tasks.filter(function(t) {
+        if (currentFilter === 'healed') return t.status === 'done' && t.healReason;
+        if (currentFilter === 'blocked') return t.status === 'blocked' || t.status === 'healing' || t.status === 'diagnosing';
+        return t.status === currentFilter;
+      });
+    }
+
+    // Sort: blocked/healing first, then by born desc
+    filtered.sort(function(a, b) {
+      var aw = (a.status === 'blocked' || a.status === 'healing' || a.status === 'diagnosing') ? 0 : 1;
+      var bw = (b.status === 'blocked' || b.status === 'healing' || b.status === 'diagnosing') ? 0 : 1;
+      if (aw !== bw) return aw - bw;
+      return b.id - a.id;
+    });
+
+    listEl.innerHTML = '';
+    filtered.forEach(function(t, i) {
+      var a = AGENTS[t.agent] || { abbr:'?', rgb:'255,255,255' };
+      var statusClass = t.healState || t.status;
+      var statusLabel = statusClass;
+      if (statusClass === 'progress') statusLabel = 'active';
+      if (statusClass === 'diagnosing') statusLabel = 'diagnosing...';
+      if (statusClass === 'healing') statusLabel = 'healing...';
+
+      var ago = Math.max(0, Math.floor((Date.now() - t.born) / 1000));
+      var agoStr = ago < 60 ? ago + 's ago' : Math.floor(ago / 60) + 'm ago';
+
+      var healHtml = '';
+      if (t.healState === 'diagnosing') {
+        healHtml = '<div class="q-heal">Auto-heal initiated — diagnosing: ' + esc(t.healReason.cause) + '</div>';
+      } else if (t.healState === 'healing') {
+        healHtml = '<div class="q-heal">Healing: ' + esc(t.healReason.fix) + '</div>';
+      } else if (t.status === 'done' && t.healReason) {
+        healHtml = '<div class="q-heal resolved">Healed: ' + esc(t.healReason.fix) + '</div>';
+      }
+
+      var el = document.createElement('div');
+      el.className = 'q-item status-' + statusClass;
+      el.style.animationDelay = (i * 30) + 'ms';
+      el.dataset.id = t.id;
+      el.innerHTML =
+        '<div class="q-agent" style="background:rgba(' + a.rgb + ',0.14);color:rgba(' + a.rgb + ',0.9)">' + a.abbr + '</div>' +
+        '<div class="q-body">' +
+          '<div class="q-task">' + esc(t.task) + '</div>' +
+          '<div class="q-meta">' +
+            '<span class="q-status ' + statusClass + '">' + statusLabel + '</span>' +
+            '<span>' + esc(t.agent) + '</span>' +
+          '</div>' +
+          healHtml +
+        '</div>' +
+        '<div class="q-ts">' + agoStr + '</div>';
+      listEl.appendChild(el);
+    });
+
+    updateStats();
+  }
+
+  function updateStats() {
+    var total = tasks.length, done = 0, active = 0, blocked = 0;
+    tasks.forEach(function(t) {
+      if (t.status === 'done') done++;
+      else if (t.status === 'progress') active++;
+      else if (t.status === 'blocked' || t.status === 'healing' || t.status === 'diagnosing') blocked++;
+    });
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-done').textContent = done;
+    document.getElementById('stat-active').textContent = active;
+    document.getElementById('stat-blocked').textContent = blocked;
+    document.getElementById('stat-healed').textContent = healedCount;
+  }
+
+  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  // ── Simulation engine ────────────────────────────────
+  function tick() {
+    tasks.forEach(function(t) {
+      var age = Date.now() - t.born;
+
+      // Queued → progress after 4-8s
+      if (t.status === 'queued' && age > (4000 + Math.random() * 4000)) {
+        t.status = 'progress';
+      }
+      // Progress → done after 10-20s (except blocked)
+      else if (t.status === 'progress' && age > (10000 + Math.random() * 10000)) {
+        // CS tasks have 40% chance of blocking
+        if (t.agent === 'cs' && Math.random() < 0.4 && !t.healReason) {
+          t.status = 'blocked';
+          t.healReason = HEAL_REASONS[Math.floor(Math.random() * HEAL_REASONS.length)];
+          t.blockedAt = Date.now();
+        } else {
+          t.status = 'done';
+        }
+      }
+      // Any agent can block occasionally (5% for non-CS)
+      else if (t.status === 'progress' && age > 8000 && !t.healReason && t.agent !== 'cs' && Math.random() < 0.002) {
+        t.status = 'blocked';
+        t.healReason = HEAL_REASONS[Math.floor(Math.random() * HEAL_REASONS.length)];
+        t.blockedAt = Date.now();
+      }
+
+      // Auto-heal sequence
+      if (t.status === 'blocked' && t.blockedAt) {
+        var blockedAge = Date.now() - t.blockedAt;
+        if (blockedAge > 5000 && !t.healState) {
+          t.healState = 'diagnosing';
+        }
+        if (blockedAge > 8000 && t.healState === 'diagnosing') {
+          t.healState = 'healing';
+        }
+        if (blockedAge > 11000 && t.healState === 'healing') {
+          t.status = 'done';
+          t.healState = null;
+          healedCount++;
+        }
+      }
+    });
+
+    render();
+  }
+
+  // ── New task injector ────────────────────────────────
+  function injectTask() {
+    addTask('queued', 0);
+    // Keep list manageable
+    if (tasks.length > 30) {
+      tasks = tasks.filter(function(t) { return t.status !== 'done'; }).concat(
+        tasks.filter(function(t) { return t.status === 'done'; }).slice(-8)
+      );
+    }
+  }
+
+  // ── Filters ──────────────────────────────────────────
+  document.getElementById('q-filters').addEventListener('click', function(e) {
+    var btn = e.target.closest('.q-filter');
+    if (!btn) return;
+    document.querySelectorAll('.q-filter').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    render();
+  });
+
+  // ── Boot ─────────────────────────────────────────────
+  seedTasks();
+  render();
+  setInterval(tick, 1500);
+  setInterval(injectTask, 6000 + Math.random() * 4000);
+
+})();
+</script>
+
+</body>
+</html>

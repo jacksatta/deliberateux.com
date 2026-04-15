@@ -477,6 +477,55 @@
       box-shadow: 0 0 4px rgba(245,158,11,0.4);
     }
 
+    /* ── Queue widget (compact) ──────────────────────────── */
+    .queue-mini {
+      max-width: 520px; margin: 0 auto 40px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .queue-mini-hdr {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 16px 10px; font-size: 0.78rem; color: var(--faint);
+      border-bottom: 1px solid var(--hairline);
+    }
+    .queue-mini-hdr .qm-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgb(52,211,153);
+      box-shadow: 0 0 4px rgba(52,211,153,0.5);
+      animation: qmPulse 2s ease-in-out infinite;
+    }
+    @keyframes qmPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .queue-mini-hdr a {
+      margin-left: auto; font-size: 0.75rem; font-weight: 600;
+      color: rgb(var(--c-ea)); text-decoration: none; transition: opacity 0.2s;
+    }
+    .queue-mini-hdr a:hover { opacity: 0.75; }
+    .qm-list { max-height: 176px; overflow: hidden; position: relative; }
+    .qm-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 16px; transition: all 0.3s ease;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .qm-item:last-child { border-bottom: none; }
+    .qm-badge {
+      width: 24px; height: 24px; border-radius: 6px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.58rem; font-weight: 700; font-family: var(--mono);
+    }
+    .qm-task { font-size: 0.8rem; color: var(--muted); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .qm-status {
+      width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+    }
+    .qm-status.done { background: rgb(52,211,153); }
+    .qm-status.progress { background: rgb(96,165,250); }
+    .qm-status.blocked { background: rgb(248,113,113); animation: qmPulse 1s ease-in-out infinite; }
+    .qm-status.healing { background: rgb(245,158,11); animation: qmPulse 1s ease-in-out infinite; }
+    .qm-status.queued { background: rgba(255,255,255,0.2); }
+    .qm-item.entering { animation: qmSlideIn 0.4s ease; }
+    @keyframes qmSlideIn { from{opacity:0;transform:translateY(100%)} to{opacity:1;transform:none} }
+
     /* ── Reveal animations ────────────────────────────────── */
     .ao-reveal {
       opacity: 0;
@@ -498,6 +547,7 @@
         <a href="#agents">Agents</a>
         <a href="#protocol">Protocol</a>
         <a href="/ao/configure.html">Configure</a>
+        <a href="/ao/queue.html">Queue</a>
       </div>
       <a href="#request-access" class="ao-nav-cta">Request access</a>
       <a href="/ao/dashboard.html" class="ao-nav-admin" id="admin-pill">Admin</a>
@@ -524,6 +574,16 @@
         </div>
       </div>
     </section>
+
+    <!-- Compact work queue widget -->
+    <div class="queue-mini ao-reveal" id="queue-mini">
+      <div class="queue-mini-hdr">
+        <span class="qm-dot"></span>
+        <span>Live work queue</span>
+        <a href="/ao/queue.html">View all &rarr;</a>
+      </div>
+      <div class="qm-list" id="qm-list"></div>
+    </div>
 
     <!-- Live network graph (code-generated) -->
     <section class="ao-network-section" id="network">
@@ -947,6 +1007,83 @@
         }
       });
     });
+  </script>
+
+  <!-- Queue widget simulation -->
+  <script>
+  (function() {
+    var AGENTS = {
+      admin:{abbr:'EA',rgb:'168,139,250'},dev:{abbr:'Dev',rgb:'96,165,250'},
+      qa:{abbr:'QA',rgb:'251,191,36'},mkt:{abbr:'Mkt',rgb:'244,114,182'},
+      uxr:{abbr:'UXR',rgb:'52,211,153'},cs:{abbr:'CS',rgb:'110,231,183'},
+      biz:{abbr:'Biz',rgb:'147,197,253'},ops:{abbr:'Ops',rgb:'248,113,113'}
+    };
+    var POOL = [
+      {a:'dev',t:'Build work queue visualization',s:'progress'},
+      {a:'qa',t:'Cross-browser test: sticky nav',s:'progress'},
+      {a:'cs',t:'Process inbound beta request',s:'blocked'},
+      {a:'mkt',t:'Draft launch announcement copy',s:'progress'},
+      {a:'dev',t:'Add localStorage org persistence',s:'done'},
+      {a:'uxr',t:'Accessibility audit: role cards',s:'queued'},
+      {a:'admin',t:'Synthesize weekly status report',s:'progress'},
+      {a:'qa',t:'Verify admin URL param flow',s:'done'},
+      {a:'biz',t:'Pricing model: per-seat vs per-org',s:'queued'},
+      {a:'ops',t:'Monitor page load after nav changes',s:'done'},
+      {a:'dev',t:'Optimize configure page rendering',s:'progress'},
+      {a:'cs',t:'Route feature request to dev backlog',s:'healing'},
+      {a:'mkt',t:'Competitive scan: agent platforms',s:'done'},
+      {a:'uxr',t:'Heuristic eval: onboard wizard',s:'progress'},
+      {a:'dev',t:'Refactor role-grid templates',s:'queued'},
+    ];
+    var MAX_VISIBLE = 4;
+    var items = POOL.slice(0, MAX_VISIBLE + 1);
+    var idx = MAX_VISIBLE + 1;
+    var list = document.getElementById('qm-list');
+    if (!list) return;
+
+    function renderWidget() {
+      list.innerHTML = '';
+      var show = items.slice(0, MAX_VISIBLE);
+      show.forEach(function(item) {
+        var ag = AGENTS[item.a] || {abbr:'?',rgb:'255,255,255'};
+        var el = document.createElement('div');
+        el.className = 'qm-item';
+        el.innerHTML =
+          '<div class="qm-badge" style="background:rgba(' + ag.rgb + ',0.14);color:rgba(' + ag.rgb + ',0.9)">' + ag.abbr + '</div>' +
+          '<div class="qm-task">' + item.t + '</div>' +
+          '<div class="qm-status ' + item.s + '"></div>';
+        list.appendChild(el);
+      });
+    }
+
+    function cycleWidget() {
+      // Shift out oldest, push new
+      items.shift();
+      var next = POOL[idx % POOL.length]; idx++;
+      // Randomize status for variety
+      var statuses = ['done','progress','progress','queued','done'];
+      var s = statuses[Math.floor(Math.random() * statuses.length)];
+      // CS has chance of blocking
+      if (next.a === 'cs' && Math.random() < 0.3) s = 'blocked';
+      items.push({a: next.a, t: next.t, s: s});
+      renderWidget();
+      // Animate new item
+      var last = list.lastElementChild;
+      if (last) last.classList.add('entering');
+    }
+
+    // Auto-heal blocked items after a few cycles
+    setInterval(function() {
+      items.forEach(function(item) {
+        if (item.s === 'blocked') item.s = 'healing';
+        else if (item.s === 'healing') { item.s = 'done'; }
+      });
+      renderWidget();
+    }, 5000);
+
+    renderWidget();
+    setInterval(cycleWidget, 4000);
+  })();
   </script>
 
   <!-- Contact form submission -->
