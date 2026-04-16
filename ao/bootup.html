@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Launching — AO</title>
+  <link rel="icon" href="/assets/favicon.svg" />
+  <style>
+    :root {
+      --bg: #070812;
+      --bg2: #0b1021;
+      --panel: rgba(255,255,255,0.05);
+      --border: rgba(255,255,255,0.09);
+      --border2: rgba(255,255,255,0.14);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.58);
+      --faint: rgba(255,255,255,0.38);
+      --ghost: rgba(255,255,255,0.22);
+      --hairline: rgba(255,255,255,0.07);
+      --purple: 168,139,250;
+      --green: 52,211,153;
+      --blue: 96,165,250;
+      --amber: 245,158,11;
+      --pink: 244,114,182;
+      --yellow: 251,191,36;
+      --red: 248,113,113;
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --ease: cubic-bezier(.2,.8,.2,1);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: var(--font); color: var(--text);
+      background: var(--bg);
+      background-image:
+        radial-gradient(800px 600px at 50% 20%, rgba(168,139,250,0.10), transparent 60%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      display: flex; align-items: center; justify-content: center;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .boot-container {
+      width: min(580px, calc(100% - 48px));
+      text-align: center;
+    }
+
+    /* ── Header ──────────────────────────────────── */
+    .boot-logo {
+      font-size: 0.85rem; font-weight: 700;
+      color: var(--muted); letter-spacing: 0.04em;
+      margin-bottom: 32px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .boot-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: rgb(var(--purple));
+      box-shadow: 0 0 8px rgba(var(--purple),0.5);
+      animation: dotPulse 2s ease-in-out infinite;
+    }
+    @keyframes dotPulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .boot-title {
+      font-size: clamp(1.4rem, 3.5vw, 2rem);
+      font-weight: 800; letter-spacing: -0.02em;
+      margin: 0 0 6px;
+    }
+    .boot-title em {
+      font-style: normal;
+      background: linear-gradient(135deg, rgb(var(--purple)), rgb(var(--green)));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .boot-sub {
+      color: var(--muted); font-size: 0.9rem; margin: 0 0 36px;
+    }
+
+    /* ── Progress bar ────────────────────────────── */
+    .boot-progress {
+      width: 100%; height: 3px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 2px; overflow: hidden;
+      margin-bottom: 32px;
+    }
+    .boot-progress-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, rgb(var(--purple)), rgb(var(--green)));
+      border-radius: 2px;
+      transition: width 0.6s var(--ease);
+    }
+
+    /* ── Agent list ──────────────────────────────── */
+    .agent-boot-list {
+      text-align: left;
+      display: flex; flex-direction: column; gap: 6px;
+      margin-bottom: 32px;
+    }
+    .ab-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 14px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      opacity: 0; transform: translateY(8px);
+      transition: opacity 0.4s ease, transform 0.4s ease, border-color 0.3s;
+    }
+    .ab-row.visible { opacity: 1; transform: none; }
+    .ab-row.done { border-color: rgba(var(--green),0.25); }
+    .ab-row.active { border-color: rgba(var(--purple),0.35); }
+
+    .ab-icon {
+      width: 30px; height: 30px; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 700; flex-shrink: 0;
+    }
+    .ab-info { flex: 1; min-width: 0; }
+    .ab-name { font-size: 0.85rem; font-weight: 600; }
+    .ab-status {
+      font-size: 0.72rem; color: var(--faint);
+      font-family: var(--mono);
+      margin-top: 1px;
+      min-height: 1em;
+    }
+    .ab-status.ok { color: rgb(var(--green)); }
+    .ab-check {
+      font-size: 0.8rem; font-weight: 700;
+      color: rgb(var(--green));
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .ab-check.visible { opacity: 1; }
+
+    /* Spinner */
+    .ab-spinner {
+      width: 14px; height: 14px;
+      border: 2px solid rgba(var(--purple),0.2);
+      border-top-color: rgb(var(--purple));
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+      display: none;
+    }
+    .ab-row.active .ab-spinner { display: block; }
+    .ab-row.active .ab-check { display: none; }
+    .ab-row.done .ab-spinner { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Boot log ────────────────────────────────── */
+    .boot-log {
+      text-align: left;
+      font-family: var(--mono); font-size: 0.72rem;
+      color: var(--ghost); line-height: 1.7;
+      max-height: 90px; overflow: hidden;
+      margin-bottom: 28px;
+      mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
+    }
+    .boot-log .log-line {
+      opacity: 0; animation: logFade 0.3s ease forwards;
+    }
+    @keyframes logFade { to { opacity: 1; } }
+
+    /* ── CTA ─────────────────────────────────────── */
+    .boot-cta {
+      opacity: 0; transform: translateY(10px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .boot-cta.visible { opacity: 1; transform: none; }
+    .boot-btn {
+      font-family: var(--font); font-size: 0.9rem; font-weight: 600;
+      padding: 12px 28px; border-radius: 10px;
+      border: none; background: rgb(var(--purple));
+      color: #0a0616; cursor: pointer;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+      transition: opacity 0.2s;
+    }
+    .boot-btn:hover { opacity: 0.88; }
+    .boot-auto {
+      display: block; font-size: 0.75rem;
+      color: var(--ghost); margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="boot-container">
+    <div class="boot-logo"><span class="boot-dot"></span> AO</div>
+    <h1 class="boot-title">Launching <em id="org-name">your org</em></h1>
+    <p class="boot-sub" id="boot-sub">Provisioning agents and setting up your workspace...</p>
+
+    <div class="boot-progress"><div class="boot-progress-fill" id="progress-fill"></div></div>
+
+    <div class="agent-boot-list" id="agent-list"></div>
+
+    <div class="boot-log" id="boot-log"></div>
+
+    <div class="boot-cta" id="boot-cta">
+      <a class="boot-btn" id="continue-btn" href="/ao/configure.html">Configure your org →</a>
+      <span class="boot-auto" id="auto-label">Auto-continuing in <span id="countdown">5</span>s...</span>
+    </div>
+  </div>
+
+  <script>
+    // ── Admin gate ────────────────────────────────────────
+    function isAdmin() {
+      return new URLSearchParams(window.location.search).has('admin') ||
+             localStorage.getItem('ao_admin') === '1';
+    }
+
+    // ── Read org from URL + localStorage ─────────────────
+    var params = new URLSearchParams(window.location.search);
+    var slug = params.get('org') || '';
+    var orgs = JSON.parse(localStorage.getItem('ao_orgs') || '[]');
+    var org = null;
+    for (var i = 0; i < orgs.length; i++) {
+      if (orgs[i].slug === slug) { org = orgs[i]; break; }
+    }
+
+    var ROLE_META = {
+      admin:  { name:'Lead Admin', abbr:'EA', rgb:'168,139,250' },
+      mkt:    { name:'Marketing Lead', abbr:'Mkt', rgb:'244,114,182' },
+      dev:    { name:'Dev Lead', abbr:'Dev', rgb:'96,165,250' },
+      uxr:    { name:'UX Researcher', abbr:'UXR', rgb:'52,211,153' },
+      qa:     { name:'QA Guardian', abbr:'QA', rgb:'251,191,36' },
+      biz:    { name:'Biz Dev', abbr:'Biz', rgb:'147,197,253' },
+      cs:     { name:'Customer Service', abbr:'CS', rgb:'110,231,183' },
+      ops:    { name:'Operations', abbr:'Ops', rgb:'248,113,113' },
+      data:   { name:'Data Analyst', abbr:'Data', rgb:'129,140,248' },
+      content:{ name:'Content Lead', abbr:'Con', rgb:'232,121,249' }
+    };
+
+    var BOOT_MESSAGES = {
+      admin:  ['Initializing orchestrator...','Loading handoff protocols...','Ethics oversight active'],
+      mkt:    ['Scanning competitive landscape...','Loading positioning templates...','Copy engine ready'],
+      dev:    ['Setting up build pipeline...','Pulling latest dependencies...','Dev environment ready'],
+      uxr:    ['Loading heuristic checklists...','Accessibility scanner online...','Research toolkit ready'],
+      qa:     ['Configuring test runners...','Loading regression baselines...','Quality gates armed'],
+      biz:    ['Pulling market data...','Loading pricing models...','Revenue engine ready'],
+      cs:     ['Connecting inbox endpoints...','Loading reply templates...','Triage queue live'],
+      ops:    ['Checking infrastructure...','Monitoring probes online...','Incident pipeline ready'],
+      data:   ['Connecting analytics...','Loading metric definitions...','Dashboard feeds live'],
+      content:['Loading editorial calendar...','Content templates synced...','Publishing pipeline ready']
+    };
+
+    // ── Determine roles to boot ──────────────────────────
+    var orgName = (org && org.name) || slug.replace(/-/g, ' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); }) || 'Your org';
+    document.getElementById('org-name').textContent = orgName;
+
+    // Pick roles from org type if org has no roles yet (fresh from onboard)
+    var TEMPLATES = {
+      solo: ['admin','mkt','dev','uxr','qa','biz','cs'],
+      'small-team': ['admin','mkt','dev','uxr','qa','biz','cs'],
+      agency: ['admin','mkt','dev','uxr','qa','biz','cs','ops','data','content'],
+      minimal: ['admin','dev','qa'],
+      startup: ['admin','dev','qa','mkt','biz'],
+      creative: ['admin','dev','uxr','mkt','content']
+    };
+    var roles = (org && org.roles && org.roles.length > 0) ? org.roles : (TEMPLATES[(org && org.type) || 'solo'] || TEMPLATES.solo);
+    var operators = (org && org.operators) || {};
+
+    // Build forward URL
+    var fwdParams = new URLSearchParams({ org: slug });
+    if (org) {
+      fwdParams.set('type', org.type || 'solo');
+      if (org.focus && org.focus.length) fwdParams.set('focus', org.focus.join(','));
+      if (org.autonomy) fwdParams.set('autonomy', org.autonomy);
+    }
+    var configUrl = '/ao/configure.html?' + fwdParams.toString();
+    document.getElementById('continue-btn').href = configUrl;
+
+    // ── Build agent rows ─────────────────────────────────
+    var listEl = document.getElementById('agent-list');
+    var rows = [];
+    roles.forEach(function(roleId) {
+      var m = ROLE_META[roleId] || { name: roleId, abbr: roleId.slice(0,2).toUpperCase(), rgb:'255,255,255' };
+      var op = operators[roleId] || 'agent';
+      var row = document.createElement('div');
+      row.className = 'ab-row';
+      row.innerHTML =
+        '<div class="ab-icon" style="background:rgba(' + m.rgb + ',0.14);color:rgba(' + m.rgb + ',0.9)">' + m.abbr + '</div>' +
+        '<div class="ab-info">' +
+          '<div class="ab-name">' + m.name + ' <span style="font-size:0.68rem;color:var(--ghost);font-weight:400">' + (op === 'human' ? '(human)' : '(agent)') + '</span></div>' +
+          '<div class="ab-status" id="status-' + roleId + '">Waiting...</div>' +
+        '</div>' +
+        '<div class="ab-spinner"></div>' +
+        '<div class="ab-check" id="check-' + roleId + '">✓</div>';
+      listEl.appendChild(row);
+      rows.push({ el: row, roleId: roleId });
+    });
+
+    // ── Boot sequence ────────────────────────────────────
+    var logEl = document.getElementById('boot-log');
+    var progressEl = document.getElementById('progress-fill');
+    var totalSteps = roles.length;
+    var step = 0;
+
+    function addLog(msg) {
+      var line = document.createElement('div');
+      line.className = 'log-line';
+      line.textContent = '> ' + msg;
+      logEl.appendChild(line);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function bootNext() {
+      if (step >= totalSteps) {
+        // All done
+        progressEl.style.width = '100%';
+        document.getElementById('boot-sub').textContent = 'All agents online. Your org is ready.';
+        addLog('✓ Boot complete — ' + totalSteps + ' agents provisioned');
+
+        // Show CTA
+        setTimeout(function() {
+          document.getElementById('boot-cta').classList.add('visible');
+          startCountdown();
+        }, 400);
+
+        // Save roles back to org if it was empty
+        if (org && (!org.roles || org.roles.length === 0)) {
+          org.roles = roles.slice();
+          var defaultOps = {};
+          roles.forEach(function(r){ defaultOps[r] = 'agent'; });
+          org.operators = defaultOps;
+          localStorage.setItem('ao_orgs', JSON.stringify(orgs));
+        }
+        return;
+      }
+
+      var r = rows[step];
+      var roleId = r.roleId;
+      var msgs = BOOT_MESSAGES[roleId] || ['Initializing...','Loading...','Ready'];
+
+      // Make visible + active
+      r.el.classList.add('visible', 'active');
+      var statusEl = document.getElementById('status-' + roleId);
+
+      // Phase through messages
+      var msgIdx = 0;
+      statusEl.textContent = msgs[0];
+      addLog(msgs[0]);
+
+      var msgInterval = setInterval(function() {
+        msgIdx++;
+        if (msgIdx < msgs.length) {
+          statusEl.textContent = msgs[msgIdx];
+          addLog(msgs[msgIdx]);
+        } else {
+          clearInterval(msgInterval);
+          // Done
+          r.el.classList.remove('active');
+          r.el.classList.add('done');
+          statusEl.textContent = 'Online';
+          statusEl.classList.add('ok');
+          document.getElementById('check-' + roleId).classList.add('visible');
+
+          step++;
+          progressEl.style.width = Math.round((step / totalSteps) * 100) + '%';
+
+          setTimeout(bootNext, 200);
+        }
+      }, 450);
+    }
+
+    // Stagger initial appearance
+    setTimeout(function() {
+      addLog('Bootstrapping ' + orgName + '...');
+      addLog('Org type: ' + ((org && org.type) || 'solo') + ' — ' + totalSteps + ' roles');
+      bootNext();
+    }, 600);
+
+    // ── Auto-continue countdown ──────────────────────────
+    function startCountdown() {
+      var n = 5;
+      var cdEl = document.getElementById('countdown');
+      var iv = setInterval(function() {
+        n--;
+        cdEl.textContent = n;
+        if (n <= 0) {
+          clearInterval(iv);
+          window.location.href = configUrl;
+        }
+      }, 1000);
+    }
+  </script>
+</body>
+</html>

@@ -780,7 +780,7 @@
       if (existing > -1) orgs[existing] = entry; else orgs.push(entry);
       localStorage.setItem('ao_orgs', JSON.stringify(orgs));
 
-      // Redirect to configure page
+      // Redirect to boot-up sequence
       setTimeout(function () {
         var params = new URLSearchParams({
           org: slug,
@@ -788,7 +788,7 @@
           focus: state.focus.join(','),
           autonomy: state.autonomy
         });
-        window.location.href = '/ao/configure.html?' + params.toString();
+        window.location.href = '/ao/bootup.html?' + params.toString();
       }, 1200);
     }, 1500);
   });
