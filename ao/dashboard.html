@@ -238,6 +238,91 @@
     .svc-arrow { color: var(--ghost); font-size: 0.8rem; flex-shrink: 0; transition: color 0.2s; }
     .svc-card:hover .svc-arrow { color: var(--muted); }
 
+    /* ── Live Queue ──────────────────────────────────────── */
+    .queue-section { margin-bottom: 40px; }
+    .queue-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px; flex-wrap: wrap; gap: 8px;
+    }
+    .queue-stats {
+      display: flex; gap: 16px; font-family: var(--mono); font-size: 0.72rem; color: var(--faint);
+    }
+    .queue-stats strong {
+      color: var(--text); font-size: 0.88rem; font-family: var(--font); display: block; margin-bottom: 1px;
+    }
+    .queue-badge {
+      font-size: 0.66rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: rgb(var(--green));
+      display: flex; align-items: center; gap: 5px;
+    }
+    .queue-badge .qb-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgb(var(--green)); box-shadow: 0 0 5px rgba(var(--green),0.5);
+      animation: dotPulse 2.5s ease-in-out infinite;
+    }
+    .q-list { display: flex; flex-direction: column; gap: 5px; }
+    .q-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 12px 14px; background: var(--panel); border: 1px solid var(--border);
+      border-radius: 10px; transition: all 0.25s var(--ease);
+      animation: qIn 0.3s var(--ease) both;
+      position: relative; overflow: hidden;
+    }
+    @keyframes qIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+    .q-item:hover { border-color: var(--border2); }
+    .q-item.st-blocked { border-color: rgba(248,113,113,0.25); background: rgba(248,113,113,0.04); }
+    .q-item.st-healing { border-color: rgba(var(--amber),0.3); background: rgba(var(--amber),0.04); }
+    .q-item.st-healed  { border-color: rgba(var(--green),0.25); background: rgba(var(--green),0.04); }
+    .q-agent-icon {
+      width: 28px; height: 28px; border-radius: 7px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.62rem; font-weight: 700; font-family: var(--mono);
+    }
+    .q-body { flex: 1; min-width: 0; }
+    .q-task-name { font-size: 0.82rem; font-weight: 500; line-height: 1.35; margin-bottom: 2px; }
+    .q-meta-row {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.7rem; color: var(--faint); font-family: var(--mono);
+    }
+    .q-st {
+      font-size: 0.64rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; padding: 2px 7px; border-radius: 4px; white-space: nowrap;
+    }
+    .q-st.done     { background: rgba(var(--green),0.12); color: rgb(var(--green)); }
+    .q-st.progress  { background: rgba(var(--blue),0.12); color: rgb(var(--blue)); }
+    .q-st.queued    { background: rgba(255,255,255,0.06); color: var(--faint); }
+    .q-st.blocked   { background: rgba(248,113,113,0.15); color: rgb(248,113,113); }
+    .q-st.healing, .q-st.diagnosing { background: rgba(var(--amber),0.15); color: rgb(var(--amber)); animation: qPulse 1.5s ease-in-out infinite; }
+    .q-st.healed    { background: rgba(var(--green),0.15); color: rgb(var(--green)); }
+    @keyframes qPulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .q-heal-line { font-size: 0.72rem; color: rgb(var(--amber)); margin-top: 4px; line-height: 1.35; }
+    .q-heal-line.resolved { color: rgb(var(--green)); }
+    .q-ts { margin-left: auto; font-size: 0.68rem; color: var(--ghost); white-space: nowrap; flex-shrink: 0; padding-top: 2px; }
+
+    .completed-section { margin-top: 14px; }
+    .completed-toggle {
+      font-family: var(--font); font-size: 0.78rem; font-weight: 600;
+      color: var(--muted); background: none; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 8px 14px; cursor: pointer;
+      display: flex; align-items: center; gap: 6px; transition: all 0.2s;
+      width: 100%;
+    }
+    .completed-toggle:hover { border-color: var(--border2); color: var(--text); }
+    .completed-toggle .ct-count {
+      font-family: var(--mono); font-size: 0.72rem; color: rgb(var(--green));
+      margin-left: auto;
+    }
+    .completed-toggle .ct-arrow { transition: transform 0.2s; }
+    .completed-toggle.open .ct-arrow { transform: rotate(180deg); }
+    .completed-list {
+      display: none; flex-direction: column; gap: 4px;
+      margin-top: 8px; padding: 4px 0;
+      max-height: 280px; overflow-y: auto;
+    }
+    .completed-list.open { display: flex; }
+    .completed-list .q-item { opacity: 0.65; }
+    .completed-list .q-item:hover { opacity: 1; }
+
     /* ── Footer ──────────────────────────────────────────── */
     .dash-footer {
       border-top: 1px solid var(--hairline); padding: 20px 0;
@@ -294,6 +379,26 @@
     <div class="services-section">
       <div class="section-label">Services</div>
       <div class="svc-grid" id="svc-grid"></div>
+    </div>
+
+    <div class="queue-section">
+      <div class="queue-header">
+        <div class="section-label">Live work queue</div>
+        <div class="queue-stats">
+          <div><strong id="q-active">0</strong>active</div>
+          <div><strong id="q-done">0</strong>done</div>
+          <div><strong id="q-healed">0</strong>healed</div>
+        </div>
+        <span class="queue-badge"><span class="qb-dot"></span>Live</span>
+      </div>
+      <div class="q-list" id="q-active-list"></div>
+      <div class="completed-section">
+        <button class="completed-toggle" id="completed-toggle">
+          <span class="ct-arrow">▾</span> Completed
+          <span class="ct-count" id="ct-count">0</span>
+        </button>
+        <div class="completed-list" id="completed-list"></div>
+      </div>
     </div>
 
     <footer class="dash-footer">
@@ -377,6 +482,173 @@
     function escHtml(str) {
       return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
+
+    // ── Live queue simulation ──────────────────────────
+    (function() {
+      var QA = {
+        admin:{abbr:'EA', rgb:'168,139,250'}, dev:{abbr:'Dev',rgb:'96,165,250'},
+        qa:{abbr:'QA',rgb:'251,191,36'}, mkt:{abbr:'Mkt',rgb:'244,114,182'},
+        uxr:{abbr:'UXR',rgb:'52,211,153'}, cs:{abbr:'CS',rgb:'110,231,183'},
+        biz:{abbr:'Biz',rgb:'147,197,253'}, ops:{abbr:'Ops',rgb:'248,113,113'}
+      };
+      var POOL = [
+        {a:'dev',t:'Implement dashboard org card rendering'},{a:'dev',t:'Add localStorage persistence for configs'},
+        {a:'dev',t:'Build work queue visualization widget'},{a:'dev',t:'Optimize nav backdrop-filter for Safari'},
+        {a:'dev',t:'Wire onboard wizard state to configure'},{a:'dev',t:'Refactor role-grid template rendering'},
+        {a:'qa',t:'Regression test: template picker sync'},{a:'qa',t:'Cross-browser test: sticky nav on iOS'},
+        {a:'qa',t:'Verify admin mode URL param flow'},{a:'qa',t:'Visual diff: configure page after redesign'},
+        {a:'mkt',t:'Draft AO product page launch copy'},{a:'mkt',t:'Competitive scan: agent platform landscape'},
+        {a:'mkt',t:'Write beta access announcement email'},{a:'mkt',t:'Position AO vs. traditional agency model'},
+        {a:'uxr',t:'Accessibility audit: configure role cards'},{a:'uxr',t:'Heuristic eval: onboard wizard flow'},
+        {a:'uxr',t:'Review CTA placement on configure page'},{a:'uxr',t:'Color contrast check: admin amber on dark'},
+        {a:'cs',t:'Process inbound beta request — inbox API'},{a:'cs',t:'Triage: user reports configure page error'},
+        {a:'cs',t:'Draft reply: partnership inquiry from VC'},{a:'cs',t:'Route feature request to dev backlog'},
+        {a:'admin',t:'Synthesize weekly cross-agent status'},{a:'admin',t:'Review ethics alignment on marketing copy'},
+        {a:'biz',t:'Pricing model analysis: per-seat vs per-org'},{a:'biz',t:'Distribution research: marketplace listing'},
+        {a:'ops',t:'Monitor page load time after nav changes'},{a:'ops',t:'SSL cert check: deliberateux.com Cloudflare'}
+      ];
+      var HEALS = [
+        {cause:'Inbox API timeout (rate limit)',fix:'Switched to fallback IMAP endpoint'},
+        {cause:'Dependency stale: waiting on QA >15min',fix:'Auto-escalated to admin, QA fast-tracked'},
+        {cause:'External API 503: analytics down',fix:'Cached last known data, flagged for retry'},
+        {cause:'Token budget exceeded mid-task',fix:'Split into sub-tasks, resumed fresh'},
+        {cause:'Handoff format mismatch from upstream',fix:'Auto-normalized payload, notified admin'}
+      ];
+
+      // Shuffle pool
+      for(var i=POOL.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=POOL[i];POOL[i]=POOL[j];POOL[j]=tmp;}
+
+      var tasks=[],completed=[],nid=1,healedN=0,pidx=0;
+      var activeEl=document.getElementById('q-active-list');
+      var compEl=document.getElementById('completed-list');
+
+      function mkTask(status,ageSec){
+        var p=POOL[pidx%POOL.length];pidx++;
+        return{id:nid++,a:p.a,t:p.t,status:status,born:Date.now()+(ageSec||0)*1000,hs:null,hr:null,bat:0};
+      }
+
+      // Seed: 2 progress, 1 blocked, 1 queued
+      tasks.push(mkTask('progress',-25));
+      tasks.push(mkTask('progress',-12));
+      var bt=mkTask('blocked',-20);bt.hr=HEALS[0];bt.bat=Date.now()-20000;
+      tasks.push(bt);
+      tasks.push(mkTask('queued',-2));
+
+      // Seed some completed
+      for(var c=0;c<3;c++){var ct=mkTask('done',-120-c*40);completed.push(ct);}
+
+      function renderActive(){
+        // Sort: blocked/healing up top, then newest first
+        tasks.sort(function(a,b){
+          var aw=(a.status==='blocked'||a.hs==='diagnosing'||a.hs==='healing')?0:1;
+          var bw=(b.status==='blocked'||b.hs==='diagnosing'||b.hs==='healing')?0:1;
+          if(aw!==bw)return aw-bw;
+          return b.id-a.id;
+        });
+        activeEl.innerHTML='';
+        tasks.forEach(function(t,i){
+          var ag=QA[t.a]||{abbr:'?',rgb:'255,255,255'};
+          var sc=t.hs||t.status;
+          var sl=sc;
+          if(sc==='progress')sl='active';
+          if(sc==='diagnosing')sl='diagnosing\u2026';
+          if(sc==='healing')sl='healing\u2026';
+
+          var ago=Math.max(0,Math.floor((Date.now()-t.born)/1000));
+          var agoS=ago<60?ago+'s ago':Math.floor(ago/60)+'m ago';
+
+          var hh='';
+          if(t.hs==='diagnosing')hh='<div class="q-heal-line">Auto-heal \u2014 diagnosing: '+escHtml(t.hr.cause)+'</div>';
+          else if(t.hs==='healing')hh='<div class="q-heal-line">Healing: '+escHtml(t.hr.fix)+'</div>';
+
+          var el=document.createElement('div');
+          el.className='q-item st-'+sc;
+          el.style.animationDelay=(i*25)+'ms';
+          el.innerHTML=
+            '<div class="q-agent-icon" style="background:rgba('+ag.rgb+',0.14);color:rgba('+ag.rgb+',0.9)">'+ag.abbr+'</div>'+
+            '<div class="q-body"><div class="q-task-name">'+escHtml(t.t)+'</div>'+
+            '<div class="q-meta-row"><span class="q-st '+sc+'">'+sl+'</span><span>'+escHtml(t.a)+'</span></div>'+hh+'</div>'+
+            '<div class="q-ts">'+agoS+'</div>';
+          activeEl.appendChild(el);
+        });
+      }
+
+      function renderCompleted(){
+        compEl.innerHTML='';
+        // Show newest first, max 15
+        var show=completed.slice(-15).reverse();
+        show.forEach(function(t){
+          var ag=QA[t.a]||{abbr:'?',rgb:'255,255,255'};
+          var hh='';
+          if(t.hr)hh='<div class="q-heal-line resolved">Healed: '+escHtml(t.hr.fix)+'</div>';
+          var el=document.createElement('div');
+          el.className='q-item st-done';
+          el.innerHTML=
+            '<div class="q-agent-icon" style="background:rgba('+ag.rgb+',0.14);color:rgba('+ag.rgb+',0.9)">'+ag.abbr+'</div>'+
+            '<div class="q-body"><div class="q-task-name">'+escHtml(t.t)+'</div>'+
+            '<div class="q-meta-row"><span class="q-st '+(t.hr?'healed':'done')+'">'+(t.hr?'healed':'done')+'</span><span>'+escHtml(t.a)+'</span></div>'+hh+'</div>';
+          compEl.appendChild(el);
+        });
+        document.getElementById('ct-count').textContent=completed.length;
+      }
+
+      function updateQStats(){
+        var ac=0;
+        tasks.forEach(function(t){if(t.status==='progress')ac++;});
+        document.getElementById('q-active').textContent=ac;
+        document.getElementById('q-done').textContent=completed.length;
+        document.getElementById('q-healed').textContent=healedN;
+      }
+
+      function tick(){
+        var justDone=[];
+        tasks.forEach(function(t){
+          var age=Date.now()-t.born;
+          if(t.status==='queued'&&age>(3500+Math.random()*3500)){t.status='progress';}
+          else if(t.status==='progress'&&age>(9000+Math.random()*12000)){
+            if(t.a==='cs'&&Math.random()<0.35&&!t.hr){
+              t.status='blocked';t.hr=HEALS[Math.floor(Math.random()*HEALS.length)];t.bat=Date.now();
+            }else{t.status='done';justDone.push(t);}
+          }
+          else if(t.status==='progress'&&age>7000&&!t.hr&&t.a!=='cs'&&Math.random()<0.003){
+            t.status='blocked';t.hr=HEALS[Math.floor(Math.random()*HEALS.length)];t.bat=Date.now();
+          }
+          // Auto-heal sequence
+          if(t.status==='blocked'&&t.bat){
+            var ba=Date.now()-t.bat;
+            if(ba>4500&&!t.hs)t.hs='diagnosing';
+            if(ba>7500&&t.hs==='diagnosing')t.hs='healing';
+            if(ba>10500&&t.hs==='healing'){t.status='done';t.hs=null;healedN++;justDone.push(t);}
+          }
+        });
+        // Move done tasks to completed
+        justDone.forEach(function(t){
+          completed.push(t);
+          tasks=tasks.filter(function(x){return x.id!==t.id;});
+        });
+        renderActive();renderCompleted();updateQStats();
+      }
+
+      function inject(){
+        tasks.push(mkTask('queued',0));
+        if(tasks.length>12){
+          var doneTasks=tasks.filter(function(t){return t.status==='done';});
+          doneTasks.forEach(function(t){completed.push(t);});
+          tasks=tasks.filter(function(t){return t.status!=='done';});
+        }
+      }
+
+      // Completed toggle
+      document.getElementById('completed-toggle').addEventListener('click',function(){
+        this.classList.toggle('open');
+        compEl.classList.toggle('open');
+      });
+
+      // Boot
+      renderActive();renderCompleted();updateQStats();
+      setInterval(tick,1400);
+      setInterval(inject,5500+Math.random()*3500);
+    })();
 
     // ── Services panel ────────────────────────────────────
     var SERVICES = [
