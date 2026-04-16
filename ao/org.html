@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-9MSXWF3TX3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-9MSXWF3TX3');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Org — AO</title>
+  <meta name="description" content="Organization home — AO Agent Operations." />
+  <link rel="icon" href="/assets/favicon.svg" />
+  <style>
+    /* ── Reset + tokens ─────────────────────────────────── */
+    :root {
+      --bg: #070812;
+      --bg2: #0b1021;
+      --panel: rgba(255,255,255,0.05);
+      --panel2: rgba(255,255,255,0.08);
+      --border: rgba(255,255,255,0.09);
+      --border2: rgba(255,255,255,0.14);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.58);
+      --faint: rgba(255,255,255,0.38);
+      --ghost: rgba(255,255,255,0.22);
+      --hairline: rgba(255,255,255,0.07);
+      --amber: 245,158,11;
+      --purple: 168,139,250;
+      --green: 52,211,153;
+      --blue: 96,165,250;
+      --pink: 244,114,182;
+      --red: 248,113,113;
+      --yellow: 251,191,36;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 8px;
+      --max: 1060px;
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --ease: cubic-bezier(.2,.8,.2,1);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { height: 100%; }
+    body {
+      margin: 0; min-height: 100%;
+      font-family: var(--font); color: var(--text);
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(1000px 700px at 15% -5%, rgba(168,139,250,0.10), transparent 50%),
+        radial-gradient(800px 600px at 85% 10%, rgba(52,211,153,0.08), transparent 50%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      background-attachment: fixed;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--text); text-decoration: none; }
+    ::selection { background: rgba(168,139,250,0.25); }
+    .container { width: min(var(--max), calc(100% - 48px)); margin: 0 auto; }
+
+    /* ── Shared sticky nav ──────────────────────────────── */
+    .ao-nav {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(7,8,18,0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .ao-nav-inner {
+      width: min(var(--max), calc(100% - 48px));
+      margin: 0 auto;
+      display: flex; align-items: center; height: 54px;
+    }
+    .ao-nav-logo {
+      font-size: 0.95rem; font-weight: 700;
+      display: flex; align-items: center; gap: 8px;
+      color: var(--text); text-decoration: none;
+      margin-right: auto; flex-shrink: 0;
+    }
+    .ao-nav-context { font-weight: 400; color: var(--muted); margin-left: 2px; }
+    .ao-nav-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: rgb(var(--purple));
+      box-shadow: 0 0 7px rgba(var(--purple),0.6);
+      flex-shrink: 0;
+      animation: dotPulse 2.5s ease-in-out infinite;
+    }
+    @keyframes dotPulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+    .ao-nav-links { display: flex; gap: 22px; font-size: 0.84rem; margin-right: 20px; }
+    .ao-nav-links a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .ao-nav-links a:hover { color: var(--text); }
+    .ao-nav-admin {
+      font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 5px 11px; border-radius: 6px;
+      background: rgba(var(--amber),0.1);
+      border: 1px solid rgba(var(--amber),0.25);
+      color: rgb(var(--amber)); text-decoration: none;
+      margin-left: 8px; transition: all 0.2s; white-space: nowrap;
+      display: none;
+    }
+    .ao-nav-admin.visible { display: inline-flex; }
+
+    /* ── Hero header ────────────────────────────────────── */
+    .org-hero {
+      padding: 44px 0 20px;
+    }
+    .org-hero-top {
+      display: flex; align-items: flex-start; gap: 18px;
+      margin-bottom: 16px;
+    }
+    .org-icon {
+      width: 56px; height: 56px; border-radius: 14px;
+      background: rgba(var(--purple),0.14);
+      border: 1px solid rgba(var(--purple),0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; font-weight: 700; color: rgb(var(--purple));
+      flex-shrink: 0;
+    }
+    .org-hero h1 {
+      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 0 0 4px;
+      line-height: 1.2;
+    }
+    .org-slug {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--faint);
+    }
+    .org-status-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.72rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      padding: 4px 10px; border-radius: 6px;
+      margin-left: auto; flex-shrink: 0;
+    }
+    .org-status-badge.active {
+      background: rgba(var(--green),0.12);
+      color: rgb(var(--green));
+      border: 1px solid rgba(var(--green),0.2);
+    }
+    .org-status-badge.draft {
+      background: rgba(var(--amber),0.1);
+      color: rgb(var(--amber));
+      border: 1px solid rgba(var(--amber),0.2);
+    }
+    .org-status-badge .sb-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: currentColor;
+    }
+    .org-meta-row {
+      display: flex; gap: 24px; flex-wrap: wrap;
+      font-size: 0.82rem; color: var(--muted);
+      padding: 12px 0 20px;
+      border-bottom: 1px solid var(--hairline);
+    }
+    .org-meta-row .m-item {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .m-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .org-actions-bar {
+      display: flex; gap: 10px; padding: 20px 0 8px; flex-wrap: wrap;
+    }
+    .btn-primary {
+      font-family: var(--font);
+      font-size: 0.85rem; font-weight: 600;
+      padding: 10px 20px; border-radius: 10px;
+      border: none;
+      background: rgb(var(--purple));
+      color: #0a0616;
+      cursor: pointer; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 6px;
+      transition: opacity 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-secondary {
+      font-family: var(--font);
+      font-size: 0.82rem; font-weight: 500;
+      padding: 10px 18px; border-radius: 10px;
+      border: 1px solid var(--border2);
+      background: none; color: var(--muted);
+      cursor: pointer; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { color: var(--text); border-color: rgba(var(--purple),0.4); }
+
+    /* ── Section label ──────────────────────────────────── */
+    .section-label {
+      font-size: 0.72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--faint);
+      margin-bottom: 14px; padding-top: 32px;
+    }
+
+    /* ── Agent grid ─────────────────────────────────────── */
+    .agent-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+    }
+    .agent-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px 16px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      animation: cardIn 0.35s var(--ease) both;
+    }
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.97); }
+      to   { opacity: 1; transform: none; }
+    }
+    .agent-card:hover { border-color: var(--border2); box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+    .agent-card.is-lead {
+      border-color: rgba(var(--purple),0.25);
+      background: rgba(var(--purple),0.04);
+    }
+    .agent-top {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 10px;
+    }
+    .agent-icon {
+      width: 34px; height: 34px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700; flex-shrink: 0;
+    }
+    .agent-name { font-size: 0.9rem; font-weight: 600; }
+    .agent-type {
+      font-size: 0.7rem; font-family: var(--mono);
+      color: var(--faint);
+    }
+    .agent-operator {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 0.7rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      padding: 3px 8px; border-radius: 4px;
+      margin-top: 8px;
+    }
+    .agent-operator.is-agent {
+      background: rgba(var(--blue),0.12);
+      color: rgb(var(--blue));
+    }
+    .agent-operator.is-human {
+      background: rgba(var(--green),0.12);
+      color: rgb(var(--green));
+    }
+    .op-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+    /* ── Recent tasks ───────────────────────────────────── */
+    .task-list {
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .task-item {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      font-size: 0.84rem;
+      animation: cardIn 0.3s var(--ease) both;
+    }
+    .task-agent-pill {
+      font-size: 0.68rem; font-weight: 700;
+      padding: 2px 8px; border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .task-text { flex: 1; min-width: 0; color: var(--muted); }
+    .task-status {
+      font-size: 0.68rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      padding: 3px 8px; border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .task-status.done { background: rgba(var(--green),0.12); color: rgb(var(--green)); }
+    .task-status.progress { background: rgba(var(--blue),0.12); color: rgb(var(--blue)); }
+    .task-status.queued { background: rgba(var(--amber),0.1); color: rgb(var(--amber)); }
+
+    /* ── Links section ──────────────────────────────────── */
+    .links-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 10px;
+    }
+    .link-card {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .link-card:hover { border-color: var(--border2); color: var(--text); }
+    .link-icon {
+      font-size: 1rem; flex-shrink: 0;
+    }
+
+    /* ── Focus tags ─────────────────────────────────────── */
+    .focus-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .focus-tag {
+      font-size: 0.72rem;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    /* ── Empty / error state ────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--muted);
+    }
+    .empty-state h2 {
+      font-size: 1.4rem; font-weight: 700;
+      margin: 0 0 8px; color: var(--text);
+    }
+    .empty-state p {
+      font-size: 0.9rem; line-height: 1.6;
+      margin: 0 0 20px;
+    }
+
+    /* ── Footer ─────────────────────────────────────────── */
+    .org-footer {
+      border-top: 1px solid var(--hairline);
+      padding: 20px 0;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.8rem; color: var(--faint);
+      margin-top: 40px;
+    }
+    .org-footer a { color: var(--muted); }
+    .org-footer a:hover { color: var(--text); }
+
+    /* ── Responsive ─────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .org-hero-top { flex-direction: column; gap: 12px; }
+      .org-status-badge { margin-left: 0; }
+      .org-meta-row { gap: 14px; }
+      .agent-grid { grid-template-columns: 1fr; }
+      .links-grid { grid-template-columns: 1fr; }
+      .ao-nav-links { gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="ao-nav">
+    <div class="ao-nav-inner">
+      <a href="/ao/" class="ao-nav-logo">
+        <span class="ao-nav-dot"></span>AO<span class="ao-nav-context" id="nav-context">/ Org</span>
+      </a>
+      <div class="ao-nav-links">
+        <a href="/ao/">Overview</a>
+        <a href="/ao/onboard.html">Get started</a>
+        <a href="/ao/configure.html">Configure</a>
+        <a href="/ao/queue.html">Queue</a>
+        <a href="/ao/dashboard.html">Dashboard</a>
+      </div>
+      <a href="/ao/dashboard.html" class="ao-nav-admin" id="admin-pill">Admin</a>
+    </div>
+  </nav>
+
+  <div class="container" id="main"></div>
+
+  <script>
+    // ── Helpers ──────────────────────────────────────────
+    function isAdmin() {
+      return new URLSearchParams(window.location.search).has('admin') ||
+             localStorage.getItem('ao_admin') === '1';
+    }
+    function escHtml(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    var ROLE_META = {
+      admin: { name:'Lead Admin', abbr:'EA', rgb:'168,139,250', label:'orchestrator' },
+      mkt:   { name:'Marketing Lead', abbr:'Mkt', rgb:'244,114,182', label:'marketing' },
+      dev:   { name:'Dev Lead', abbr:'Dev', rgb:'96,165,250', label:'engineering' },
+      uxr:   { name:'UX Researcher', abbr:'UXR', rgb:'52,211,153', label:'research' },
+      qa:    { name:'QA Guardian', abbr:'QA', rgb:'251,191,36', label:'quality' },
+      biz:   { name:'Biz Dev', abbr:'Biz', rgb:'147,197,253', label:'business' },
+      cs:    { name:'Customer Service', abbr:'CS', rgb:'110,231,183', label:'support' },
+      ops:   { name:'Operations', abbr:'Ops', rgb:'248,113,113', label:'operations' },
+      data:  { name:'Data Analyst', abbr:'Data', rgb:'129,140,248', label:'analytics' },
+      content:{ name:'Content Lead', abbr:'Con', rgb:'232,121,249', label:'content' }
+    };
+
+    var TYPE_LABELS = {
+      solo: 'Solo operator', 'small-team': 'Small team',
+      agency: 'Agency / studio', startup: 'Startup',
+      creative: 'Creative practice', minimal: 'Minimal', custom: 'Custom'
+    };
+
+    // Sample tasks to simulate recent activity per agent type
+    var SAMPLE_TASKS = {
+      admin: ['Synthesize weekly cross-agent status','Review ethics alignment on outbound copy','Route escalation from CS to dev'],
+      dev:   ['Implement org dashboard card rendering','Optimize nav backdrop-filter perf','Wire onboard state to configure'],
+      qa:    ['Regression test: template picker sync','Visual diff: configure page redesign','Cross-browser test: sticky nav iOS'],
+      mkt:   ['Draft AO product page launch copy','Competitive scan: agent landscape','Position AO vs traditional agency'],
+      uxr:   ['Accessibility audit: configure cards','Heuristic eval: onboard wizard','Color contrast check: admin amber'],
+      cs:    ['Process inbound beta request','Triage: user reports config error','Draft reply: partnership inquiry'],
+      biz:   ['Pricing model: per-seat vs per-org','Distribution research: marketplace','Revenue forecast: Q2 projections'],
+      ops:   ['Monitor page load after nav changes','SSL cert check: Cloudflare','Uptime report: VPS dashboard stack'],
+      data:  ['A/B test analysis: CTA placement','Weekly metrics dashboard update','Funnel drop-off analysis: onboard'],
+      content:['Draft blog post: AO launch story','Update docs: configure workflow','Social post: beta access open']
+    };
+
+    // ── Init ────────────────────────────────────────────
+    (function() {
+      var params = new URLSearchParams(window.location.search);
+      var slug = params.get('slug');
+      var main = document.getElementById('main');
+
+      // Admin mode
+      if (isAdmin()) {
+        localStorage.setItem('ao_admin', '1');
+        document.getElementById('admin-pill').classList.add('visible');
+      }
+
+      if (!slug) {
+        main.innerHTML = '<div class="empty-state">' +
+          '<h2>No organization specified</h2>' +
+          '<p>This page needs a slug parameter. Try creating an org first.</p>' +
+          '<a href="/ao/onboard.html" class="btn-primary">Create an org</a>' +
+          '</div>';
+        return;
+      }
+
+      // Load org from localStorage
+      var orgs = JSON.parse(localStorage.getItem('ao_orgs') || '[]');
+      var org = null;
+      for (var i = 0; i < orgs.length; i++) {
+        if (orgs[i].slug === slug) { org = orgs[i]; break; }
+      }
+
+      if (!org) {
+        main.innerHTML = '<div class="empty-state">' +
+          '<h2>Organization not found</h2>' +
+          '<p>No org with slug "' + escHtml(slug) + '" exists in local storage.</p>' +
+          '<a href="/ao/onboard.html" class="btn-primary">Create an org</a>' +
+          '</div>';
+        return;
+      }
+
+      // Update page title + nav context
+      document.title = escHtml(org.name || org.slug) + ' — AO';
+      document.getElementById('nav-context').textContent = '/ ' + (org.name || org.slug);
+
+      var statusClass = org.status === 'active' ? 'active' : 'draft';
+      var statusLabel = org.status === 'active' ? 'Active' : 'Draft';
+      var typeLabel = TYPE_LABELS[org.type] || org.type || 'Custom';
+      var roles = org.roles || [];
+      var operators = org.operators || {};
+      var agents = 0, humans = 0;
+      for (var k in operators) {
+        if (operators[k] === 'agent') agents++;
+        else if (operators[k] === 'human') humans++;
+      }
+      var focusArr = org.focus || [];
+      var created = org.createdAt || org.updatedAt || '—';
+
+      // ── Hero ────────────────────────────────────────
+      var initials = (org.name || org.slug).split(/[\s-]+/).map(function(w){ return w[0]; }).join('').toUpperCase().slice(0,2);
+
+      var html = '';
+      html += '<div class="org-hero">';
+      html += '  <div class="org-hero-top">';
+      html += '    <div class="org-icon">' + escHtml(initials) + '</div>';
+      html += '    <div style="flex:1;min-width:0">';
+      html += '      <h1>' + escHtml(org.name || org.slug) + '</h1>';
+      html += '      <div class="org-slug">' + escHtml(org.slug) + ' · ' + escHtml(typeLabel) + '</div>';
+      html += '    </div>';
+      html += '    <span class="org-status-badge ' + statusClass + '"><span class="sb-dot"></span>' + statusLabel + '</span>';
+      html += '  </div>';
+
+      // Focus tags
+      if (focusArr.length > 0) {
+        html += '  <div class="focus-tags" style="margin-bottom:8px">';
+        focusArr.forEach(function(f) {
+          html += '<span class="focus-tag">' + escHtml(f.replace(/-/g,' ')) + '</span>';
+        });
+        html += '  </div>';
+      }
+
+      // Meta row
+      html += '  <div class="org-meta-row">';
+      html += '    <span class="m-item"><span class="m-dot" style="background:rgb(var(--blue))"></span>' + agents + ' agent' + (agents !== 1 ? 's' : '') + '</span>';
+      html += '    <span class="m-item"><span class="m-dot" style="background:rgb(var(--green))"></span>' + humans + ' human' + (humans !== 1 ? 's' : '') + '</span>';
+      html += '    <span class="m-item"><span class="m-dot" style="background:rgb(var(--purple))"></span>' + roles.length + ' role' + (roles.length !== 1 ? 's' : '') + '</span>';
+      if (org.autonomy) {
+        html += '    <span class="m-item" style="margin-left:auto;font-size:0.78rem;color:var(--faint)">Autonomy: ' + escHtml(org.autonomy) + '</span>';
+      }
+      html += '  </div>';
+
+      // Action bar
+      html += '  <div class="org-actions-bar">';
+      html += '    <a class="btn-primary" href="/ao/queue.html">Open queue</a>';
+      html += '    <a class="btn-secondary" href="/ao/configure.html?org=' + encodeURIComponent(org.slug) + '&admin=1">Edit config</a>';
+      html += '    <a class="btn-secondary" href="/ao/dashboard.html">Back to dashboard</a>';
+      html += '  </div>';
+      html += '</div>';
+
+      // ── Agents section ──────────────────────────────
+      html += '<div class="section-label">Team (' + roles.length + ' roles)</div>';
+      html += '<div class="agent-grid">';
+      roles.forEach(function(roleId, i) {
+        var meta = ROLE_META[roleId] || { name: roleId, abbr: roleId.slice(0,2).toUpperCase(), rgb:'255,255,255', label: roleId };
+        var op = operators[roleId] || 'agent';
+        var isLead = roleId === 'admin';
+        html += '<div class="agent-card' + (isLead ? ' is-lead' : '') + '" style="animation-delay:' + (i * 40) + 'ms">';
+        html += '  <div class="agent-top">';
+        html += '    <div class="agent-icon" style="background:rgba(' + meta.rgb + ',0.14);color:rgba(' + meta.rgb + ',0.9)">' + meta.abbr + '</div>';
+        html += '    <div>';
+        html += '      <div class="agent-name">' + escHtml(meta.name) + '</div>';
+        html += '      <div class="agent-type">' + escHtml(meta.label) + '</div>';
+        html += '    </div>';
+        html += '  </div>';
+        html += '  <span class="agent-operator is-' + op + '"><span class="op-dot"></span>' + (op === 'agent' ? 'Agent' : 'Human') + '</span>';
+        html += '</div>';
+      });
+      html += '</div>';
+
+      // ── Recent tasks (simulated) ────────────────────
+      html += '<div class="section-label">Recent tasks</div>';
+      html += '<div class="task-list">';
+      var taskItems = [];
+      roles.forEach(function(roleId) {
+        var pool = SAMPLE_TASKS[roleId] || ['General task for ' + roleId];
+        var meta = ROLE_META[roleId] || { abbr: roleId.slice(0,2).toUpperCase(), rgb:'255,255,255' };
+        pool.forEach(function(t, ti) {
+          taskItems.push({ roleId: roleId, meta: meta, text: t, idx: ti });
+        });
+      });
+      // Shuffle deterministically based on slug
+      var seed = 0;
+      for (var si = 0; si < slug.length; si++) seed += slug.charCodeAt(si);
+      taskItems.sort(function(a, b) {
+        return ((a.idx * 31 + seed) % 97) - ((b.idx * 31 + seed) % 97);
+      });
+      var statuses = ['done','done','done','progress','done','progress','queued','done','done','done'];
+      taskItems.slice(0, 10).forEach(function(item, i) {
+        var st = statuses[i % statuses.length];
+        var stLabel = st === 'done' ? 'Done' : st === 'progress' ? 'In progress' : 'Queued';
+        html += '<div class="task-item" style="animation-delay:' + (i * 30) + 'ms">';
+        html += '  <span class="task-agent-pill" style="background:rgba(' + item.meta.rgb + ',0.14);color:rgba(' + item.meta.rgb + ',0.9)">' + item.meta.abbr + '</span>';
+        html += '  <span class="task-text">' + escHtml(item.text) + '</span>';
+        html += '  <span class="task-status ' + st + '">' + stLabel + '</span>';
+        html += '</div>';
+      });
+      html += '</div>';
+
+      // ── Quick links ─────────────────────────────────
+      html += '<div class="section-label">Quick links</div>';
+      html += '<div class="links-grid">';
+      html += '  <a class="link-card" href="/ao/queue.html"><span class="link-icon">&#9654;</span> Live work queue</a>';
+      html += '  <a class="link-card" href="/ao/configure.html?org=' + encodeURIComponent(org.slug) + '&admin=1"><span class="link-icon">&#9881;</span> Edit configuration</a>';
+      html += '  <a class="link-card" href="/ao/onboard.html"><span class="link-icon">&#43;</span> Create new org</a>';
+      html += '  <a class="link-card" href="/ao/dashboard.html"><span class="link-icon">&#9632;</span> Admin dashboard</a>';
+      html += '  <a class="link-card" href="/ao/"><span class="link-icon">&#8962;</span> AO overview</a>';
+      html += '  <a class="link-card" href="/"><span class="link-icon">&#9733;</span> deliberateux.com</a>';
+      html += '</div>';
+
+      // ── Footer ──────────────────────────────────────
+      html += '<footer class="org-footer">';
+      html += '  <div><a href="/ao/">AO Overview</a> · <a href="/ao/dashboard.html">Dashboard</a> · <a href="/">deliberateux.com</a></div>';
+      html += '  <span style="font-size:0.72rem;color:var(--ghost)">Created ' + escHtml(created) + '</span>';
+      html += '</footer>';
+
+      main.innerHTML = html;
+    })();
+  </script>
+</body>
+</html>

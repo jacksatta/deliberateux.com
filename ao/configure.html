@@ -589,7 +589,7 @@
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button class="admin-save-btn" onclick="saveConfig()">Save config</button>
-        <a href="/ao/dashboard.html" class="admin-run-btn">Run org →</a>
+        <a href="/ao/dashboard.html" class="admin-run-btn" id="admin-run-btn">Run org →</a>
       </div>
     </div>
 
@@ -680,6 +680,12 @@
   </div>
 
   <script>
+    // ── Admin gate ─────────────────────────────────────────
+    function isAdmin() {
+      return new URLSearchParams(window.location.search).has('admin') ||
+             localStorage.getItem('ao_admin') === '1';
+    }
+
     // ── Role definitions ──────────────────────────────────
     const ROLE_CATALOG = {
       admin: {
@@ -791,10 +797,10 @@
         const role = ROLE_CATALOG[roleId];
         if (!role) return;
         const op = state.operators[roleId] || 'agent';
-        const isAdmin = roleId === 'admin';
+        const isAdminRole = roleId === 'admin';
 
         const card = document.createElement('div');
-        card.className = 'role-card' + (isAdmin ? ' is-admin' : '');
+        card.className = 'role-card' + (isAdminRole ? ' is-admin' : '');
         card.style.animationDelay = (i * 40) + 'ms';
 
         card.innerHTML = `
@@ -809,7 +815,7 @@
             <div class="role-info">
               <div class="role-name">
                 ${role.name}
-                ${isAdmin ? '<span style="font-size:0.65rem;background:rgba(168,139,250,0.2);color:rgb(168,139,250);padding:1px 6px;border-radius:4px;font-weight:600">ETHICS LEAD</span>' : ''}
+                ${isAdminRole ? '<span style="font-size:0.65rem;background:rgba(168,139,250,0.2);color:rgb(168,139,250);padding:1px 6px;border-radius:4px;font-weight:600">ETHICS LEAD</span>' : ''}
               </div>
               <div class="role-label">${role.label}</div>
             </div>
@@ -916,8 +922,6 @@
       const params = new URLSearchParams(window.location.search);
       const orgSlug = params.get('org');
       const orgType = params.get('type');
-      const isAdmin = params.has('admin') || localStorage.getItem('ao_admin') === '1';
-
       // Load saved org from localStorage, or fall back to URL type param
       if (orgSlug) {
         const orgs = JSON.parse(localStorage.getItem('ao_orgs') || '[]');
@@ -946,7 +950,7 @@
       render();
 
       // Admin mode
-      if (isAdmin) {
+      if (isAdmin()) {
         localStorage.setItem('ao_admin', '1');
         document.getElementById('admin-pill').classList.add('visible');
         const banner = document.getElementById('admin-banner');
@@ -956,9 +960,18 @@
         const ctaHeading = document.querySelector('.cfg-cta h3');
         const ctaBody = document.querySelector('.cfg-cta p');
         const ctaPrimary = document.getElementById('cta-primary-btn');
+        var displayName = orgSlug.replace(/-/g, ' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); });
         if (ctaHeading) ctaHeading.textContent = 'Configuration ready.';
-        if (ctaBody) ctaBody.textContent = 'Save this config to lock it in, then head to the dashboard to run your org.';
-        if (ctaPrimary) { ctaPrimary.textContent = 'Go to dashboard →'; ctaPrimary.href = '/ao/dashboard.html'; }
+        if (ctaBody) ctaBody.textContent = 'Save this config to lock it in, then launch your org to see agents, tasks, and links.';
+        if (ctaPrimary) {
+          ctaPrimary.textContent = 'Launch ' + displayName + ' →';
+          ctaPrimary.href = '/ao/org.html?slug=' + encodeURIComponent(orgSlug);
+        }
+        var runBtn = document.getElementById('admin-run-btn');
+        if (runBtn) {
+          runBtn.textContent = 'Launch ' + displayName + ' →';
+          runBtn.href = '/ao/org.html?slug=' + encodeURIComponent(orgSlug);
+        }
       }
     })();
 
@@ -984,6 +997,13 @@
       btn.textContent = 'Saved ✓';
       btn.style.color = 'rgb(52,211,153)';
       setTimeout(() => { btn.textContent = orig; btn.style.color = '#f59e0b'; }, 2000);
+      // Update CTA to launch org
+      const ctaPrimary = document.getElementById('cta-primary-btn');
+      if (ctaPrimary) {
+        const displayName = orgSlug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        ctaPrimary.textContent = 'Launch ' + displayName + ' →';
+        ctaPrimary.href = '/ao/org.html?slug=' + encodeURIComponent(orgSlug);
+      }
     }
 
     // ── Copy config link ──────────────────────────────────

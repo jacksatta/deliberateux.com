@@ -256,12 +256,13 @@
     addTask('done', -65);
     addTask('progress', -30);
     addTask('progress', -15);
-    // Force a CS blocked task
+    // Force a CS blocked task — with blockedAt so auto-heal fires
     var csTask = { agent:'cs', task:'Process inbound beta request — inbox API timeout' };
     tasks.push({
       id: nextId++, agent: csTask.agent, task: csTask.task,
       status: 'blocked', born: Date.now() - 25000,
-      healState: null, healReason: null
+      healState: null, healReason: HEAL_REASONS[0],
+      blockedAt: Date.now() - 6000
     });
     addTask('queued', -3);
   }
@@ -276,8 +277,9 @@
     });
   }
 
-  // ── Render ───────────────────────────────────────────
+  // ── Render (keyed DOM diff) ──────────────────────────
   var listEl = document.getElementById('q-list');
+  var mountedIds = {}; // track which ids have had their entry animation
 
   function render() {
     var filtered = tasks;
@@ -297,48 +299,99 @@
       return b.id - a.id;
     });
 
-    listEl.innerHTML = '';
+    // Build a map of desired ids in order
+    var desiredIds = filtered.map(function(t) { return t.id; });
+    var existingMap = {};
+    Array.from(listEl.children).forEach(function(el) {
+      existingMap[el.dataset.id] = el;
+    });
+
+    // Remove rows no longer in filtered set
+    Object.keys(existingMap).forEach(function(id) {
+      if (desiredIds.indexOf(Number(id)) === -1) {
+        existingMap[id].remove();
+        delete existingMap[id];
+      }
+    });
+
+    // Update or create rows in order
     filtered.forEach(function(t, i) {
       var a = AGENTS[t.agent] || { abbr:'?', rgb:'255,255,255' };
       var statusClass = t.healState || t.status;
       var statusLabel = statusClass;
       if (statusClass === 'progress') statusLabel = 'active';
-      if (statusClass === 'diagnosing') statusLabel = 'diagnosing...';
-      if (statusClass === 'healing') statusLabel = 'healing...';
+      if (statusClass === 'diagnosing') statusLabel = 'diagnosing\u2026';
+      if (statusClass === 'healing') statusLabel = 'healing\u2026';
 
       var ago = Math.max(0, Math.floor((Date.now() - t.born) / 1000));
       var agoStr = ago < 60 ? ago + 's ago' : Math.floor(ago / 60) + 'm ago';
 
       var healHtml = '';
       if (t.healState === 'diagnosing') {
-        healHtml = '<div class="q-heal">Auto-heal initiated — diagnosing: ' + esc(t.healReason.cause) + '</div>';
+        healHtml = '<div class="q-heal">Auto-heal initiated \u2014 diagnosing: ' + esc(t.healReason.cause) + '</div>';
       } else if (t.healState === 'healing') {
         healHtml = '<div class="q-heal">Healing: ' + esc(t.healReason.fix) + '</div>';
       } else if (t.status === 'done' && t.healReason) {
         healHtml = '<div class="q-heal resolved">Healed: ' + esc(t.healReason.fix) + '</div>';
       }
 
-      var el = document.createElement('div');
-      el.className = 'q-item status-' + statusClass;
-      el.style.animationDelay = (i * 30) + 'ms';
-      el.dataset.id = t.id;
-      el.innerHTML =
-        '<div class="q-agent" style="background:rgba(' + a.rgb + ',0.14);color:rgba(' + a.rgb + ',0.9)">' + a.abbr + '</div>' +
-        '<div class="q-body">' +
-          '<div class="q-task">' + esc(t.task) + '</div>' +
-          '<div class="q-meta">' +
-            '<span class="q-status ' + statusClass + '">' + statusLabel + '</span>' +
-            '<span>' + esc(t.agent) + '</span>' +
+      var el = existingMap[t.id];
+      if (el) {
+        // Patch existing row in place — no rebuild
+        el.className = 'q-item status-' + statusClass;
+        el.style.animationDelay = '';
+        var statusEl = el.querySelector('.q-status');
+        if (statusEl) {
+          statusEl.className = 'q-status ' + statusClass;
+          statusEl.textContent = statusLabel;
+        }
+        var tsEl = el.querySelector('.q-ts');
+        if (tsEl) tsEl.textContent = agoStr;
+        // Update heal line
+        var healEl = el.querySelector('.q-heal');
+        if (healHtml) {
+          if (healEl) {
+            healEl.outerHTML = healHtml;
+          } else {
+            el.querySelector('.q-body').insertAdjacentHTML('beforeend', healHtml);
+          }
+        } else if (healEl) {
+          healEl.remove();
+        }
+      } else {
+        // Create new row — entry animation only on first mount
+        el = document.createElement('div');
+        el.className = 'q-item status-' + statusClass;
+        if (!mountedIds[t.id]) {
+          el.style.animationDelay = (i * 30) + 'ms';
+          mountedIds[t.id] = true;
+        }
+        el.dataset.id = t.id;
+        el.innerHTML =
+          '<div class="q-agent" style="background:rgba(' + a.rgb + ',0.14);color:rgba(' + a.rgb + ',0.9)">' + a.abbr + '</div>' +
+          '<div class="q-body">' +
+            '<div class="q-task">' + esc(t.task) + '</div>' +
+            '<div class="q-meta">' +
+              '<span class="q-status ' + statusClass + '">' + statusLabel + '</span>' +
+              '<span>' + esc(t.agent) + '</span>' +
+            '</div>' +
+            healHtml +
           '</div>' +
-          healHtml +
-        '</div>' +
-        '<div class="q-ts">' + agoStr + '</div>';
-      listEl.appendChild(el);
+          '<div class="q-ts">' + agoStr + '</div>';
+        existingMap[t.id] = el;
+      }
+
+      // Ensure correct order: insert at position i
+      if (listEl.children[i] !== el) {
+        listEl.insertBefore(el, listEl.children[i] || null);
+      }
     });
 
     updateStats();
   }
 
+  // Guard stats so we only write when values change (avoid paint thrash)
+  var prevStats = {};
   function updateStats() {
     var total = tasks.length, done = 0, active = 0, blocked = 0;
     tasks.forEach(function(t) {
@@ -346,11 +399,13 @@
       else if (t.status === 'progress') active++;
       else if (t.status === 'blocked' || t.status === 'healing' || t.status === 'diagnosing') blocked++;
     });
-    document.getElementById('stat-total').textContent = total;
-    document.getElementById('stat-done').textContent = done;
-    document.getElementById('stat-active').textContent = active;
-    document.getElementById('stat-blocked').textContent = blocked;
-    document.getElementById('stat-healed').textContent = healedCount;
+    var next = { total:total, done:done, active:active, blocked:blocked, healed:healedCount };
+    if (next.total !== prevStats.total) document.getElementById('stat-total').textContent = total;
+    if (next.done !== prevStats.done) document.getElementById('stat-done').textContent = done;
+    if (next.active !== prevStats.active) document.getElementById('stat-active').textContent = active;
+    if (next.blocked !== prevStats.blocked) document.getElementById('stat-blocked').textContent = blocked;
+    if (next.healed !== prevStats.healed) document.getElementById('stat-healed').textContent = healedCount;
+    prevStats = next;
   }
 
   function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -432,14 +487,15 @@
 })();
 </script>
 <script>
-  // Admin pill visibility
-  (function(){
-    var isAdmin = new URLSearchParams(window.location.search).has('admin') || localStorage.getItem('ao_admin') === '1';
-    if (isAdmin) {
-      var pill = document.getElementById('admin-pill');
-      if (pill) pill.classList.add('visible');
-    }
-  })();
+  // Admin gate
+  function isAdmin() {
+    return new URLSearchParams(window.location.search).has('admin') ||
+           localStorage.getItem('ao_admin') === '1';
+  }
+  if (isAdmin()) {
+    var pill = document.getElementById('admin-pill');
+    if (pill) pill.classList.add('visible');
+  }
 </script>
 
 </body>

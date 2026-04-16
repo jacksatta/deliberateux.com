@@ -72,6 +72,10 @@ AO is the internal operations layer hosted at `deliberateux.com/ao/*` and backed
 - `/ao/onboard.html` — Organization setup wizard
 - `/ao/configure.html` — Configuration page
 - `/ao/dashboard.html` — Admin dashboard
+- `/ao/queue.html` — Live work queue (simulated tasks, auto-heal)
+
+### AO — Open Requests (for cowork review)
+- **`/ao/REQUEST-admin-flow.md`** (2026-04-16) — four items pending: (1) queue.html flashing fix via keyed DOM diff; (2) seeded CS task missing `blockedAt` so auto-heal never fires (queue.html:261–265); (3) onboard → configure should finish with a working “Launch <Org>” link to a real `/ao/org/<slug>/` surface; (4) admin dashboard needs review-my-orgs list + CS-assist backdoor into other customer orgs (agent-mediated preferred, no raw PII). Read the request doc before starting any of these.
 
 ### AO Work Tracker (.xlsx — primary)
 - **File:** `ao-work-tracker.xlsx` (Sheet ID: `11ikRhmCsG3f8bXg0iMbxnH7pDIQ1x0_X`)

@@ -991,8 +991,12 @@
       document.querySelectorAll('.ao-reveal').forEach(function (el) { el.classList.add('in'); });
     }
 
-    // ── Admin detection ───────────────────────────────────
-    if (new URLSearchParams(window.location.search).has('admin') || localStorage.getItem('ao_admin') === '1') {
+    // ── Admin gate ────────────────────────────────────────
+    function isAdmin() {
+      return new URLSearchParams(window.location.search).has('admin') ||
+             localStorage.getItem('ao_admin') === '1';
+    }
+    if (isAdmin()) {
       localStorage.setItem('ao_admin', '1');
       document.getElementById('admin-pill').classList.add('visible');
     }
