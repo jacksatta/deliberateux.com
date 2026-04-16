@@ -63,6 +63,36 @@ Layered overlap — each layer starts halfway through the previous, total ~3s:
 - Section-head reveals first; card group has `transition-delay: 120ms` for stagger
 - To retune: edit delay/duration values in the cinematic block in styles.css
 
+## AO — Agent Operations System
+
+AO is the internal operations layer hosted at `deliberateux.com/ao/*` and backed by VPS services at `100.71.12.80`.
+
+### AO Pages (GitHub Pages)
+- `/ao/index.html` — AO landing page
+- `/ao/onboard.html` — Organization setup wizard
+- `/ao/configure.html` — Configuration page
+- `/ao/dashboard.html` — Admin dashboard
+
+### AO Work Tracker (.xlsx — primary)
+- **File:** `ao-work-tracker.xlsx` (Sheet ID: `11ikRhmCsG3f8bXg0iMbxnH7pDIQ1x0_X`)
+- **Location:** Google Drive → `projects/work/2026/Tools and Inventory/`
+- **Brand colors:** BG_DARK=#1A1A2E, BG_SURFACE=#222240, ACCENT_AMBER=#C47A2A, ACCENT_PURPLE=#A78BFA, ACCENT_GREEN=#4ADE80, TEXT_PRIMARY=#F0ECE4, TEXT_SECONDARY=#9CA3AF
+- **Column H (URL Pattern)** is the CTA column — cells with HYPERLINK formulas are styled as clickable CTAs (white bg, purple #A78BFA bold text).
+- **Columns:** #, Feature/Deliverable, Status, Access, Details, File(s), Port, URL Pattern (H, CTA), Date
+- **Sheet structure:** Row 6 = section header, Row 7 = column headers, Rows 8–15 = public items (7 items)
+- Hyperlink cells: H8, H9, H10, H11, H14, H15
+- Non-link cells: H12 (GA4, "—"), H13 (Tailscale, "*.ts.net")
+
+### AO Work Tracker (native Google Sheet — secondary)
+- **Sheet ID:** `1EsFuYOYLa3VTaK80-GGEt7OVs21HHYEGiwARlOKIA4Y`
+- **Sheet structure:** Rows 1–3 title, Rows 7–14 public items, Rows 18–26 admin items, Row 28+ infrastructure
+- Hyperlink cells: H7–H10, H13–H14, H18–H21, H23
+
+### AO VPS Services
+- Theme Studio: `:18794` (theme-studio.html, ts.html, design-system.html)
+- AO CRM: `:18800` (/api/inbound, /api/leads)
+- Cloudflare Email Routing: deliberateux.com email → routing rules
+
 ## Preferred Workflow
 - No need to confirm routine actions (commit, push, file edits)
 - Push automatically after committing

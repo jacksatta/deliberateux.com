@@ -53,6 +53,9 @@
     .ao-nav-links a:hover,.ao-nav-links a.current{color:var(--text)}
     .ao-nav-cta{font-size:0.8rem;font-weight:600;padding:6px 14px;border-radius:8px;background:rgba(var(--c-admin),0.12);border:1px solid rgba(var(--c-admin),0.25);color:rgb(var(--c-admin));text-decoration:none;transition:all 0.2s;white-space:nowrap}
     .ao-nav-cta:hover{background:rgba(var(--c-admin),0.22)}
+    .ao-nav-admin{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;padding:4px 10px;border-radius:6px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);color:rgb(245,158,11);margin-left:12px;display:none;align-items:center;text-decoration:none;transition:all 0.2s}
+    .ao-nav-admin.visible{display:inline-flex}
+    .ao-nav-admin:hover{background:rgba(245,158,11,0.2)}
 
     /* ── Layout ───────────────────────────────────────── */
     .container{width:min(var(--max),calc(100% - 48px));margin:0 auto}
@@ -133,11 +136,12 @@
       <a href="/ao/" class="ao-nav-logo"><span class="ao-nav-dot"></span>AO<span class="ao-nav-context">/ Queue</span></a>
       <div class="ao-nav-links">
         <a href="/ao/">Overview</a>
+        <a href="/ao/onboard.html">Get started</a>
         <a href="/ao/configure.html">Configure</a>
         <a href="/ao/queue.html" class="current">Queue</a>
-        <a href="/ao/dashboard.html">Dashboard</a>
       </div>
-      <a href="/ao/#request-access" class="ao-nav-cta">Request access</a>
+      <a href="/ao/onboard.html" class="ao-nav-cta">Get started</a>
+      <a href="/ao/dashboard.html" class="ao-nav-admin" id="admin-pill">Admin</a>
     </div>
   </nav>
 
@@ -426,6 +430,16 @@
   setInterval(injectTask, 6000 + Math.random() * 4000);
 
 })();
+</script>
+<script>
+  // Admin pill visibility
+  (function(){
+    var isAdmin = new URLSearchParams(window.location.search).has('admin') || localStorage.getItem('ao_admin') === '1';
+    if (isAdmin) {
+      var pill = document.getElementById('admin-pill');
+      if (pill) pill.classList.add('visible');
+    }
+  })();
 </script>
 
 </body>

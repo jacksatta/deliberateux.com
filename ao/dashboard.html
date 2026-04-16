@@ -207,6 +207,37 @@
     .empty-state h3 { font-size: 1rem; font-weight: 600; color: var(--muted); margin: 0 0 8px; }
     .empty-state p { font-size: 0.875rem; margin: 0 0 20px; }
 
+    /* ── Services ────────────────────────────────────────── */
+    .services-section { margin-bottom: 40px; }
+    .section-label {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--faint); margin-bottom: 14px;
+    }
+    .svc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 10px;
+    }
+    .svc-card {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 14px 16px;
+      display: flex; align-items: center; gap: 12px;
+      transition: border-color 0.2s var(--ease);
+      text-decoration: none;
+    }
+    .svc-card:hover { border-color: var(--border2); }
+    .svc-dot {
+      width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+    }
+    .svc-dot.online { background: rgb(var(--green)); box-shadow: 0 0 6px rgba(var(--green),0.5); }
+    .svc-dot.offline { background: rgb(var(--pink)); box-shadow: 0 0 6px rgba(var(--pink),0.4); }
+    .svc-dot.na { background: var(--ghost); }
+    .svc-info { flex: 1; min-width: 0; }
+    .svc-name { font-size: 0.84rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .svc-desc { font-size: 0.7rem; color: var(--faint); font-family: var(--mono); margin-top: 1px; }
+    .svc-arrow { color: var(--ghost); font-size: 0.8rem; flex-shrink: 0; transition: color 0.2s; }
+    .svc-card:hover .svc-arrow { color: var(--muted); }
+
     /* ── Footer ──────────────────────────────────────────── */
     .dash-footer {
       border-top: 1px solid var(--hairline); padding: 20px 0;
@@ -232,8 +263,9 @@
       </a>
       <div class="ao-nav-links">
         <a href="/ao/">Overview</a>
-        <a href="/ao/onboard.html">New org</a>
+        <a href="/ao/onboard.html">Get started</a>
         <a href="/ao/configure.html">Configure</a>
+        <a href="/ao/queue.html">Queue</a>
         <a href="/ao/dashboard.html" class="current">Dashboard</a>
       </div>
       <span class="ao-nav-admin">Admin</span>
@@ -259,8 +291,13 @@
 
     <div class="org-grid" id="org-grid"></div>
 
+    <div class="services-section">
+      <div class="section-label">Services</div>
+      <div class="svc-grid" id="svc-grid"></div>
+    </div>
+
     <footer class="dash-footer">
-      <div><a href="/ao/">AO Overview</a> · <a href="/">deliberateux.com</a></div>
+      <div><a href="/ao/">AO Overview</a> · <a href="/ao/queue.html">Queue</a> · <a href="/">deliberateux.com</a></div>
       <span class="admin-badge">Admin</span>
     </footer>
 
@@ -340,6 +377,45 @@
     function escHtml(str) {
       return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
+
+    // ── Services panel ────────────────────────────────────
+    var SERVICES = [
+      { name:'Theme Studio',   desc:':18794', url:'http://100.71.12.80:18794/theme-studio.html', probe:true },
+      { name:'Design System',  desc:':18794', url:'http://100.71.12.80:18794/design-system.html', probe:true },
+      { name:'Demo Mode',      desc:'Guest-safe', url:'http://100.71.12.80:18794/ts.html?demo=true', probe:true },
+      { name:'CRM API',        desc:':18800', url:'http://100.71.12.80:18800/api/leads', probe:true },
+      { name:'Work Queue',     desc:'AO page', url:'/ao/queue.html', status:'online' },
+      { name:'Contact Form',   desc:':18794', url:'http://100.71.12.80:18794/contact.html', probe:true },
+      { name:'Pricing',        desc:':18794', url:'http://100.71.12.80:18794/pricing.html', probe:true },
+      { name:'GA4 Analytics',  desc:'G-9MSXWF3TX3', url:'https://analytics.google.com/', status:'na' },
+    ];
+
+    var svcGrid = document.getElementById('svc-grid');
+    SERVICES.forEach(function(svc, i) {
+      var dotClass = svc.status === 'na' ? 'na' : (svc.status === 'online' ? 'online' : 'na');
+      var card = document.createElement('a');
+      card.className = 'svc-card';
+      card.href = svc.url;
+      card.target = svc.url.startsWith('/') ? '_self' : '_blank';
+      card.rel = 'noopener';
+      card.id = 'svc-' + i;
+      card.innerHTML =
+        '<span class="svc-dot ' + dotClass + '" id="svc-dot-' + i + '"></span>' +
+        '<div class="svc-info"><div class="svc-name">' + escHtml(svc.name) + '</div>' +
+        '<div class="svc-desc">' + escHtml(svc.desc) + '</div></div>' +
+        '<span class="svc-arrow">→</span>';
+      svcGrid.appendChild(card);
+
+      // Probe VPS services (best-effort, CORS may block)
+      if (svc.probe) {
+        var dot = card.querySelector('.svc-dot');
+        var controller = new AbortController();
+        var timer = setTimeout(function(){ controller.abort(); }, 3000);
+        fetch(svc.url, { mode:'no-cors', signal:controller.signal })
+          .then(function(){ clearTimeout(timer); dot.className = 'svc-dot online'; })
+          .catch(function(){ clearTimeout(timer); dot.className = 'svc-dot offline'; });
+      }
+    });
   </script>
 
 </body>
