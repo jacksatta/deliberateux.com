@@ -878,13 +878,25 @@
           render();
         });
       });
-      // Remove role
+      // Remove role (with warning if flows exist)
       document.querySelectorAll('.role-remove').forEach(btn => {
         btn.addEventListener('click', () => {
           const id = btn.dataset.role;
+          const roleName = ROLE_CATALOG[id] ? ROLE_CATALOG[id].name : id;
+          // Check if this role is used in any saved flow
+          const flowKeys = Object.keys(localStorage).filter(k => k.startsWith('ao_flow'));
+          let inFlows = 0;
+          flowKeys.forEach(k => {
+            try {
+              const f = JSON.parse(localStorage.getItem(k));
+              if (f && f.nodes && f.nodes.some(n => n.roleId === id)) inFlows++;
+            } catch(e) {}
+          });
+          if (inFlows > 0) {
+            if (!confirm(roleName + ' is used in ' + inFlows + ' saved flow' + (inFlows > 1 ? 's' : '') + '. Removing this role may break those workflows.\n\nRemove anyway?')) return;
+          }
           state.roles = state.roles.filter(r => r !== id);
           delete state.operators[id];
-          // Clear active template
           document.querySelectorAll('.tpl-btn').forEach(b => b.classList.remove('active'));
           render();
         });
@@ -966,7 +978,7 @@
         if (ctaBody) ctaBody.textContent = 'Save this config to lock it in, then launch your org to see agents, tasks, and links.';
         if (ctaPrimary) {
           ctaPrimary.textContent = 'Launch ' + displayName + ' →';
-          ctaPrimary.href = '/ao/org.html?slug=' + encodeURIComponent(orgSlug);
+          ctaPrimary.href = '/ao/flows.html?slug=' + encodeURIComponent(orgSlug);
         }
         var runBtn = document.getElementById('admin-run-btn');
         if (runBtn) {

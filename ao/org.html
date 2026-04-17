@@ -502,11 +502,23 @@
       html += '  </div>';
 
       // Action bar
+      var canvasUrl = '/ao/flows.html?slug=' + encodeURIComponent(org.slug);
       html += '  <div class="org-actions-bar">';
-      html += '    <a class="btn-primary" href="/ao/queue.html">Open queue</a>';
+      html += '    <a class="btn-primary" href="' + canvasUrl + '">Open workspace</a>';
+      html += '    <a class="btn-secondary" href="/ao/queue.html">Queue</a>';
       html += '    <a class="btn-secondary" href="/ao/configure.html?org=' + encodeURIComponent(org.slug) + '&admin=1">Edit config</a>';
-      html += '    <a class="btn-secondary" href="/ao/dashboard.html">Back to dashboard</a>';
+      html += '    <a class="btn-secondary" href="/ao/dashboard.html">Dashboard</a>';
       html += '  </div>';
+      html += '</div>';
+
+      // ── Mini canvas preview ─────────────────────────
+      html += '<div class="section-label" style="display:flex;align-items:center;justify-content:space-between">';
+      html += '  <span>Workspace</span>';
+      html += '  <a href="' + canvasUrl + '" style="font-size:0.72rem;font-weight:600;color:rgb(var(--purple));text-decoration:none;text-transform:none;letter-spacing:0">Open full canvas →</a>';
+      html += '</div>';
+      html += '<div style="border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;height:280px;position:relative;background:var(--panel)">';
+      html += '  <iframe src="' + canvasUrl + '" style="width:100%;height:100%;border:none;pointer-events:none;opacity:0.85" loading="lazy"></iframe>';
+      html += '  <a href="' + canvasUrl + '" style="position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.15);opacity:0;transition:opacity 0.2s;text-decoration:none;color:var(--text);font-weight:600;font-size:0.9rem" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">Open workspace →</a>';
       html += '</div>';
 
       // ── Agents section ──────────────────────────────
