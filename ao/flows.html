@@ -357,6 +357,25 @@
     .canvas-hint.hidden{opacity:0}
     .canvas-hint h3{font-size:1.05rem;font-weight:600;margin:0 0 5px;color:var(--faint)}
     .canvas-hint p{font-size:0.82rem;margin:0}
+    /* ── BETA badge ──────────────────────── */
+    .beta-pill{font-size:0.5rem;font-weight:700;padding:1px 5px;border-radius:3px;background:rgba(251,191,36,0.15);color:rgb(251,191,36);margin-left:4px;letter-spacing:.04em;vertical-align:middle}
+    .insp-tab .beta-pill{font-size:0.45rem;padding:0 3px;margin-left:3px}
+    .trig-type-block{margin-top:8px;padding-top:8px;border-top:1px solid var(--hairline)}
+    .trig-type-block .insp-field{margin-bottom:10px}
+    .insp-curl{font-family:var(--mono);font-size:0.62rem;padding:6px 8px;border-radius:5px;background:var(--panel2);border:1px solid var(--border);color:var(--faint);word-break:break-all;line-height:1.4}
+    .insp-preview{font-size:0.68rem;color:var(--muted);padding:4px 8px;border-radius:5px;background:rgba(var(--green),0.06);border:1px solid rgba(var(--green),0.15);margin-top:4px}
+    .var-unresolved{color:rgb(var(--red));opacity:0.7}
+    .var-scope-header{font-size:0.58rem;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin:8px 0 4px;display:flex;align-items:center;gap:5px}
+    .var-scope-count{font-size:0.48rem;padding:0 4px;border-radius:3px;background:var(--panel2);color:var(--ghost)}
+    .gate-buttons{display:flex;gap:8px;margin-top:6px}
+    .gate-btn{font-family:var(--font);font-size:0.72rem;font-weight:600;padding:6px 14px;border-radius:6px;border:none;cursor:pointer;transition:all .12s}
+    .gate-btn.approve{background:rgba(var(--green),0.15);color:rgb(var(--green));border:1px solid rgba(var(--green),0.3)}
+    .gate-btn.approve:hover{background:rgba(var(--green),0.25)}
+    .gate-btn.reject{background:rgba(var(--red),0.12);color:rgb(var(--red));border:1px solid rgba(var(--red),0.25)}
+    .gate-btn.reject:hover{background:rgba(var(--red),0.22)}
+    .runner-eval{font-family:var(--mono);font-size:0.65rem;padding:4px 7px;border-radius:4px;margin-top:4px}
+    .runner-eval.true{background:rgba(var(--green),0.1);color:rgb(var(--green))}
+    .runner-eval.false{background:rgba(var(--red),0.1);color:rgb(var(--red))}
     @media(max-width:700px){.sidebar{width:200px}.cnode.agent-node{width:160px}}
   </style>
 </head>
@@ -370,7 +389,7 @@
     <button class="tb-btn tpl" id="btn-tpl">Templates</button>
     <button class="tb-btn" id="btn-clear">Clear</button>
     <button class="tb-btn save" id="btn-save">Save</button>
-    <button class="tb-btn run" id="btn-run">Run ▶</button>
+    <button class="tb-btn run" id="btn-run">Run ▶ <span class="beta-pill">BETA</span></button>
   </div>
   <div class="body">
     <div class="sidebar" id="sidebar">
@@ -903,12 +922,12 @@
     var nc=getNC(node.id);
     // Build tabs + body based on type
     var tabs=[],sections=[];
-    tabs.push({id:'config',label:'Configure'});
-    tabs.push({id:'io',label:'Variables'});
-    tabs.push({id:'notes',label:'Notes'});
+    tabs.push({id:'config',label:'Configure',beta:false});
+    tabs.push({id:'io',label:'Variables',beta:true});
+    tabs.push({id:'notes',label:'Notes',beta:false});
     inspTabs.innerHTML='';
     tabs.forEach(function(t,i){
-      var btn=document.createElement('button');btn.className='insp-tab'+(i===0?' active':'');btn.textContent=t.label;btn.dataset.tab=t.id;
+      var btn=document.createElement('button');btn.className='insp-tab'+(i===0?' active':'');btn.innerHTML=escH(t.label)+(t.beta?'<span class="beta-pill">BETA</span>':'');btn.dataset.tab=t.id;
       btn.addEventListener('click',function(){inspTabs.querySelectorAll('.insp-tab').forEach(function(b){b.classList.remove('active')});btn.classList.add('active');inspBody.querySelectorAll('.insp-section').forEach(function(s){s.classList.remove('active')});document.getElementById('insp-s-'+t.id).classList.add('active')});
       inspTabs.appendChild(btn);
     });
@@ -926,6 +945,24 @@
     notesSec.innerHTML='<div class="insp-field"><div class="insp-field-label">Custom label</div><input id="insp-label" placeholder="Override display name" value="'+escH(nc.label)+'" /></div><div class="insp-field"><div class="insp-field-label">Notes</div><textarea id="insp-notes" rows="4" placeholder="Internal notes about this node...">'+escH(nc.notes)+'</textarea></div>';
     inspBody.appendChild(notesSec);
     inspEl.classList.add('v');
+    // Wire trigger-type toggle for Start nodes
+    setTimeout(function(){
+      var trigSel=document.getElementById('insp-trigType');
+      if(trigSel){
+        trigSel.addEventListener('change',function(){
+          inspBody.querySelectorAll('.trig-type-block').forEach(function(b){b.style.display='none'});
+          var active=inspBody.querySelector('.trig-type-block[data-trig="'+trigSel.value+'"]');
+          if(active)active.style.display='block';
+        });
+      }
+      var cronInput=document.getElementById('insp-cron');
+      if(cronInput){
+        cronInput.addEventListener('input',function(){
+          var prev=document.getElementById('insp-cron-preview');if(prev)prev.textContent=cronPreview(cronInput.value);
+          var next=document.getElementById('insp-cron-next');if(next)next.textContent=cronNextRun(cronInput.value);
+        });
+      }
+    },60);
   }
 
   function closeInspector(){
@@ -1005,7 +1042,36 @@
     } else if(node.type==='endpoint'){
       if(node.itemId==='ep-start'){
         h+='<div class="insp-field"><div class="insp-field-label">Input schema</div><textarea data-ncfield="inputSchema" rows="3" placeholder="name: string\nemail: string\ncompany: string">'+escH(nc.fields.inputSchema||'')+'</textarea></div>';
-        h+='<div class="insp-field"><div class="insp-field-label">Trigger type</div><select data-ncfield="trigType"><option'+(nc.fields.trigType==='manual'||!nc.fields.trigType?' selected':'')+'>Manual</option><option'+(nc.fields.trigType==='webhook'?' selected':'')+'>Webhook</option><option'+(nc.fields.trigType==='schedule'?' selected':'')+'>Schedule</option><option'+(nc.fields.trigType==='event'?' selected':'')+'>Event</option></select></div>';
+        var tt=nc.fields.trigType||'manual';
+        h+='<div class="insp-field"><div class="insp-field-label">Trigger type</div><select data-ncfield="trigType" id="insp-trigType"><option value="manual"'+(tt==='manual'?' selected':'')+'>Manual</option><option value="webhook"'+(tt==='webhook'?' selected':'')+'>Webhook</option><option value="schedule"'+(tt==='schedule'?' selected':'')+'>Schedule</option><option value="event"'+(tt==='event'?' selected':'')+'>Event</option></select></div>';
+        // Manual
+        h+='<div class="trig-type-block" data-trig="manual"'+(tt!=='manual'?' style="display:none"':'')+'>';
+        h+='<div class="insp-field"><div class="insp-field-label">Button label</div><input data-ncfield="manualLabel" value="'+escH(nc.fields.manualLabel||'Start flow')+'" /></div>';
+        h+='<div class="insp-field"><div class="insp-field-label">Description</div><input data-ncfield="manualDesc" placeholder="What does clicking this do?" value="'+escH(nc.fields.manualDesc||'')+'" /></div>';
+        h+='</div>';
+        // Webhook
+        var flowSlug=ftInput.value.toLowerCase().replace(/[^a-z0-9]+/g,'-')||'untitled';
+        var whUrl=nc.fields.webhookUrl||'/api/flows/'+flowSlug+'/trigger';
+        var whMethod=nc.fields.webhookMethod||'POST';
+        h+='<div class="trig-type-block" data-trig="webhook"'+(tt!=='webhook'?' style="display:none"':'')+'>';
+        h+='<div class="insp-field"><div class="insp-field-label">Endpoint URL</div><input data-ncfield="webhookUrl" value="'+escH(whUrl)+'" style="font-family:var(--mono);font-size:0.7rem" /></div>';
+        h+='<div class="insp-field"><div class="insp-field-label">Method</div><select data-ncfield="webhookMethod"><option value="POST"'+(whMethod==='POST'?' selected':'')+'>POST</option><option value="GET"'+(whMethod==='GET'?' selected':'')+'>GET</option><option value="PUT"'+(whMethod==='PUT'?' selected':'')+'>PUT</option></select></div>';
+        h+='<div class="insp-field"><div class="insp-field-label">Auth header</div><input data-ncfield="webhookAuth" value="'+escH(nc.fields.webhookAuth||'')+'" placeholder="Bearer $FLOW_SECRET" /></div>';
+        h+='<div class="insp-field"><div class="insp-field-label">Sample cURL</div><div class="insp-curl" id="insp-curl">curl -X '+escH(whMethod)+' '+escH(whUrl)+' \\\n  -H "Content-Type: application/json" \\\n  -d \'{"name":"test","email":"test@co.com"}\'</div></div>';
+        h+='</div>';
+        // Schedule
+        var sCron=nc.fields.scheduleCron||'0 9 * * 1-5';
+        h+='<div class="trig-type-block" data-trig="schedule"'+(tt!=='schedule'?' style="display:none"':'')+'>';
+        h+='<div class="insp-field"><div class="insp-field-label">Cron expression</div><input data-ncfield="scheduleCron" id="insp-cron" value="'+escH(sCron)+'" placeholder="0 9 * * 1-5" style="font-family:var(--mono)" /></div>';
+        h+='<div class="insp-preview" id="insp-cron-preview">'+cronPreview(sCron)+'</div>';
+        h+='<div class="insp-field" style="margin-top:8px"><div class="insp-field-label">Next run</div><div class="insp-preview" id="insp-cron-next" style="background:rgba(var(--blue),0.06);border-color:rgba(var(--blue),0.15)">'+cronNextRun(sCron)+'</div></div>';
+        h+='<div class="insp-field"><div class="insp-field-label">Timezone</div><input data-ncfield="scheduleTz" value="'+escH(nc.fields.scheduleTz||'America/New_York')+'" /></div>';
+        h+='</div>';
+        // Event
+        h+='<div class="trig-type-block" data-trig="event"'+(tt!=='event'?' style="display:none"':'')+'>';
+        h+='<div class="insp-field"><div class="insp-field-label">Event name</div><input data-ncfield="eventName" placeholder="e.g. user.signup, order.complete" value="'+escH(nc.fields.eventName||'')+'" /></div>';
+        h+='<div class="insp-field"><div class="insp-field-label">Filter</div><textarea data-ncfield="eventFilter" rows="2" placeholder="e.g. event.source === \'web\' && event.value > 100">'+escH(nc.fields.eventFilter||'')+'</textarea></div>';
+        h+='</div>';
       } else {
         h+='<div class="insp-field"><div class="insp-field-label">Output schema</div><textarea data-ncfield="outputSchema" rows="3" placeholder="status: success | error\nrecords_created: number">'+escH(nc.fields.outputSchema||'')+'</textarea></div>';
         h+='<div class="insp-field"><div class="insp-field-label">On complete</div><select data-ncfield="onComplete"><option'+(nc.fields.onComplete==='return'||!nc.fields.onComplete?' selected':'')+'>Return result</option><option'+(nc.fields.onComplete==='webhook'?' selected':'')+'>Call webhook</option><option'+(nc.fields.onComplete==='notify'?' selected':'')+'>Send notification</option></select></div>';
@@ -1015,30 +1081,88 @@
   }
 
   function buildIOFields(node,item){
-    var h='<div style="margin-bottom:10px;font-size:0.7rem;color:var(--muted)">Variables available at this node during execution.</div>';
-    // Inbound variables (from connected inputs)
-    var inConns=conns.filter(function(c){return c.toId===node.id});
+    var h='<div style="margin-bottom:10px;font-size:0.7rem;color:var(--muted)">Variables in scope at this node during execution.</div>';
+    // Trace all upstream variables via reverse BFS
+    function traceUpstream(){
+      var vars=[],visited={},queue=[node.id];
+      while(queue.length){
+        var nid2=queue.shift();if(visited[nid2])continue;visited[nid2]=true;
+        var incoming=conns.filter(function(c){return c.toId===nid2});
+        incoming.forEach(function(c){
+          var srcNode=nodes.find(function(n){return n.id===c.fromId});
+          if(srcNode){queue.push(srcNode.id);
+            var srcItem=lookupItem(srcNode.itemId,srcNode.type);
+            (c.logic.dataMap||[]).forEach(function(m){
+              var t='string';if(m.to.indexOf('score')>=0||m.to.indexOf('count')>=0||m.to.indexOf('id')>=0)t='number';
+              if(m.to.indexOf('data')>=0||m.to.indexOf('payload')>=0||m.to.indexOf('record')>=0)t='object';
+              vars.push({name:m.to,from:m.from,src:srcItem?srcItem.name:'?',type:t,direct:nid2===node.id});
+            });
+          }
+        });
+      }
+      return vars;
+    }
+    var upVars=traceUpstream();
+    var directVars=upVars.filter(function(v){return v.direct});
+    var inheritedVars=upVars.filter(function(v){return!v.direct});
     var outConns=conns.filter(function(c){return c.fromId===node.id});
-    if(inConns.length){
-      h+='<div style="margin-bottom:6px;font-size:0.62rem;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.06em">Inputs</div>';
-      inConns.forEach(function(c){
-        var fn=nodes.find(function(n){return n.id===c.fromId}),fi=fn?lookupItem(fn.itemId,fn.type):null;
-        (c.logic.dataMap||[]).forEach(function(m){
-          h+='<div class="insp-var-row"><span class="insp-var-dir in">IN</span><span class="insp-var-name">'+escH(m.to)+'</span><span class="insp-var-type">from '+(fi?fi.name:'?')+'</span></div>';
-        });
+    // Direct inputs
+    h+='<div class="var-scope-header">Direct inputs <span class="var-scope-count">'+directVars.length+'</span></div>';
+    if(directVars.length){directVars.forEach(function(v){
+      h+='<div class="insp-var-row"><span class="insp-var-dir in">IN</span><span class="insp-var-name">$'+escH(v.name)+'</span><span class="insp-var-type" style="font-size:0.55rem">'+escH(v.type)+' · from '+escH(v.src)+'</span></div>';
+    })}else{h+='<div style="color:var(--ghost);font-size:0.68rem;padding:2px 0">No direct inputs connected.</div>'}
+    // Inherited (upstream)
+    if(inheritedVars.length){
+      h+='<div class="var-scope-header" style="margin-top:10px">Inherited (upstream) <span class="var-scope-count">'+inheritedVars.length+'</span></div>';
+      inheritedVars.forEach(function(v){
+        h+='<div class="insp-var-row" style="opacity:0.7"><span class="insp-var-dir in" style="background:rgba(var(--purple),0.1);color:rgba(var(--purple),0.7)">UP</span><span class="insp-var-name">$'+escH(v.name)+'</span><span class="insp-var-type" style="font-size:0.55rem">'+escH(v.type)+' · via '+escH(v.src)+'</span></div>';
       });
     }
-    if(outConns.length){
-      h+='<div style="margin:10px 0 6px;font-size:0.62rem;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.06em">Outputs</div>';
-      outConns.forEach(function(c){
-        var tn=nodes.find(function(n){return n.id===c.toId}),ti=tn?lookupItem(tn.itemId,tn.type):null;
-        (c.logic.dataMap||[]).forEach(function(m){
-          h+='<div class="insp-var-row"><span class="insp-var-dir out">OUT</span><span class="insp-var-name">'+escH(m.from)+'</span><span class="insp-var-type">to '+(ti?ti.name:'?')+'</span></div>';
-        });
+    // Check for unresolved references in conditions
+    var nc=getNC(node.id),refs=[];
+    var allText=(nc.fields.condition||'')+(nc.fields.filter||'')+(nc.fields.loopCond||'');
+    var refMatch=allText.match(/\b(input|lead|customer|event|payload)\.\w+/g);
+    if(refMatch){
+      var knownNames=upVars.map(function(v){return v.name});
+      refMatch.forEach(function(r){
+        var short=r.split('.')[1];
+        if(knownNames.indexOf(short)===-1&&knownNames.indexOf(r)===-1)refs.push(r);
       });
+      if(refs.length){
+        h+='<div class="var-scope-header" style="margin-top:10px;color:rgb(var(--amber))">⚠ Unresolved refs <span class="var-scope-count" style="background:rgba(var(--amber),0.15);color:rgb(var(--amber))">'+refs.length+'</span></div>';
+        refs.forEach(function(r){h+='<div class="insp-var-row var-unresolved"><span style="font-size:0.55rem;color:rgb(var(--amber))">?</span><span class="insp-var-name" style="color:rgb(var(--amber))">$'+escH(r)+'</span><span class="insp-var-type">not found in upstream</span></div>'});
+      }
     }
-    if(!inConns.length&&!outConns.length){h+='<div style="color:var(--ghost);font-size:0.72rem;padding:10px 0">Connect this node to see variable flow.</div>'}
+    // Outputs
+    h+='<div class="var-scope-header" style="margin-top:10px">Outputs <span class="var-scope-count">'+outConns.length+'</span></div>';
+    if(outConns.length){outConns.forEach(function(c){
+      var tn=nodes.find(function(n){return n.id===c.toId}),ti=tn?lookupItem(tn.itemId,tn.type):null;
+      (c.logic.dataMap||[]).forEach(function(m){
+        h+='<div class="insp-var-row"><span class="insp-var-dir out">OUT</span><span class="insp-var-name">$'+escH(m.from)+'</span><span class="insp-var-type" style="font-size:0.55rem">to '+(ti?ti.name:'?')+'</span></div>';
+      });
+    })}else{h+='<div style="color:var(--ghost);font-size:0.68rem;padding:2px 0">No outgoing connections.</div>'}
     return h;
+  }
+
+  // ── Cron helpers ──────────────────────────────────────
+  function cronPreview(cron){
+    if(!cron)return'—';var p=(cron||'').trim().split(/\s+/);if(p.length<5)return'Invalid cron';
+    var min=p[0],hr=p[1],dom=p[2],mon=p[3],dow=p[4];
+    var dayNames={0:'Sun',1:'Mon',2:'Tue',3:'Wed',4:'Thu',5:'Fri',6:'Sat'};
+    var desc='';
+    if(dow==='1-5')desc='Every weekday';else if(dow==='0,6')desc='Weekends';else if(dow==='*')desc=dom==='*'?'Every day':'Day '+dom;else desc='On '+dow.split(',').map(function(d){return dayNames[d]||d}).join(', ');
+    if(hr!=='*'){var h=parseInt(hr),ampm=h>=12?'PM':'AM',h12=h%12||12;desc+=' at '+h12+':'+(min==='0'?'00':min)+' '+ampm}
+    else if(min!=='*')desc+=' every hour at :'+('0'+min).slice(-2);
+    if(mon!=='*')desc+=' in month '+mon;
+    return desc;
+  }
+  function cronNextRun(cron){
+    if(!cron)return'—';var p=(cron||'').trim().split(/\s+/);if(p.length<5)return'—';
+    var now=new Date(),hr=parseInt(p[1])||9,min=parseInt(p[0])||0;
+    var next=new Date(now);next.setHours(hr,min,0,0);
+    if(next<=now)next.setDate(next.getDate()+1);
+    if(p[4]==='1-5'){while(next.getDay()===0||next.getDay()===6)next.setDate(next.getDate()+1)}
+    return next.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})+' '+next.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
   }
 
   // ── Templates ─────────────────────────────────────────
@@ -1078,11 +1202,44 @@
         10:{title:'Customer → Welcome Email',desc:'Send welcome email with onboarding links',sla:'immediate',dataMap:[{from:'customer.email',to:'to'},{from:'customer.name',to:'greeting'}]},
         11:{title:'CRM → Slack Notify',desc:'Notify #new-customers channel',sla:'immediate',dataMap:[{from:'customer.name',to:'message.title'},{from:'customer.tier',to:'message.tag'}]},
         12:{title:'Slack → End',desc:'Flow complete, all systems updated',dataMap:[{from:'final_status',to:'output'}]}
+      },
+      nodeDefaults:{
+        0:{trigType:'manual',manualLabel:'Start Onboarding',manualDesc:'Manually trigger when a new lead arrives',inputSchema:'name: string\nemail: string\ncompany: string\nsource: website | referral | ads'},
+        1:{formId:'contact-form',required:'name, email, company'},
+        2:{role:'support',prompt:'You are a customer service agent. Qualify leads by checking company size (>50 employees = enterprise) and budget. Assign score: enterprise (>70), growth (40-70), starter (<40). Always check spam signals.',skills:'crm_lookup, email_validate'},
+        3:{condition:'input.score >= 70 && input.employees > 100',trueLabel:'Enterprise path',falseLabel:'Standard path'},
+        4:{role:'business',prompt:'Biz Dev: negotiate terms for enterprise accounts. Prepare SOW with pricing, timeline, and deliverables.',skills:'proposal_gen, pricing_calc'},
+        5:{schema:'title: string\nparty: string\nterms: object\nvalue_usd: number\nstatus: draft | review | signed',defaults:'{"status":"draft"}'},
+        6:{approver:'legal@company.co',timeout:'2 business days'},
+        7:{role:'orchestrator',prompt:'Admin: provision customer account, set up billing, assign CSM. Verify all systems are configured.',skills:'account_provision, billing_setup'},
+        8:{schema:'name: string\nemail: string\ntier: enterprise | growth | starter\naccount_id: string\nstatus: active | pending',defaults:'{"status":"pending"}'},
+        9:{endpoint:'/api/crm/leads',method:'POST',authType:'bearer',bodyTpl:'{"name":"$lead.name","email":"$lead.email","tier":"$tier","score":$score,"company":"$lead.company"}'},
+        10:{endpoint:'/api/email/send',method:'POST',bodyTpl:'{"to":"$customer.email","template":"welcome-onboard","vars":{"name":"$customer.name","tier":"$tier"}}'},
+        11:{endpoint:'/api/slack/message',method:'POST',bodyTpl:'{"channel":"#new-customers","text":"New $tier customer: $customer.name ($lead.company)"}'},
+        12:{outputSchema:'status: success | error\ncustomer_id: string\nrecords_created: number\nnotifications_sent: number',onComplete:'return'}
       }
     },
     {name:'Launch a product',cat:'product',icon:'🚀',desc:'Start → Admin approves, dev builds, QA verifies, marketing announces → End.',
       nodes:[{r:'ep-start',t:'endpoint',x:0,y:140},{r:'admin',t:'agent',x:170,y:140},{r:'dev',t:'agent',x:410,y:80},{r:'qa',t:'agent',x:650,y:80},{r:'mkt',t:'agent',x:410,y:240},{r:'biz-product',t:'biz',x:650,y:240},{r:'ep-end',t:'endpoint',x:860,y:160}],
-      conns:[[0,'out',1,'in'],[1,'out',2,'in'],[1,'out',4,'in'],[2,'out',3,'in'],[4,'out',5,'in'],[3,'out',6,'in'],[5,'out',6,'in']]},
+      conns:[[0,'out',1,'in'],[1,'out',2,'in'],[1,'out',4,'in'],[2,'out',3,'in'],[4,'out',5,'in'],[3,'out',6,'in'],[5,'out',6,'in']],
+      logic:{
+        0:{title:'Start → Admin Review',desc:'Product launch request submitted for approval',dataMap:[{from:'request',to:'launch_proposal'}]},
+        1:{title:'Admin → Dev',desc:'Approved: begin development sprint',condition:'proposal.approved === true',sla:'immediate',dataMap:[{from:'spec',to:'dev_task'},{from:'timeline',to:'deadline'}]},
+        2:{title:'Admin → Marketing',desc:'Brief marketing team in parallel',dataMap:[{from:'product_info',to:'campaign_brief'},{from:'target_date',to:'launch_date'}]},
+        3:{title:'Dev → QA Gate',desc:'Code complete, ready for testing',sla:'5 days',dataMap:[{from:'build_artifact',to:'test_target'},{from:'version',to:'release_candidate'}]},
+        4:{title:'Marketing → Product Listing',desc:'Campaign assets ready, product page updated',sla:'3 days',dataMap:[{from:'campaign_assets',to:'product_page'},{from:'launch_copy',to:'listing'}]},
+        5:{title:'QA → Release',desc:'All tests passed, clear to ship',condition:'test.critical_bugs === 0',sla:'2 days',fallback:'Delay launch 1 week if critical bugs found',dataMap:[{from:'test_report',to:'release_notes'},{from:'qa_sign_off',to:'go_live'}]},
+        6:{title:'Product → End',desc:'Product live, campaign active, metrics tracking',dataMap:[{from:'live_url',to:'output'}]}
+      },
+      nodeDefaults:{
+        0:{trigType:'manual',manualLabel:'Request Launch',inputSchema:'product_name: string\nversion: string\ntarget_date: date\nbudget_usd: number'},
+        1:{role:'orchestrator',prompt:'Executive review: validate market timing, budget, risk. Check: Is target_date realistic? Is budget sufficient? Approve or request changes.',skills:'calendar_check, budget_review'},
+        2:{role:'engineering',prompt:'Lead dev: coordinate feature completion, run code reviews, prepare build artifact for QA. Track scope against spec.',skills:'code_review, build_deploy, test_run'},
+        3:{role:'quality',prompt:'QA lead: execute full test plan (functional, perf, security, a11y). Produce detailed report. Gate release if critical_bugs > 0.',skills:'test_runner, perf_check, security_scan'},
+        4:{role:'marketing',prompt:'Marketing lead: create launch campaign — landing page copy, social assets, email sequence, press release. Sync timing with dev/QA.',skills:'copywriting, social_scheduler, email_campaign'},
+        5:{schema:'product_name: string\nversion: string\nstatus: draft | live\nlaunch_url: string\ndownloads: number',defaults:'{"status":"draft","downloads":0}'},
+        6:{outputSchema:'status: launched | blocked\nversion: string\nlaunch_url: string\nmetrics_dashboard: string'}
+      }},
     {name:'Ship a release',cat:'ops',icon:'📦',desc:'Start → Dev builds, QA gates, approval, Ops deploys → End.',
       nodes:[{r:'ep-start',t:'endpoint',x:0,y:150},{r:'dev',t:'agent',x:170,y:150},{r:'qa',t:'agent',x:390,y:150},{r:'op-gate',t:'op',x:590,y:150},{r:'ops',t:'agent',x:760,y:80},{r:'data',t:'agent',x:760,y:240},{r:'ep-end',t:'endpoint',x:960,y:150}],
       conns:[[0,'out',1,'in'],[1,'out',2,'in'],[2,'out',3,'in'],[3,'out',4,'in'],[3,'out',5,'in'],[4,'out',6,'in'],[5,'out',6,'in']]},
@@ -1118,6 +1275,8 @@
     _loadingTpl=true;clearCanvas();var map=[];
     t.nodes.forEach(function(n){var node=addNode(n.r,n.t,n.x,n.y);if(node)map.push(node.id);else map.push(null)});
     t.conns.forEach(function(c,i){if(map[c[0]]&&map[c[2]]){addConn(map[c[0]],c[1],map[c[2]],c[3]);if(t.logic&&t.logic[i]){var conn=conns[conns.length-1],lg=t.logic[i];conn.logic.title=lg.title||'';conn.logic.desc=lg.desc||'';conn.logic.condition=lg.condition||'';conn.logic.sla=lg.sla||'';conn.logic.fallback=lg.fallback||'';conn.logic.transform=lg.transform||'';conn.logic.dataMap=lg.dataMap||[];updConnLabel(conn)}}});
+    // Populate nodeConfigs from template defaults
+    if(t.nodeDefaults){Object.keys(t.nodeDefaults).forEach(function(idx){var nodeId=map[parseInt(idx)];if(!nodeId)return;var nc=getNC(nodeId);Object.assign(nc.fields,t.nodeDefaults[idx])})}
     _loadingTpl=false;ftInput.value=t.name;document.getElementById('tb-title').textContent='/ '+t.name;
     setTimeout(fitView,100);
   }
@@ -1148,46 +1307,127 @@
 
   function loadFlowData(data){_loadingTpl=true;clearCanvas();if(!data||!data.nodes){_loadingTpl=false;return}data.nodes.forEach(function(n){addNode(n.itemId,n.type,n.x,n.y)});if(data.nodeConfigs)nodeConfigs=JSON.parse(JSON.stringify(data.nodeConfigs));if(data.conns)data.conns.forEach(function(c){if(nodes[c[0]]&&nodes[c[2]]){addConn(nodes[c[0]].id,c[1],nodes[c[2]].id,c[3]);if(c[4]){var conn=conns[conns.length-1];try{var lg=JSON.parse(c[4]);Object.assign(conn.logic,lg);updConnLabel(conn)}catch(e){conn.logic.title=c[4]}}}});_loadingTpl=false}
 
-  // ── Run simulation (with real data + API calls) ───────
+  // ── Run simulation (with real data + condition eval) ──
   document.getElementById('btn-run').addEventListener('click',function(){
     if(running||!conns.length)return;running=true;closeInspector();closePop();
     var panel=document.getElementById('runner');panel.classList.add('v');
+    // BFS to get topological order
     var hasIn={};conns.forEach(function(c){hasIn[c.toId]=true});
     var entries=nodes.filter(function(n){return!hasIn[n.id]});if(!entries.length)entries=[nodes[0]];
     var queue=entries.map(function(n){return n.id}),visited={},order=[];
     while(queue.length){var nid2=queue.shift();if(visited[nid2])continue;visited[nid2]=true;order.push(nid2);conns.forEach(function(c){if(c.fromId===nid2&&!visited[c.toId])queue.push(c.toId)})}
-    var payload={lead:{name:'Alex Rivera',email:'alex@acme.co',company:'Acme Corp',score:82,employees:250,source:'website'},timestamp:new Date().toISOString()};
-    var step=0,total=order.length;
+    // Real test payload
+    var payload={lead:{name:'Alex Rivera',email:'alex@acme.co',company:'Acme Corp',score:82,employees:250,source:'website',tier:'enterprise'},customer:{name:'Alex Rivera',email:'alex@acme.co'},timestamp:new Date().toISOString()};
+    var step=0,stepsRun=0,skipped={},loopCounts={};
+    function finishRun(){
+      setRSt('done','Done');document.getElementById('r-node-name').textContent='Flow complete';
+      document.getElementById('r-step-label').textContent=stepsRun+' steps executed'+(Object.keys(skipped).length?' · '+Object.keys(skipped).length+' skipped':'');
+      showPayload({result:'success',records_created:3,notifications_sent:2,duration_ms:stepsRun*1600});
+      conns.forEach(function(c){c.el.classList.remove('active');c.arrowEl.classList.remove('active')});
+      nodes.forEach(function(n){n.el.classList.remove('running')});
+      setTimeout(function(){panel.classList.remove('v');running=false},3500);
+    }
+    function advanceNode(nid2){
+      node.el.classList.remove('running','selected');
+      conns.forEach(function(c){if(c.fromId===nid2){c.el.classList.remove('active');c.arrowEl.classList.remove('active')}});
+    }
     function runStep(){
-      if(step>=total){
-        setRSt('done','Done');document.getElementById('r-node-name').textContent='Flow complete';
-        document.getElementById('r-step-label').textContent=total+' steps executed';
-        showPayload({result:'success',records_created:3,notifications_sent:2,duration_ms:total*1600});
-        conns.forEach(function(c){c.el.classList.remove('active');c.arrowEl.classList.remove('active')});
-        nodes.forEach(function(n){n.el.classList.remove('running')});
-        setTimeout(function(){panel.classList.remove('v');running=false},3000);return;
-      }
+      if(step>=order.length){finishRun();return}
       var nid2=order[step],node=nodes.find(function(n){return n.id===nid2});
-      if(!node){step++;runStep();return}
+      if(!node||skipped[nid2]){step++;runStep();return}
+      stepsRun++;
       node.el.classList.add('running','selected');
       conns.forEach(function(c){if(c.fromId===nid2){c.el.classList.add('active');c.arrowEl.classList.add('active')}});
       var item=lookupItem(node.itemId,node.type),label=item?(item.abbr||item.symbol||'?'):'?',rgb=item&&item.rgb?item.rgb:'168,139,250';
       document.getElementById('r-agent').textContent=label;
       document.getElementById('r-agent').style.background='rgba('+rgb+',0.15)';document.getElementById('r-agent').style.color='rgba('+rgb+',0.9)';
       document.getElementById('r-node-name').textContent=item?item.name:'Processing';
-      document.getElementById('r-step-label').textContent='Step '+(step+1)+' of '+total;
-      if(step>0)setRSt('handoff','Handoff');setTimeout(function(){setRSt('running','Running')},350);
+      document.getElementById('r-step-label').textContent='Step '+stepsRun+' · node '+(step+1)+'/'+order.length;
+      if(stepsRun>1)setRSt('handoff','Handoff');setTimeout(function(){setRSt('running','Running')},350);
+
+      // ── IF/Branch: evaluate real condition ──
+      if(node.type==='op'&&node.itemId==='op-if'){
+        var nc=getNC(node.id),cond=nc.fields.condition||'true';
+        var condResult=false;
+        try{condResult=(new Function('input','lead','customer','payload','return '+cond))(payload,payload.lead,payload.customer,payload)}catch(e){condResult=false}
+        setRSt('running','Evaluating');
+        document.getElementById('r-data').innerHTML='<div class="r-data-line"><span class="r-data-key">condition</span>: <span class="r-data-val" style="font-size:0.62rem">'+escH(cond)+'</span></div><div class="runner-eval '+(condResult?'true':'false')+'">'+(condResult?'✓ TRUE — taking '+(nc.fields.trueLabel||'true')+' path':'✗ FALSE — taking '+(nc.fields.falseLabel||'false')+' path')+'</div>';
+        // Skip nodes on the branch NOT taken
+        var takenPort=condResult?'out':'out2',skipPort=condResult?'out2':'out';
+        var skipConn=conns.find(function(c){return c.fromId===nid2&&c.fromPort===skipPort});
+        if(skipConn){
+          // Mark all downstream from skipped branch
+          var sq=[skipConn.toId],sv={};
+          while(sq.length){var sid=sq.shift();if(sv[sid])continue;sv[sid]=true;skipped[sid]=true;
+            conns.forEach(function(c){if(c.fromId===sid)sq.push(c.toId)});}
+          // Don't skip nodes that are also reachable from the taken branch
+          var takenConn=conns.find(function(c){return c.fromId===nid2&&c.fromPort===takenPort});
+          if(takenConn){var tq=[takenConn.toId],tv={};while(tq.length){var tid=tq.shift();if(tv[tid])continue;tv[tid]=true;delete skipped[tid];conns.forEach(function(c){if(c.fromId===tid)tq.push(c.toId)})}}
+        }
+        step++;setTimeout(function(){advanceNode(nid2);runStep()},2000);return;
+      }
+      // ── Approval Gate: show approve/reject ──
+      if(node.type==='op'&&node.itemId==='op-gate'){
+        var nc=getNC(node.id);
+        setRSt('handoff','Awaiting approval');
+        var el=document.getElementById('r-data');
+        el.innerHTML='<div class="r-data-line"><span class="r-data-key">approver</span>: '+escH(nc.fields.approver||'admin')+'</div><div class="r-data-line"><span class="r-data-key">timeout</span>: '+escH(nc.fields.timeout||'24h')+'</div><div class="gate-buttons"><button class="gate-btn approve" id="gate-approve">✓ Approve</button><button class="gate-btn reject" id="gate-reject">✗ Reject</button></div>';
+        var approved=false;
+        document.getElementById('gate-approve').addEventListener('click',function(){approved=true;setRSt('done','Approved');step++;advanceNode(nid2);runStep()});
+        document.getElementById('gate-reject').addEventListener('click',function(){setRSt('done','Rejected');advanceNode(nid2);finishRun()});
+        // Auto-approve after 4s if no click
+        setTimeout(function(){if(!approved){document.getElementById('gate-approve').click()}},4000);
+        return;
+      }
+      // ── Delay: show countdown ──
+      if(node.type==='op'&&node.itemId==='op-delay'){
+        var nc=getNC(node.id),delayStr=nc.fields.delay||'30 min';
+        setRSt('running','Delaying');
+        var el=document.getElementById('r-data'),countdown=3;
+        el.innerHTML='<div class="r-data-line"><span class="r-data-key">delay</span>: '+escH(delayStr)+'</div><div class="r-data-line" id="delay-counter" style="font-size:0.82rem;color:rgb(var(--blue))">⏳ Simulating... '+countdown+'s</div>';
+        var dInt=setInterval(function(){countdown--;var dc=document.getElementById('delay-counter');if(dc)dc.textContent='⏳ Simulating... '+countdown+'s';if(countdown<=0){clearInterval(dInt);step++;advanceNode(nid2);runStep()}},800);
+        return;
+      }
+      // ── Loop: iterate with counter ──
+      if(node.type==='op'&&node.itemId==='op-loop'){
+        if(!loopCounts[nid2])loopCounts[nid2]=0;loopCounts[nid2]++;
+        var nc=getNC(node.id),maxLoop=parseInt(nc.fields.maxLoop)||3;
+        var shouldContinue=loopCounts[nid2]<maxLoop;
+        setRSt('running','Looping');
+        document.getElementById('r-data').innerHTML='<div class="r-data-line"><span class="r-data-key">iteration</span>: '+loopCounts[nid2]+'/'+maxLoop+'</div><div class="runner-eval '+(shouldContinue?'true':'false')+'">'+(shouldContinue?'↻ Looping again...':'✓ Max reached, continuing')+'</div>';
+        if(shouldContinue){
+          // Find the upstream node to loop back to
+          var backConn=conns.find(function(c){return c.fromId===nid2});
+          if(backConn){var backIdx=order.indexOf(backConn.toId);if(backIdx>=0&&backIdx<step){step=backIdx;setTimeout(function(){advanceNode(nid2);runStep()},1600);return}}
+        }
+        loopCounts[nid2]=0;step++;setTimeout(function(){advanceNode(nid2);runStep()},1600);return;
+      }
+      // ── Integration: real API calls ──
+      if(node.type==='integ'){
+        var nc=getNC(node.id);
+        setRSt('api','API Call');
+        if(node.itemId==='int-crm'){
+          var endpoint=nc.fields.endpoint||CRM_BASE+'/api/leads';
+          document.getElementById('r-data').innerHTML='<div class="r-data-line"><span class="r-data-key">api</span>: '+(nc.fields.method||'GET')+' '+escH(endpoint)+'</div><div class="r-data-line" style="color:rgb(var(--blue))">Calling...</div>';
+          fetch(CRM_BASE+'/api/leads',{method:'GET',mode:'cors'}).then(function(r){return r.json()}).then(function(d){showPayload({api:'GET /api/leads',status:200,records:Array.isArray(d)?d.length:'?'})}).catch(function(){showPayload({api:'GET /api/leads',status:'unreachable',note:'VPS offline'})});
+        }else if(node.itemId==='int-email'){
+          showPayload({api:'POST /api/email/send',to:payload.customer?payload.customer.email:'user@co.com',template:'welcome',status:'simulated'});
+        }else if(node.itemId==='int-slack'){
+          showPayload({api:'POST /api/slack/message',channel:'#new-customers',text:'New customer: '+(payload.lead?payload.lead.name:'?'),status:'simulated'});
+        }else if(node.itemId==='int-analytics'){
+          showPayload({api:'POST /api/analytics/event',event:'flow_step',node:item?item.name:'?',status:'simulated'});
+        }else{
+          showPayload({api:(nc.fields.method||'GET')+' '+(nc.fields.endpoint||'/api/...'),status:'simulated'});
+        }
+        step++;setTimeout(function(){advanceNode(nid2);runStep()},1800);return;
+      }
+      // ── Default: show data map or payload ──
       var connToMe=conns.find(function(c){return c.toId===nid2});
       var connLogic=connToMe?connToMe.logic:null;
       if(connLogic&&connLogic.dataMap&&connLogic.dataMap.length){showDataMap(connLogic.dataMap,payload)}
-      else if(node.type==='endpoint'){showPayload(node.itemId==='ep-start'?{trigger:'flow_start',input:'ready'}:{status:'complete',output:'delivered'})}
+      else if(node.type==='endpoint'){showPayload(node.itemId==='ep-start'?{trigger:'flow_start',payload:'lead data ready'}:{status:'complete',output:'all systems updated'})}
       else{showPayload(node.type==='trigger'?payload.lead:{node:item?item.name:'?',input:Object.keys(payload).slice(0,3).join(', ')})}
-      if(node.type==='integ'&&node.itemId==='int-crm'){
-        setRSt('api','API Call');
-        fetch(CRM_BASE+'/api/leads',{method:'GET',mode:'cors'}).then(function(r){return r.json()}).then(function(d){showPayload({api:'GET /api/leads',status:200,records:Array.isArray(d)?d.length:'?'})}).catch(function(){showPayload({api:'GET /api/leads',status:'unreachable',note:'VPS not on network'})});
-      }
-      step++;
-      setTimeout(function(){node.el.classList.remove('running','selected');conns.forEach(function(c){if(c.fromId===nid2){c.el.classList.remove('active');c.arrowEl.classList.remove('active')}});runStep()},1800);
+      step++;setTimeout(function(){advanceNode(nid2);runStep()},1800);
     }
     runStep();
   });
