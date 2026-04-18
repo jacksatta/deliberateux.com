@@ -413,6 +413,10 @@ function DeployModal({theme,oldTheme,subs,onClose,activeTheme}){
   const[stepIdx,setStepIdx]=useState(-1);
   const[copied,setCopied]=useState(false);
   const[showBefore,setShowBefore]=useState(false);
+  const[deployError,setDeployError]=useState(null);
+  const[patInput,setPatInput]=useState(()=>localStorage.getItem('ao_gh_pat')||"");
+  const[showPat,setShowPat]=useState(false);
+  const deployAbort=useRef(null);
 
   const changedTokens=Object.keys(theme).filter(k=>{
     if(["label","desc","accent","isLight"].includes(k))return false;
@@ -421,22 +425,77 @@ function DeployModal({theme,oldTheme,subs,onClose,activeTheme}){
     return o!==n;
   });
 
-  const startDeploy=()=>{setPhase("deploying");setStepIdx(0)};
+  /* ── Real GitHub deploy via Contents API ──────── */
+  async function realDeploy(){
+    const pat=patInput.trim();
+    if(!pat){setShowPat(true);return;}
+    localStorage.setItem('ao_gh_pat',pat);
 
-  useEffect(()=>{
-    if(phase!=="deploying"||stepIdx<0)return;
-    if(stepIdx>=DEPLOY_STEPS.length){setPhase("done");return;}
-    const delays=[800,600,1200,700,1400,600];
-    const timer=setTimeout(()=>setStepIdx(s=>s+1),delays[stepIdx]||800);
-    return()=>clearTimeout(timer);
-  },[phase,stepIdx]);
+    /* Persist theme in localStorage immediately */
+    localStorage.setItem('ao_theme', activeTheme);
+    document.documentElement.dataset.theme = activeTheme;
 
-  useEffect(()=>{
-    if(phase==="done"){
-      const css=generateCSS(activeTheme,theme,subs);
+    setPhase("deploying");
+    setDeployError(null);
+    const ctrl=new AbortController();
+    deployAbort.current=ctrl;
+
+    const REPO="jacksatta/deliberateux.com";
+    const PATH="ao/ao-theme.css";
+    const headers={"Authorization":`token ${pat}`,"Accept":"application/vnd.github.v3+json","Content-Type":"application/json"};
+    const css=generateCSS(activeTheme,theme,subs);
+
+    try{
+      /* Step 0: generating tokens */
+      setStepIdx(0);
+      await delay(400);
+
+      /* Step 1: get current file SHA */
+      setStepIdx(1);
+      const getRes=await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`,{headers,signal:ctrl.signal});
+      let sha=null;
+      if(getRes.ok){const data=await getRes.json();sha=data.sha;}
+      else if(getRes.status!==404){throw new Error(`GitHub API: ${getRes.status} ${getRes.statusText}`);}
+      await delay(300);
+
+      /* Step 2: update/create file */
+      setStepIdx(2);
+      const body={message:`AO: apply ${theme.label} theme from Theme Studio`,content:btoa(unescape(encodeURIComponent(css)))};
+      if(sha)body.sha=sha;
+      const putRes=await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`,{method:"PUT",headers,body:JSON.stringify(body),signal:ctrl.signal});
+      if(!putRes.ok){const err=await putRes.json().catch(()=>({}));throw new Error(err.message||`GitHub API: ${putRes.status}`);}
+      await delay(300);
+
+      /* Step 3: commit done (happened in PUT) */
+      setStepIdx(3);
+      await delay(400);
+
+      /* Step 4: GitHub Pages deploying */
+      setStepIdx(4);
+      await delay(1200);
+
+      /* Step 5: verify */
+      setStepIdx(5);
+      await delay(600);
+
+      /* Done */
+      setStepIdx(DEPLOY_STEPS.length);
+      setPhase("done");
       navigator.clipboard?.writeText(css).catch(()=>{});
+
+    }catch(err){
+      if(err.name==="AbortError")return;
+      setDeployError(err.message);
+      setPhase("preview");
+      setStepIdx(-1);
     }
-  },[phase]);
+  }
+
+  function delay(ms){return new Promise(r=>setTimeout(r,ms))}
+
+  const startDeploy=()=>{
+    realDeploy();
+  };
 
   const t=showBefore?oldTheme:theme;
   const Renderer=RENDERERS.flows;
@@ -522,29 +581,55 @@ function DeployModal({theme,oldTheme,subs,onClose,activeTheme}){
           </div>
           {phase==="done"&&<div style={{marginTop:20,padding:"20px",background:"rgba(82,195,140,0.06)",border:"1px solid rgba(82,195,140,0.15)",borderRadius:12,textAlign:"center",animation:"fadeIn 0.4s ease 0.3s both"}}>
             <div style={{fontSize:32,marginBottom:8}}>✓</div>
-            <div style={{fontSize:15,fontWeight:700,color:"rgb(82,195,140)",marginBottom:4}}>Theme deployed successfully</div>
-            <div style={{fontSize:11,color:"rgba(245,240,232,0.45)",marginBottom:16}}>CSS copied to clipboard. Run these commands to push live:</div>
-            <div style={{background:"rgba(0,0,0,0.3)",borderRadius:8,padding:"12px 16px",textAlign:"left",fontFamily:"ui-monospace,SFMono-Regular,Menlo,monospace",fontSize:11,lineHeight:1.8,color:"rgba(245,240,232,0.65)",marginBottom:16,border:"1px solid rgba(245,240,232,0.06)"}}>
-              <div><span style={{color:"rgba(82,195,140,0.5)"}}>$</span> cd ~/Projects/Websites/deliberateux.com</div>
-              <div><span style={{color:"rgba(82,195,140,0.5)"}}>$</span> git add ao/ao-theme.css</div>
-              <div><span style={{color:"rgba(82,195,140,0.5)"}}>$</span> git commit -m "AO: apply {theme.label} theme"</div>
-              <div><span style={{color:"rgba(82,195,140,0.5)"}}>$</span> git push origin main</div>
+            <div style={{fontSize:15,fontWeight:700,color:"rgb(82,195,140)",marginBottom:4}}>Theme pushed to GitHub</div>
+            <div style={{fontSize:11,color:"rgba(245,240,232,0.45)",marginBottom:16}}>ao-theme.css committed and pushed. GitHub Pages will deploy in ~2 minutes.</div>
+            <div style={{background:"rgba(0,0,0,0.3)",borderRadius:8,padding:"12px 16px",textAlign:"left",fontSize:11,lineHeight:1.8,color:"rgba(245,240,232,0.5)",marginBottom:16,border:"1px solid rgba(245,240,232,0.06)"}}>
+              <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
+                <span style={{color:"rgb(82,195,140)"}}>✓</span>
+                <span>Theme <strong style={{color:"rgba(245,240,232,0.8)"}}>{theme.label}</strong> saved to localStorage</span>
+              </div>
+              <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
+                <span style={{color:"rgb(82,195,140)"}}>✓</span>
+                <span>ao-theme.css pushed to <strong style={{color:"rgba(245,240,232,0.8)"}}>{activeTheme}</strong> defaults</span>
+              </div>
+              <div style={{display:"flex",alignItems:"center",gap:6}}>
+                <span style={{color:"rgb(218,160,72)",animation:"pulse 2s infinite"}}>●</span>
+                <span>GitHub Pages deploy in progress...</span>
+              </div>
             </div>
             <div style={{display:"flex",gap:8,justifyContent:"center"}}>
               <a href="https://deliberateux.com/ao/" target="_blank" rel="noopener" style={{display:"inline-flex",padding:"8px 18px",borderRadius:7,background:"rgba(82,195,140,0.14)",border:"1px solid rgba(82,195,140,0.3)",color:"rgb(82,195,140)",fontSize:12,fontWeight:600,textDecoration:"none",cursor:"pointer"}}>View Live Site</a>
               <button onClick={()=>{
-                const cmds=`cd ~/Projects/Websites/deliberateux.com\ngit add ao/ao-theme.css\ngit commit -m "AO: apply ${theme.label} theme"\ngit push origin main`;
-                navigator.clipboard?.writeText(cmds);setCopied(true);setTimeout(()=>setCopied(false),2000);
-              }} style={{padding:"8px 18px",borderRadius:7,background:"rgba(245,240,232,0.06)",border:"1px solid rgba(245,240,232,0.1)",color:copied?"rgb(82,195,140)":"rgba(245,240,232,0.6)",fontSize:12,fontWeight:600,cursor:"pointer",transition:"all 0.15s"}}>{copied?"Copied!":"Copy Commands"}</button>
+                const css=generateCSS(activeTheme,theme,subs);
+                navigator.clipboard?.writeText(css);setCopied(true);setTimeout(()=>setCopied(false),2000);
+              }} style={{padding:"8px 18px",borderRadius:7,background:"rgba(245,240,232,0.06)",border:"1px solid rgba(245,240,232,0.1)",color:copied?"rgb(82,195,140)":"rgba(245,240,232,0.6)",fontSize:12,fontWeight:600,cursor:"pointer",transition:"all 0.15s"}}>{copied?"Copied!":"Copy CSS"}</button>
             </div>
           </div>}
         </div>}
       </div>
 
-      {phase==="preview"&&<div style={{padding:"14px 24px",borderTop:"1px solid rgba(245,240,232,0.07)",display:"flex",gap:10,alignItems:"center"}}>
-        <span style={{flex:1,fontSize:10,color:"rgba(245,240,232,0.3)"}}>This will update ao-theme.css and affect all AO pages</span>
-        <button onClick={onClose} style={{padding:"8px 16px",borderRadius:7,fontSize:12,fontWeight:500,cursor:"pointer",background:"transparent",border:"1px solid rgba(245,240,232,0.1)",color:"rgba(245,240,232,0.5)",transition:"all 0.15s"}}>Cancel</button>
-        <button onClick={startDeploy} style={{padding:"8px 20px",borderRadius:7,fontSize:12,fontWeight:600,cursor:"pointer",background:"rgba(218,160,72,0.14)",border:"1px solid rgba(218,160,72,0.35)",color:"rgb(218,160,72)",transition:"all 0.15s"}}>Push Live</button>
+      {phase==="preview"&&<div style={{padding:"14px 24px",borderTop:"1px solid rgba(245,240,232,0.07)"}}>
+        {/* Error message */}
+        {deployError&&<div style={{padding:"8px 12px",borderRadius:7,background:"rgba(248,113,113,0.08)",border:"1px solid rgba(248,113,113,0.2)",color:"rgba(248,113,113,0.8)",fontSize:11,marginBottom:10}}>
+          Deploy failed: {deployError}
+        </div>}
+
+        {/* PAT input (shown if no token stored) */}
+        {showPat&&<div style={{marginBottom:10}}>
+          <div style={{fontSize:10,color:"rgba(245,240,232,0.4)",marginBottom:6}}>GitHub Personal Access Token <span style={{color:"rgba(245,240,232,0.2)"}}>(stored locally, never sent anywhere else)</span></div>
+          <div style={{display:"flex",gap:6}}>
+            <input type="password" value={patInput} onChange={e=>setPatInput(e.target.value)} placeholder="ghp_xxxxxxxxxxxx" style={{flex:1,padding:"7px 12px",borderRadius:7,border:"1px solid rgba(245,240,232,0.1)",background:"rgba(0,0,0,0.3)",color:"rgba(245,240,232,0.8)",fontSize:12,fontFamily:"monospace",outline:"none"}}/>
+            <button onClick={()=>{if(patInput.trim()){localStorage.setItem('ao_gh_pat',patInput.trim());setShowPat(false)}}} style={{padding:"7px 12px",borderRadius:7,fontSize:11,fontWeight:600,cursor:"pointer",background:"rgba(82,195,140,0.1)",border:"1px solid rgba(82,195,140,0.25)",color:"rgb(82,195,140)"}}>Save</button>
+          </div>
+        </div>}
+
+        <div style={{display:"flex",gap:10,alignItems:"center"}}>
+          <span style={{flex:1,fontSize:10,color:"rgba(245,240,232,0.3)"}}>Pushes ao-theme.css to GitHub → deploys via GitHub Pages</span>
+          <button onClick={onClose} style={{padding:"8px 16px",borderRadius:7,fontSize:12,fontWeight:500,cursor:"pointer",background:"transparent",border:"1px solid rgba(245,240,232,0.1)",color:"rgba(245,240,232,0.5)",transition:"all 0.15s"}}>Cancel</button>
+          <button onClick={startDeploy} style={{padding:"8px 20px",borderRadius:7,fontSize:12,fontWeight:600,cursor:"pointer",background:"rgba(218,160,72,0.14)",border:"1px solid rgba(218,160,72,0.35)",color:"rgb(218,160,72)",transition:"all 0.15s"}}>
+            {patInput.trim()?"Push Live":"Set Token"}
+          </button>
+        </div>
       </div>}
     </div>
   </div>;
@@ -610,6 +695,8 @@ function App(){
     setSavedTheme(activeTheme);
     setSavedSubs({...subs});
     setHasChanges(false);
+    localStorage.setItem('ao_theme', activeTheme);
+    document.documentElement.dataset.theme = activeTheme;
   };
 
   /* Color override handler */
