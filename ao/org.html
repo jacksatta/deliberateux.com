@@ -14,35 +14,9 @@
   <title>Org — AO</title>
   <meta name="description" content="Organization home — AO Agent Operations." />
   <link rel="icon" href="/assets/favicon.svg" />
+  <link rel="stylesheet" href="ao-theme.css">
+  <script>/* theme persistence */ (function(){var t=localStorage.getItem('ao_theme');if(t)document.documentElement.dataset.theme=t})()</script>
   <style>
-    /* ── Reset + tokens ─────────────────────────────────── */
-    :root {
-      --bg: #070812;
-      --bg2: #0b1021;
-      --panel: rgba(255,255,255,0.05);
-      --panel2: rgba(255,255,255,0.08);
-      --border: rgba(255,255,255,0.09);
-      --border2: rgba(255,255,255,0.14);
-      --text: rgba(255,255,255,0.92);
-      --muted: rgba(255,255,255,0.58);
-      --faint: rgba(255,255,255,0.38);
-      --ghost: rgba(255,255,255,0.22);
-      --hairline: rgba(255,255,255,0.07);
-      --amber: 245,158,11;
-      --purple: 168,139,250;
-      --green: 52,211,153;
-      --blue: 96,165,250;
-      --pink: 244,114,182;
-      --red: 248,113,113;
-      --yellow: 251,191,36;
-      --radius-lg: 20px;
-      --radius-md: 14px;
-      --radius-sm: 8px;
-      --max: 1060px;
-      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      --ease: cubic-bezier(.2,.8,.2,1);
-    }
     *, *::before, *::after { box-sizing: border-box; }
     html { height: 100%; }
     body {
@@ -50,20 +24,20 @@
       font-family: var(--font); color: var(--text);
       background-color: var(--bg);
       background-image:
-        radial-gradient(1000px 700px at 15% -5%, rgba(168,139,250,0.10), transparent 50%),
+        radial-gradient(1000px 700px at 15% -5%, rgba(218,160,72,0.10), transparent 50%),
         radial-gradient(800px 600px at 85% 10%, rgba(52,211,153,0.08), transparent 50%),
         linear-gradient(180deg, var(--bg2), var(--bg));
       background-attachment: fixed;
       -webkit-font-smoothing: antialiased;
     }
     a { color: var(--text); text-decoration: none; }
-    ::selection { background: rgba(168,139,250,0.25); }
+    ::selection { background: rgba(218,160,72,0.25); }
     .container { width: min(var(--max), calc(100% - 48px)); margin: 0 auto; }
 
     /* ── Shared sticky nav ──────────────────────────────── */
     .ao-nav {
       position: sticky; top: 0; z-index: 200;
-      background: rgba(7,8,18,0.92);
+      background: var(--surface);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid rgba(255,255,255,0.07);
@@ -82,8 +56,8 @@
     .ao-nav-context { font-weight: 400; color: var(--muted); margin-left: 2px; }
     .ao-nav-dot {
       width: 7px; height: 7px; border-radius: 50%;
-      background: rgb(var(--purple));
-      box-shadow: 0 0 7px rgba(var(--purple),0.6);
+      background: rgb(var(--amber));
+      box-shadow: 0 0 7px rgba(var(--amber),0.6);
       flex-shrink: 0;
       animation: dotPulse 2.5s ease-in-out infinite;
     }
@@ -113,10 +87,10 @@
     }
     .org-icon {
       width: 56px; height: 56px; border-radius: 14px;
-      background: rgba(var(--purple),0.14);
-      border: 1px solid rgba(var(--purple),0.25);
+      background: rgba(var(--amber),0.14);
+      border: 1px solid rgba(var(--amber),0.25);
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.3rem; font-weight: 700; color: rgb(var(--purple));
+      font-size: 1.3rem; font-weight: 700; color: rgb(var(--amber));
       flex-shrink: 0;
     }
     .org-hero h1 {
@@ -170,7 +144,7 @@
       font-size: 0.85rem; font-weight: 600;
       padding: 10px 20px; border-radius: 10px;
       border: none;
-      background: rgb(var(--purple));
+      background: rgb(var(--amber));
       color: #0a0616;
       cursor: pointer; text-decoration: none;
       display: inline-flex; align-items: center; gap: 6px;
@@ -187,7 +161,7 @@
       display: inline-flex; align-items: center; gap: 6px;
       transition: all 0.2s;
     }
-    .btn-secondary:hover { color: var(--text); border-color: rgba(var(--purple),0.4); }
+    .btn-secondary:hover { color: var(--text); border-color: rgba(var(--amber),0.4); }
 
     /* ── Section label ──────────────────────────────────── */
     .section-label {
@@ -217,8 +191,8 @@
     }
     .agent-card:hover { border-color: var(--border2); box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
     .agent-card.is-lead {
-      border-color: rgba(var(--purple),0.25);
-      background: rgba(var(--purple),0.04);
+      border-color: rgba(var(--amber),0.25);
+      background: rgba(var(--amber),0.04);
     }
     .agent-top {
       display: flex; align-items: center; gap: 10px;

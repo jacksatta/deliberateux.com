@@ -1,40 +1,20 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Launching — AO</title>
   <link rel="icon" href="/assets/favicon.svg" />
+  <link rel="stylesheet" href="ao-theme.css">
+  <script>/* theme persistence */ (function(){var t=localStorage.getItem('ao_theme');if(t)document.documentElement.dataset.theme=t})()</script>
   <style>
-    :root {
-      --bg: #070812;
-      --bg2: #0b1021;
-      --panel: rgba(255,255,255,0.05);
-      --border: rgba(255,255,255,0.09);
-      --border2: rgba(255,255,255,0.14);
-      --text: rgba(255,255,255,0.92);
-      --muted: rgba(255,255,255,0.58);
-      --faint: rgba(255,255,255,0.38);
-      --ghost: rgba(255,255,255,0.22);
-      --hairline: rgba(255,255,255,0.07);
-      --purple: 168,139,250;
-      --green: 52,211,153;
-      --blue: 96,165,250;
-      --amber: 245,158,11;
-      --pink: 244,114,182;
-      --yellow: 251,191,36;
-      --red: 248,113,113;
-      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      --ease: cubic-bezier(.2,.8,.2,1);
-    }
     *, *::before, *::after { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; }
     body {
       font-family: var(--font); color: var(--text);
       background: var(--bg);
       background-image:
-        radial-gradient(800px 600px at 50% 20%, rgba(168,139,250,0.10), transparent 60%),
+        radial-gradient(800px 600px at 50% 20%, rgba(218,160,72,0.10), transparent 60%),
         linear-gradient(180deg, var(--bg2), var(--bg));
       display: flex; align-items: center; justify-content: center;
       -webkit-font-smoothing: antialiased;
@@ -54,8 +34,8 @@
     }
     .boot-dot {
       width: 7px; height: 7px; border-radius: 50%;
-      background: rgb(var(--purple));
-      box-shadow: 0 0 8px rgba(var(--purple),0.5);
+      background: rgb(var(--amber));
+      box-shadow: 0 0 8px rgba(var(--amber),0.5);
       animation: dotPulse 2s ease-in-out infinite;
     }
     @keyframes dotPulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
@@ -67,7 +47,7 @@
     }
     .boot-title em {
       font-style: normal;
-      background: linear-gradient(135deg, rgb(var(--purple)), rgb(var(--green)));
+      background: linear-gradient(135deg, rgb(var(--amber)), rgb(var(--green)));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text;
     }
@@ -84,7 +64,7 @@
     }
     .boot-progress-fill {
       height: 100%; width: 0%;
-      background: linear-gradient(90deg, rgb(var(--purple)), rgb(var(--green)));
+      background: linear-gradient(90deg, rgb(var(--amber)), rgb(var(--green)));
       border-radius: 2px;
       transition: width 0.6s var(--ease);
     }
@@ -106,7 +86,7 @@
     }
     .ab-row.visible { opacity: 1; transform: none; }
     .ab-row.done { border-color: rgba(var(--green),0.25); }
-    .ab-row.active { border-color: rgba(var(--purple),0.35); }
+    .ab-row.active { border-color: rgba(var(--amber),0.35); }
 
     .ab-icon {
       width: 30px; height: 30px; border-radius: 7px;
@@ -132,8 +112,8 @@
     /* Spinner */
     .ab-spinner {
       width: 14px; height: 14px;
-      border: 2px solid rgba(var(--purple),0.2);
-      border-top-color: rgb(var(--purple));
+      border: 2px solid rgba(var(--amber),0.2);
+      border-top-color: rgb(var(--amber));
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
       flex-shrink: 0;
@@ -168,7 +148,7 @@
     .boot-btn {
       font-family: var(--font); font-size: 0.9rem; font-weight: 600;
       padding: 12px 28px; border-radius: 10px;
-      border: none; background: rgb(var(--purple));
+      border: none; background: rgb(var(--amber));
       color: #0a0616; cursor: pointer;
       text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
       transition: opacity 0.2s;

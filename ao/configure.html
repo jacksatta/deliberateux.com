@@ -14,40 +14,17 @@
   <title>Configure — AO Org Builder</title>
   <meta name="description" content="Build your own AO agency. Choose roles, assign humans or agents, scale up or down. Every configuration includes built-in ethics guidance." />
   <link rel="icon" href="/assets/favicon.svg" />
+  <link rel="stylesheet" href="ao-theme.css">
+  <script>/* theme persistence */ (function(){var t=localStorage.getItem('ao_theme');if(t)document.documentElement.dataset.theme=t})()</script>
   <style>
-    /* ── Reset + tokens (shared with AO) ──────────────────── */
+    /* ── Page-specific overrides ──────────────────────────── */
     :root {
-      --bg: #070812;
-      --bg2: #0b1021;
-      --panel: rgba(255,255,255,0.06);
-      --panel2: rgba(255,255,255,0.08);
-      --border: rgba(255,255,255,0.10);
-      --border2: rgba(255,255,255,0.14);
-      --text: rgba(255,255,255,0.92);
-      --muted: rgba(255,255,255,0.68);
-      --faint: rgba(255,255,255,0.52);
-      --ghost: rgba(255,255,255,0.28);
-      --hairline: rgba(255,255,255,0.08);
+      --max: 1060px;
+      --pad: 28px;
       --shadow-soft: 0 10px 30px rgba(0,0,0,0.35);
       --radius-lg: 24px;
       --radius-md: 18px;
       --radius-sm: 10px;
-      --max: 1060px;
-      --pad: 28px;
-      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      --ease: cubic-bezier(.2,.8,.2,1);
-      /* Role colors */
-      --c-admin: 168,139,250;
-      --c-mkt: 244,114,182;
-      --c-dev: 96,165,250;
-      --c-uxr: 52,211,153;
-      --c-qa: 251,191,36;
-      --c-biz: 147,197,253;
-      --c-cs: 110,231,183;
-      --c-ops: 248,113,113;
-      --c-data: 129,140,248;
-      --c-content: 232,121,249;
     }
     *, *::before, *::after { box-sizing: border-box; }
     html { height: 100%; }
@@ -58,20 +35,20 @@
       color: var(--text);
       background-color: var(--bg);
       background-image:
-        radial-gradient(1200px 900px at 20% -10%, rgba(142,72,255,0.20), transparent 55%),
+        radial-gradient(1200px 900px at 20% -10%, rgba(218,160,72,0.20), transparent 55%),
         radial-gradient(900px 700px at 90% 0%, rgba(0,168,255,0.14), transparent 55%),
         linear-gradient(180deg, var(--bg2), var(--bg));
       background-attachment: fixed;
       -webkit-font-smoothing: antialiased;
     }
     a { color: var(--text); text-decoration: none; }
-    ::selection { background: rgba(140,90,255,0.35); }
+    ::selection { background: rgba(218,160,72,0.35); }
     .container { width: min(var(--max), calc(100% - 48px)); margin: 0 auto; }
 
     /* ── Shared sticky nav ───────────────────────────────── */
     .ao-nav {
       position: sticky; top: 0; z-index: 200;
-      background: rgba(7,8,18,0.88);
+      background: var(--surface);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid rgba(255,255,255,0.07);

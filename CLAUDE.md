@@ -67,12 +67,69 @@ Layered overlap — each layer starts halfway through the previous, total ~3s:
 
 AO is the internal operations layer hosted at `deliberateux.com/ao/*` and backed by VPS services at `100.71.12.80`.
 
+### AO Information Architecture (2026-04-18)
+- **Sitemap reference:** `/ao/ao-sitemap.html` — interactive visual sitemap with audience tabs.
+- **Dashboard is the roof.** It is the top-level container, not a peer of other pages. Everything lives under it.
+- **Three audience tracks:** Prospect (demo, read-only sandbox), Customer (auth'd, own orgs), Admin (you — all orgs + system panels).
+- **Org-scoped pages:** Queue, Flows, and Configure are scoped to an org via `?org=<slug>`. They are not standalone global pages.
+- **Everything is clickable:** Org cards → org detail. Task rows → task detail. Agent badges → agent info. Role cards → toggle assignment.
+- **Demo mode:** Pre-seeded "Acme Inc." sandbox org. Same page structure as real orgs but read-only, nothing persists. Prospect explores without signup.
+- **Onboard flow returns to Dashboard:** Onboard → Bootup → Configure → Dashboard (with new org card). No dead ends.
+- **Admin is auth-based:** No more `?admin=1` URL param. Account-level flag. Admin sees all orgs + Global Services + CS Backdoor.
+- **New pages needed:** Login/auth gate, CS Backdoor (agent-mediated, no raw PII), Demo Dashboard variant.
+
 ### AO Pages (GitHub Pages)
-- `/ao/index.html` — AO landing page
-- `/ao/onboard.html` — Organization setup wizard
-- `/ao/configure.html` — Configuration page
-- `/ao/dashboard.html` — Admin dashboard
-- `/ao/queue.html` — Live work queue (simulated tasks, auto-heal)
+- `/ao/index.html` — Landing page (marketing, two CTAs: "Try the demo" / "Get started")
+- `/ao/dashboard.html` — **The roof.** My Orgs grid (customer) or All Orgs grid (admin) + system services
+- `/ao/org.html` — Single org home (agents, tasks, workspace) — scoped via `?slug=`
+- `/ao/onboard.html` — Organization setup wizard (5 steps)
+- `/ao/bootup.html` — Agent provisioning animation (post-onboard)
+- `/ao/configure.html` — Role builder, scoped to an org via `?org=`
+- `/ao/queue.html` — Live work queue, scoped to an org via `?org=`
+- `/ao/flows.html` — Workflow canvas, scoped to an org via `?org=`
+- `/ao/ao-sitemap.html` — Visual IA sitemap (internal reference)
+
+### AO Theme System (v3 — shared tokens, all pages wired)
+- **Shared token file:** `/ao/ao-theme.css` — single CSS file defining all design tokens for the entire AO experience. All 8 AO pages import this via `<link rel="stylesheet" href="ao-theme.css">`.
+- **Theme Studio Light:** `/ao/theme-studio-local.html` — interactive theme configurator (admin tool). Features:
+  - **Tabbed left panel:** Themes / Palette / Fine-tune tabs
+  - **6 theme palettes** with live preview thumbnails of all AO pages
+  - **Color Harmony engine:** complementary, analogous, triadic, split-complementary, tetradic presets — modifiable and applicable to any base color
+  - **Zoom toolbar:** Fit-to-frame, 50%/75%/100%/150% presets, +/- buttons, persistent zoom level
+  - **Revert button:** Undo all unsaved changes back to last deployed state
+  - **Before/After (A/B) toggle:** Compare new theme vs. legacy purple-AI look
+  - **Deploy modal:** Pre-flight preview with before/after + change stats, animated 6-step deployment, CSS export + git commands
+  - **Upsell CTA:** "Want the full Theme Studio? See AO plans" — links to /ao/ product page
+- **Themes (6):**
+  - **Ops** (DEFAULT) — warm charcoal bg (#121110), amber accent (218,160,72). "Air traffic control, not Tron."
+  - **Midnight** — cool steel/navy bg (#0a0d14), ice-blue accent (140,185,235). Cool-shifted panels, blue-white text.
+  - **Greenhouse** — dark chocolate bg (#1a1f1c), mint/cream accents. Earthy, organic.
+  - **Sandstone** — warm tan bg (#1e1b18), terracotta/clay accents. Desert warmth.
+  - **Studio** — warm ivory light mode (#f4f2ee). Has SVG icon/shadow overrides.
+  - **Daybreak** — soft blue-white light mode (#f0f4f8), slate-blue accent (58,120,180). Sky/cloud feel.
+- **Key design decision (2026-04-18):** Amber replaces purple as the primary accent (`--accent: var(--amber)`) across all themes. Purple is demoted to a desaturated secondary role.
+- **Architecture:** CSS custom properties at `:root` in ao-theme.css, overridden by `[data-theme="<name>"]` selectors. Key token groups: surfaces, overlays, panels, borders, text hierarchy, semantic colors (RGB triplets), agent colors, status colors, radii, typography, layout.
+- **Theme persistence:** `localStorage` key `ao_theme`. Each page has inline persistence script at load time.
+- **Transitions:** 350ms ease on `background`/`color` for `html`, `body`, `.topbar`/`.ao-nav`, `.sidebar`, `.canvas-wrap`.
+- **Adding a new theme:** Add `[data-theme="<name>"]` block in ao-theme.css. Add to theme-studio-local.html THEMES object. If light-mode, add Studio-style SVG/shadow overrides.
+- **Wiring status (2026-04-18):** ALL 8 pages wired to ao-theme.css:
+  - `flows.html` — inline theme block removed, only component-level Studio overrides remain
+  - `index.html` — purple gradients replaced with amber/blue/pink theme vars
+  - `dashboard.html` — purple button/filter styles replaced with amber
+  - `bootup.html` — boot dot, progress bar, spinner, buttons all use amber
+  - `org.html` — gradients/buttons/selections switched to amber
+  - `queue.html` — nav uses `var(--surface)`
+  - `configure.html` — role colors removed (flow through agent color aliases), purple→amber
+  - `onboard.html` — unique warm light page; `--warm-purple`/`--warm-green` now alias to shared `--purple`/`--green` tokens; nav uses `var(--surface)`, dot uses `var(--amber)`
+
+### AO Flows — Legacy Theme Notes
+- flows.html theme switcher dropdown (`.theme-sw`) and customizer panel (`.theme-cust`) JS objects (`themeColors`, `themeBgs`) may still reference old values — should be updated to sync with ao-theme.css theme names
+- The old inline `:root` block has been removed; flows now inherits from ao-theme.css
+
+### AO Theme Tiers (planned)
+- **Theme Studio Light** (free / all users): Current `/ao/theme-studio-local.html`. 6 preset palettes, harmony presets, fine-tune controls. Available to any org admin.
+- **Theme Studio Full** (paid tier): Extended palette builder, custom color import, export to Figma tokens, brand kit upload, multi-org theme management. Not yet built — upsell link points to `/ao/` product page.
+- **Onboard theme selector** (planned): Simplified 3-4 palette picker embedded in onboard.html step 4 or as new step. Not the full studio — just visual cards with preview dots. New users pick a theme during org setup.
 
 ### AO — Open Requests (for cowork review)
 - **`/ao/REQUEST-admin-flow.md`** (2026-04-16) — four items pending: (1) queue.html flashing fix via keyed DOM diff; (2) seeded CS task missing `blockedAt` so auto-heal never fires (queue.html:261–265); (3) onboard → configure should finish with a working “Launch <Org>” link to a real `/ao/org/<slug>/` surface; (4) admin dashboard needs review-my-orgs list + CS-assist backdoor into other customer orgs (agent-mediated preferred, no raw PII). Read the request doc before starting any of these.

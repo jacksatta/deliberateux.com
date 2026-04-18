@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AO — Information Architecture Sitemap</title>
+<style>
+  :root {
+    --bg: #121110;
+    --surface: #1a1917;
+    --overlay: #232220;
+    --border: #333230;
+    --text: #f0ece4;
+    --muted: #9ca3af;
+    --amber: 218,160,72;
+    --green: 74,222,128;
+    --blue: 140,185,235;
+    --purple: 167,139,250;
+    --red: 248,113,113;
+    --radius: 10px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 40px;
+    line-height: 1.5;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 15px;
+    margin-bottom: 40px;
+  }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  /* Audience tabs */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 32px;
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 4px;
+    width: fit-content;
+  }
+  .tab {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    background: var(--overlay);
+    color: var(--text);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .tab .badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  /* Map container */
+  .map-view {
+    display: none;
+  }
+  .map-view.active {
+    display: block;
+  }
+
+  /* Tree layout */
+  .tree {
+    position: relative;
+    padding-left: 0;
+  }
+  .tree-level {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .tree-level::before {
+    content: '';
+    position: absolute;
+    top: -12px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--border);
+    display: none;
+  }
+  .level-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  /* Node cards */
+  .node {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    min-width: 200px;
+    max-width: 280px;
+    transition: all 0.2s;
+    position: relative;
+    cursor: default;
+  }
+  .node:hover {
+    border-color: rgba(var(--amber), 0.5);
+    box-shadow: 0 0 20px rgba(var(--amber), 0.08);
+  }
+  .node.root {
+    border-color: rgba(var(--amber), 0.6);
+    background: linear-gradient(135deg, var(--surface), rgba(var(--amber), 0.06));
+    min-width: 300px;
+  }
+  .node.shared {
+    border-left: 3px solid rgba(var(--green), 0.6);
+  }
+  .node.admin-only {
+    border-left: 3px solid rgba(var(--red), 0.5);
+  }
+  .node.customer-only {
+    border-left: 3px solid rgba(var(--blue), 0.6);
+  }
+  .node.prospect-only {
+    border-left: 3px solid rgba(var(--purple), 0.6);
+  }
+  .node.new-page {
+    border-style: dashed;
+    opacity: 0.85;
+  }
+
+  .node-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .node-file {
+    font-size: 11px;
+    font-family: 'SF Mono', monospace;
+    color: rgba(var(--amber), 0.8);
+    margin-bottom: 6px;
+  }
+  .node-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+  .node-children {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .node-children strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .tag-new {
+    background: rgba(var(--amber), 0.15);
+    color: rgba(var(--amber), 1);
+  }
+  .tag-exists {
+    background: rgba(var(--green), 0.12);
+    color: rgba(var(--green), 1);
+  }
+  .tag-rework {
+    background: rgba(var(--blue), 0.12);
+    color: rgba(var(--blue), 1);
+  }
+
+  /* Connector lines */
+  .connector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 12px;
+    margin: 8px 0 8px 32px;
+  }
+  .connector-line {
+    width: 24px;
+    height: 1px;
+    background: var(--border);
+  }
+  .connector-arrow {
+    color: rgba(var(--amber), 0.6);
+  }
+
+  /* Flow arrows */
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .flow-arrow {
+    color: rgba(var(--amber), 0.6);
+    font-size: 18px;
+  }
+  .flow-node {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .flow-node.entry {
+    border-color: rgba(var(--amber), 0.5);
+  }
+
+  /* Section dividers */
+  .section {
+    margin-bottom: 48px;
+  }
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .section-desc {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  /* Comparison table */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+  }
+  .compare-table th,
+  .compare-table td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .compare-table th {
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+  .compare-table td:first-child {
+    font-weight: 500;
+    color: var(--text);
+  }
+  .check { color: rgba(var(--green), 1); }
+  .cross { color: rgba(var(--red), 0.6); }
+  .partial { color: rgba(var(--amber), 1); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    body { padding: 20px; }
+    .tree-level { flex-direction: column; }
+    .node { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<h1>AO — Information Architecture</h1>
+<p class="subtitle">Three audience tracks, one product. Dashboard is the roof.</p>
+
+<div class="legend">
+  <div class="legend-item">
+    <div class="legend-dot" style="background: rgba(var(--green), 0.7)"></div>
+    Shared (all users)
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background: rgba(var(--blue), 0.7)"></div>
+    Customer only
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background: rgba(var(--purple), 0.7)"></div>
+    Prospect only
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background: rgba(var(--red), 0.6)"></div>
+    Admin only (you)
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="border: 2px dashed var(--muted); background: transparent"></div>
+    New / to build
+  </div>
+</div>
+
+<!-- Audience Tabs -->
+<div class="tabs">
+  <button class="tab active" onclick="showView('full')">
+    Full IA Map
+  </button>
+  <button class="tab" onclick="showView('prospect')">
+    Prospect View
+    <span class="badge" style="background:rgba(var(--purple),0.2);color:rgba(var(--purple),1)">demo</span>
+  </button>
+  <button class="tab" onclick="showView('customer')">
+    Customer View
+    <span class="badge" style="background:rgba(var(--blue),0.2);color:rgba(var(--blue),1)">auth'd</span>
+  </button>
+  <button class="tab" onclick="showView('admin')">
+    Admin View
+    <span class="badge" style="background:rgba(var(--red),0.15);color:rgba(var(--red),0.8)">you</span>
+  </button>
+</div>
+
+<!-- ===================== FULL IA MAP ===================== -->
+<div class="map-view active" id="view-full">
+
+  <!-- Level 0: Entry Points -->
+  <div class="section">
+    <p class="level-label">Level 0 — Entry Points</p>
+    <div class="tree-level">
+      <div class="node root">
+        <div class="node-title">Landing <span class="tag tag-rework">rework</span></div>
+        <div class="node-file">index.html</div>
+        <div class="node-desc">
+          Marketing overview of AO. Agent roster, value prop, protocol explanation. Two CTAs diverge audiences:
+        </div>
+        <div class="node-children">
+          <strong>→ "Try the demo"</strong> (prospect track)<br>
+          <strong>→ "Get started"</strong> (customer onboard track)
+        </div>
+      </div>
+
+      <div class="node shared">
+        <div class="node-title">Login / Auth <span class="tag tag-new">new</span></div>
+        <div class="node-file">login.html</div>
+        <div class="node-desc">
+          Auth gate. Returning customers → Dashboard. New signups → Onboard flow.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Level 1: Dashboard (the roof) -->
+  <div class="section">
+    <p class="level-label">Level 1 — Dashboard (the roof)</p>
+    <div class="tree-level">
+      <div class="node root">
+        <div class="node-title">Dashboard <span class="tag tag-rework">rework</span></div>
+        <div class="node-file">dashboard.html</div>
+        <div class="node-desc">
+          <strong>The top-level container.</strong> Everything lives under this. Shows "My Orgs" grid — each org is a clickable card. For admin: shows ALL orgs + system services. For customers: shows their org(s) only.
+        </div>
+        <div class="node-children">
+          <strong>Cards are clickable →</strong> each opens that org's detail view<br>
+          <strong>[+ New Org]</strong> button → enters onboard flow
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Level 2: Org Detail + Onboard Flow -->
+  <div class="section">
+    <p class="level-label">Level 2 — Inside an Org</p>
+    <div class="tree-level">
+      <div class="node shared">
+        <div class="node-title">Org Home <span class="tag tag-rework">rework</span></div>
+        <div class="node-file">org.html?slug=...</div>
+        <div class="node-desc">
+          Single org view. Shows agents roster, recent tasks summary, workspace overview, health status. Clickable sub-navigation into Queue, Flows, Configure.
+        </div>
+        <div class="node-children">
+          <strong>Tabs/cards link to:</strong> Queue, Flows, Configure, Agents
+        </div>
+      </div>
+
+      <div class="node shared">
+        <div class="node-title">Queue <span class="tag tag-exists">exists</span></div>
+        <div class="node-file">queue.html?org=...</div>
+        <div class="node-desc">
+          Live work queue scoped to this org. Tasks with status flow, agent badges, auto-heal visualization. Clickable task rows expand detail.
+        </div>
+      </div>
+
+      <div class="node shared">
+        <div class="node-title">Flows <span class="tag tag-exists">exists</span></div>
+        <div class="node-file">flows.html?org=...</div>
+        <div class="node-desc">
+          Visual workflow canvas for this org. Drag-and-drop agent assignments, trigger chains. Customers see their flows; admin sees all.
+        </div>
+      </div>
+
+      <div class="node shared">
+        <div class="node-title">Configure <span class="tag tag-exists">exists</span></div>
+        <div class="node-file">configure.html?org=...</div>
+        <div class="node-desc">
+          Role builder for this org. Assign agent vs. human to each role. Ethics guardrails, autonomy levels. Clickable role cards toggle assignment.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Onboard Flow -->
+  <div class="section">
+    <p class="level-label">Onboard Flow (new customer or new org)</p>
+    <div class="flow-row">
+      <div class="flow-node entry">Dashboard [+ New Org]</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node">Onboard (5 steps)</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node">Bootup (animation)</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node">Configure (pre-filled)</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node entry">Dashboard (org card appears)</div>
+    </div>
+    <p class="section-desc" style="margin-top:8px">
+      Flow ends by returning to Dashboard with the new org visible as an Active card. Not a dead end.
+    </p>
+  </div>
+
+  <!-- Prospect / Demo Track -->
+  <div class="section">
+    <p class="level-label">Prospect Demo Track</p>
+    <div class="tree-level">
+      <div class="node prospect-only">
+        <div class="node-title">Demo Dashboard <span class="tag tag-new">new</span></div>
+        <div class="node-file">dashboard.html?demo=true</div>
+        <div class="node-desc">
+          Read-only sandbox. Shows a pre-seeded "Acme Inc." demo org. Cards are clickable to explore, but no edits persist. CTA: "Start building your own →"
+        </div>
+      </div>
+
+      <div class="node prospect-only">
+        <div class="node-title">Demo Org <span class="tag tag-new">new</span></div>
+        <div class="node-file">org.html?demo=true</div>
+        <div class="node-desc">
+          Pre-populated org with agents, tasks, and flows running. Prospect can click into Queue, Flows, Configure — all read-only with sample data.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin-Only -->
+  <div class="section">
+    <p class="level-label">Admin-Only Surfaces (you)</p>
+    <div class="tree-level">
+      <div class="node admin-only">
+        <div class="node-title">All Orgs View</div>
+        <div class="node-file">dashboard.html (admin flag)</div>
+        <div class="node-desc">
+          Dashboard shows ALL customer orgs, not just your own. Search, filter, drill into any org.
+        </div>
+      </div>
+
+      <div class="node admin-only">
+        <div class="node-title">Global Services</div>
+        <div class="node-file">dashboard.html → services panel</div>
+        <div class="node-desc">
+          System health: probed service status, global queue stats, infrastructure alerts. Not visible to customers.
+        </div>
+      </div>
+
+      <div class="node admin-only">
+        <div class="node-title">CS Backdoor <span class="tag tag-new">new</span></div>
+        <div class="node-file">org.html?cs=true&org=...</div>
+        <div class="node-desc">
+          Agent-mediated entry into a customer's org for support. No raw PII — agent surfaces relevant context only.
+        </div>
+      </div>
+
+      <div class="node admin-only">
+        <div class="node-title">Theme Studio</div>
+        <div class="node-file">theme-studio-local.html</div>
+        <div class="node-desc">
+          CSS token editor. Admin-only tool, not part of the customer experience.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comparison -->
+  <div class="section">
+    <p class="section-title">What each audience sees</p>
+    <p class="section-desc">Every checkmark is a clickable surface.</p>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Page / Surface</th>
+          <th>Prospect (demo)</th>
+          <th>Customer</th>
+          <th>Admin (you)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Landing</td>
+          <td class="check">✓</td>
+          <td class="check">✓</td>
+          <td class="check">✓</td>
+        </tr>
+        <tr>
+          <td>Dashboard</td>
+          <td class="partial">◐ demo</td>
+          <td class="check">✓ own orgs</td>
+          <td class="check">✓ all orgs</td>
+        </tr>
+        <tr>
+          <td>Org Home</td>
+          <td class="partial">◐ read-only</td>
+          <td class="check">✓</td>
+          <td class="check">✓</td>
+        </tr>
+        <tr>
+          <td>Queue</td>
+          <td class="partial">◐ sample data</td>
+          <td class="check">✓ live tasks</td>
+          <td class="check">✓ all tasks</td>
+        </tr>
+        <tr>
+          <td>Flows</td>
+          <td class="partial">◐ view only</td>
+          <td class="check">✓ editable</td>
+          <td class="check">✓</td>
+        </tr>
+        <tr>
+          <td>Configure</td>
+          <td class="cross">✗</td>
+          <td class="check">✓</td>
+          <td class="check">✓</td>
+        </tr>
+        <tr>
+          <td>Onboard</td>
+          <td class="cross">✗</td>
+          <td class="check">✓</td>
+          <td class="check">✓</td>
+        </tr>
+        <tr>
+          <td>Global Services</td>
+          <td class="cross">✗</td>
+          <td class="cross">✗</td>
+          <td class="check">✓</td>
+        </tr>
+        <tr>
+          <td>CS Backdoor</td>
+          <td class="cross">✗</td>
+          <td class="cross">✗</td>
+          <td class="check">✓</td>
+        </tr>
+        <tr>
+          <td>Theme Studio</td>
+          <td class="cross">✗</td>
+          <td class="cross">✗</td>
+          <td class="check">✓</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Key decisions -->
+  <div class="section">
+    <p class="section-title">Key Architecture Decisions</p>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Decision</th>
+          <th>Before</th>
+          <th>After</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Dashboard position</td>
+          <td>Peer of other pages</td>
+          <td><strong>Roof — everything is under it</strong></td>
+        </tr>
+        <tr>
+          <td>Org cards</td>
+          <td>Decorative status display</td>
+          <td><strong>Clickable → drill into org detail</strong></td>
+        </tr>
+        <tr>
+          <td>Queue, Flows, Configure</td>
+          <td>Global/standalone pages</td>
+          <td><strong>Scoped to an org (via ?org= param)</strong></td>
+        </tr>
+        <tr>
+          <td>Demo mode</td>
+          <td>Separate ?demo=true behavior</td>
+          <td><strong>Pre-seeded sandbox org, same page structure</strong></td>
+        </tr>
+        <tr>
+          <td>Onboard flow exit</td>
+          <td>Dead end at Configure</td>
+          <td><strong>Returns to Dashboard with new org card</strong></td>
+        </tr>
+        <tr>
+          <td>Admin distinction</td>
+          <td>?admin=1 URL param</td>
+          <td><strong>Auth-based; admin sees all orgs + system panels</strong></td>
+        </tr>
+        <tr>
+          <td>Everything clickable</td>
+          <td>Some cards are display-only</td>
+          <td><strong>Cards, task rows, agent badges — all drill down</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ===================== PROSPECT VIEW ===================== -->
+<div class="map-view" id="view-prospect">
+  <div class="section">
+    <p class="section-title" style="color: rgba(var(--purple), 1)">Prospect Journey</p>
+    <p class="section-desc">No account. Exploring what AO can do. Everything is read-only with sample data.</p>
+
+    <div class="flow-row" style="margin-bottom: 32px">
+      <div class="flow-node entry">Landing page</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node">"Try the demo"</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node">Demo Dashboard</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node">Click "Acme Inc."</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node">Explore org</div>
+    </div>
+
+    <div class="tree-level">
+      <div class="node prospect-only">
+        <div class="node-title">Landing</div>
+        <div class="node-desc">Marketing page. "Try the demo" CTA is prominent. No login required to start exploring.</div>
+      </div>
+
+      <div class="node prospect-only">
+        <div class="node-title">Demo Dashboard</div>
+        <div class="node-desc">Pre-seeded with "Acme Inc." org card. Card is clickable. Persistent CTA: "Start building your own →" leads to signup.</div>
+      </div>
+
+      <div class="node prospect-only">
+        <div class="node-title">Demo Org Home</div>
+        <div class="node-desc">Agents are running, tasks are in progress. Can click into Queue (sample tasks), Flows (view-only canvas). Configure is hidden — they haven't earned that yet.</div>
+      </div>
+
+      <div class="node prospect-only">
+        <div class="node-title">Demo Queue</div>
+        <div class="node-desc">Sample tasks with agents working. Auto-heal fires. Feels alive. "This could be your team" energy.</div>
+      </div>
+    </div>
+
+    <p class="section-desc" style="margin-top: 24px">
+      <strong>What they can't do:</strong> Create orgs, configure roles, save anything, see system services. Everything resets on refresh.
+    </p>
+  </div>
+</div>
+
+<!-- ===================== CUSTOMER VIEW ===================== -->
+<div class="map-view" id="view-customer">
+  <div class="section">
+    <p class="section-title" style="color: rgba(var(--blue), 1)">Customer Journey</p>
+    <p class="section-desc">Authenticated user with their own org(s). Full read/write access to their stuff.</p>
+
+    <div class="flow-row" style="margin-bottom: 16px">
+      <div class="flow-node entry">Login</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node">Dashboard (my orgs)</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node">Click org card</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node">Org Home</div>
+    </div>
+    <div class="flow-row" style="margin-bottom: 32px; padding-left: 48px;">
+      <span class="flow-arrow" style="opacity:0">→</span>
+      <div class="flow-node">[+ New Org]</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node">Onboard (5 steps)</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node">Bootup</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node">Configure</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-node entry">Back to Dashboard</div>
+    </div>
+
+    <div class="tree-level">
+      <div class="node customer-only">
+        <div class="node-title">Dashboard</div>
+        <div class="node-desc">Shows only their org(s). Org cards are clickable. [+ New Org] to create another. No system services panel, no other customers' orgs.</div>
+      </div>
+
+      <div class="node customer-only">
+        <div class="node-title">Org Home</div>
+        <div class="node-desc">Their agents, their tasks, their workspace. Full read/write. Tabs: Queue, Flows, Configure. Each is clickable and scoped to this org.</div>
+      </div>
+
+      <div class="node customer-only">
+        <div class="node-title">Queue</div>
+        <div class="node-desc">Live tasks for their org. Can see agent assignments, status, auto-heal. Click task rows for detail. Can manually trigger tasks.</div>
+      </div>
+
+      <div class="node customer-only">
+        <div class="node-title">Flows</div>
+        <div class="node-desc">Full workflow canvas. Drag-drop agents, create trigger chains, edit automations. Saves to their org.</div>
+      </div>
+
+      <div class="node customer-only">
+        <div class="node-title">Configure</div>
+        <div class="node-desc">Role builder with agent/human toggles. Autonomy slider. Ethics lead always-on. Changes apply to their org immediately.</div>
+      </div>
+    </div>
+
+    <p class="section-desc" style="margin-top: 24px">
+      <strong>What they can't see:</strong> Other customers' orgs, global services, CS backdoor, Theme Studio.
+    </p>
+  </div>
+</div>
+
+<!-- ===================== ADMIN VIEW ===================== -->
+<div class="map-view" id="view-admin">
+  <div class="section">
+    <p class="section-title" style="color: rgba(var(--red), 0.9)">Admin View (You)</p>
+    <p class="section-desc">Everything customers see, plus: all orgs, system services, CS tools.</p>
+
+    <div class="tree-level">
+      <div class="node admin-only">
+        <div class="node-title">Dashboard (all orgs)</div>
+        <div class="node-desc">Every org across all customers. Search, filter by status/owner. Click any org card to drill in. "Review my orgs" section at top for your own.</div>
+        <div class="node-children">
+          <strong>Extra panels:</strong> Global Services status, infrastructure health, total agent/human counts across system
+        </div>
+      </div>
+
+      <div class="node admin-only">
+        <div class="node-title">CS Backdoor</div>
+        <div class="node-desc">Agent-mediated entry into customer orgs for support. No raw PII exposed — agent surfaces only relevant context. Audit trail on every access.</div>
+      </div>
+
+      <div class="node admin-only">
+        <div class="node-title">Global Queue</div>
+        <div class="node-desc">All tasks across all orgs. Filter by org, agent, status. Useful for spotting system-wide issues or stuck tasks.</div>
+      </div>
+
+      <div class="node admin-only">
+        <div class="node-title">Theme Studio</div>
+        <div class="node-desc">CSS token editor, design system management. Not a customer feature — purely operational tooling.</div>
+      </div>
+    </div>
+
+    <p class="section-desc" style="margin-top: 24px">
+      <strong>Admin distinguisher:</strong> Auth-based, not URL-param based. Your account is flagged as admin. No ?admin=1 needed.
+    </p>
+  </div>
+</div>
+
+<script>
+function showView(view) {
+  document.querySelectorAll('.map-view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  event.target.closest('.tab').classList.add('active');
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,374 @@
+/* ═══════════════════════════════════════════════════════════
+   AO Theme System — Shared Design Tokens
+   ═══════════════════════════════════════════════════════════
+   Import in every AO page:  <link rel="stylesheet" href="ao-theme.css">
+   Switch themes:            document.documentElement.dataset.theme = 'ops'
+   Persist:                  localStorage.setItem('ao_theme', 'ops')
+   ─────────────────────────────────────────────────────────── */
+
+/* ── Default: Ops (warm operational) ─────────────────────── */
+:root {
+  /* Surfaces — warm charcoal base, not blue-black */
+  --bg: #121110;
+  --bg2: #1a1816;
+  --surface: rgba(18,17,16,0.94);
+  --surface2: rgba(18,17,16,0.8);
+  --surface3: rgba(18,17,16,0.96);
+
+  /* Overlays — warm-tinted for modals, popovers, dropdowns */
+  --overlay: rgba(18,17,16,0.85);
+  --overlay2: rgba(24,22,20,0.92);
+  --overlay3: rgba(24,22,20,0.94);
+  --overlay4: rgba(24,22,20,0.95);
+  --overlay5: rgba(24,22,20,0.96);
+  --overlay6: rgba(24,22,20,0.97);
+  --overlay7: rgba(24,22,20,0.98);
+  --overlay8: rgba(22,20,18,0.98);
+
+  /* Canvas gradients (flows.html start/end nodes) */
+  --start-bg: rgba(28,22,12,0.9);
+  --end-bg: rgba(32,16,14,0.9);
+  --dot-grid: rgba(255,220,180,0.03);
+
+  /* Panels — warm white tints */
+  --panel: rgba(255,248,240,0.04);
+  --panel2: rgba(255,248,240,0.07);
+  --panel3: rgba(255,248,240,0.11);
+
+  /* Borders */
+  --border: rgba(255,248,240,0.08);
+  --border2: rgba(255,248,240,0.13);
+  --border3: rgba(255,248,240,0.20);
+
+  /* Text — warm off-white, not blue-white */
+  --text: rgba(245,240,232,0.93);
+  --muted: rgba(245,240,232,0.60);
+  --faint: rgba(245,240,232,0.42);
+  --ghost: rgba(245,240,232,0.24);
+  --hairline: rgba(245,240,232,0.07);
+
+  /* Semantic colors (RGB triplets for alpha compositing) */
+  --amber: 218,160,72;       /* primary accent — warm gold, not neon */
+  --green: 82,195,140;       /* success, active, go */
+  --blue: 120,170,210;       /* info, links */
+  --purple: 165,145,195;     /* secondary — desaturated, background role */
+  --pink: 200,130,145;       /* alerts, feminine agents */
+  --yellow: 210,185,85;      /* warnings, caution */
+  --red: 200,105,95;         /* errors, danger */
+  --teal: 110,195,175;       /* integrations */
+  --indigo: 140,150,190;     /* data, analytics */
+  --orange: 205,145,75;      /* operations category */
+  --cyan: 100,190,195;       /* triggers */
+  --lime: 155,195,85;        /* endpoints */
+
+  /* Accent alias — what the whole UI keys off of */
+  --accent: var(--amber);
+
+  /* Agent colors */
+  --c-ea: var(--amber);      /* Exec Assistant → amber (was purple) */
+  --c-admin: var(--amber);   /* Alias for c-ea (used by some pages) */
+  --c-mkt: var(--pink);      /* Marketing */
+  --c-dev: var(--blue);      /* Dev */
+  --c-uxr: var(--green);     /* UX Research */
+  --c-qa: var(--yellow);     /* QA */
+  --c-biz: var(--blue);      /* Biz Dev */
+  --c-cs: var(--teal);       /* Customer Service */
+  --c-ops: var(--red);       /* Ops/system */
+  --c-data: var(--indigo);   /* Data */
+  --c-content: var(--pink);  /* Content */
+
+  /* Status colors (queue.html) */
+  --s-done: var(--green);
+  --s-progress: var(--blue);
+  --s-queued: 245,240,232;
+  --s-blocked: var(--red);
+  --s-healing: var(--amber);
+
+  /* Shadows, effects */
+  --node-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  --conn-opacity: 0.3;
+  --search-icon: rgba(245,240,232,0.3);
+  --shadow-soft: 0 10px 30px rgba(0,0,0,0.35);
+
+  /* Radii */
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 8px;
+
+  /* Typography */
+  --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --ease: cubic-bezier(.2,.8,.2,1);
+
+  /* Page-level layout (used by dashboard, index, etc.) */
+  --max: 960px;
+  --pad: 28px;
+}
+
+
+/* ── Theme: Midnight (cool steel / ice blue / deep navy) ─── */
+[data-theme="midnight"] {
+  --bg: #0a0d14;
+  --bg2: #0e1220;
+  --surface: rgba(10,13,20,0.94);
+  --surface2: rgba(10,13,20,0.8);
+  --surface3: rgba(10,13,20,0.96);
+  --overlay: rgba(10,13,20,0.85);
+  --overlay2: rgba(14,18,32,0.92);
+  --overlay3: rgba(14,18,32,0.94);
+  --overlay4: rgba(14,18,32,0.95);
+  --overlay5: rgba(14,18,32,0.96);
+  --overlay6: rgba(14,18,32,0.97);
+  --overlay7: rgba(14,18,32,0.98);
+  --overlay8: rgba(12,16,28,0.98);
+  --start-bg: rgba(10,20,35,0.9);
+  --end-bg: rgba(18,12,28,0.9);
+  --dot-grid: rgba(140,180,230,0.035);
+  --panel: rgba(180,210,240,0.04);
+  --panel2: rgba(180,210,240,0.07);
+  --panel3: rgba(180,210,240,0.11);
+  --border: rgba(160,195,230,0.08);
+  --border2: rgba(160,195,230,0.14);
+  --border3: rgba(160,195,230,0.22);
+  --text: rgba(210,225,245,0.93);
+  --muted: rgba(200,215,235,0.58);
+  --faint: rgba(190,205,225,0.40);
+  --ghost: rgba(180,200,220,0.24);
+  --hairline: rgba(160,195,230,0.07);
+  --amber: 140,185,235;      /* → ice blue (primary in midnight) */
+  --green: 72,210,190;       /* → cool mint */
+  --blue: 110,165,240;       /* → brighter steel */
+  --purple: 145,160,220;     /* → periwinkle */
+  --pink: 170,140,210;       /* → lavender */
+  --yellow: 180,200,130;     /* → sage/cool gold */
+  --red: 220,120,120;
+  --teal: 94,220,215;
+  --indigo: 130,145,230;
+  --orange: 195,160,110;     /* → muted warm (secondary) */
+  --cyan: 120,205,230;
+  --lime: 150,210,120;
+  --accent: var(--amber);
+  --node-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  --conn-opacity: 0.3;
+  --search-icon: rgba(200,215,235,0.3);
+}
+
+
+/* ── Theme: Greenhouse (mint + cream + dark chocolate) ──── */
+[data-theme="greenhouse"] {
+  --bg: #1a1f1c;
+  --bg2: #222a25;
+  --surface: rgba(26,31,28,0.94);
+  --surface2: rgba(26,31,28,0.8);
+  --surface3: rgba(26,31,28,0.96);
+  --overlay: rgba(26,31,28,0.85);
+  --overlay2: rgba(30,40,34,0.92);
+  --overlay3: rgba(30,40,34,0.94);
+  --overlay4: rgba(30,40,34,0.95);
+  --overlay5: rgba(30,40,34,0.96);
+  --overlay6: rgba(30,40,34,0.97);
+  --overlay7: rgba(30,40,34,0.98);
+  --overlay8: rgba(28,36,30,0.98);
+  --start-bg: rgba(18,42,28,0.9);
+  --end-bg: rgba(42,22,22,0.9);
+  --dot-grid: rgba(180,210,190,0.04);
+  --panel: rgba(255,255,255,0.04);
+  --panel2: rgba(255,255,255,0.06);
+  --panel3: rgba(255,255,255,0.10);
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.12);
+  --border3: rgba(255,255,255,0.18);
+  --text: rgba(240,235,225,0.93);
+  --muted: rgba(240,235,225,0.58);
+  --faint: rgba(240,235,225,0.38);
+  --ghost: rgba(240,235,225,0.22);
+  --hairline: rgba(240,235,225,0.06);
+  --amber: 195,145,75;
+  --green: 76,175,130;
+  --blue: 108,170,190;
+  --purple: 110,190,160;
+  --pink: 185,120,145;
+  --yellow: 200,175,80;
+  --red: 200,100,95;
+  --teal: 100,195,170;
+  --indigo: 130,155,195;
+  --orange: 195,130,70;
+  --cyan: 80,190,185;
+  --lime: 140,195,85;
+  --accent: var(--amber);
+  --node-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  --conn-opacity: 0.3;
+  --search-icon: rgba(255,255,255,0.3);
+}
+
+
+/* ── Theme: Sandstone (warm tan + terracotta + charcoal) ── */
+[data-theme="sandstone"] {
+  --bg: #1e1b18;
+  --bg2: #252220;
+  --surface: rgba(30,27,24,0.94);
+  --surface2: rgba(30,27,24,0.8);
+  --surface3: rgba(30,27,24,0.96);
+  --overlay: rgba(30,27,24,0.85);
+  --overlay2: rgba(38,34,30,0.92);
+  --overlay3: rgba(38,34,30,0.94);
+  --overlay4: rgba(38,34,30,0.95);
+  --overlay5: rgba(38,34,30,0.96);
+  --overlay6: rgba(38,34,30,0.97);
+  --overlay7: rgba(38,34,30,0.98);
+  --overlay8: rgba(35,30,26,0.98);
+  --start-bg: rgba(28,38,22,0.9);
+  --end-bg: rgba(40,24,20,0.9);
+  --dot-grid: rgba(200,180,160,0.04);
+  --panel: rgba(255,248,240,0.04);
+  --panel2: rgba(255,248,240,0.06);
+  --panel3: rgba(255,248,240,0.10);
+  --border: rgba(255,248,240,0.08);
+  --border2: rgba(255,248,240,0.12);
+  --border3: rgba(255,248,240,0.20);
+  --text: rgba(245,238,228,0.93);
+  --muted: rgba(245,238,228,0.58);
+  --faint: rgba(245,238,228,0.38);
+  --ghost: rgba(245,238,228,0.22);
+  --hairline: rgba(245,238,228,0.06);
+  --amber: 210,155,80;
+  --green: 140,175,110;
+  --blue: 140,165,190;
+  --purple: 195,150,110;
+  --pink: 195,125,130;
+  --yellow: 210,180,90;
+  --red: 200,105,90;
+  --teal: 120,185,165;
+  --indigo: 145,150,190;
+  --orange: 205,140,75;
+  --cyan: 100,185,185;
+  --lime: 160,190,90;
+  --accent: var(--amber);
+  --node-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  --conn-opacity: 0.3;
+  --search-icon: rgba(255,255,255,0.3);
+}
+
+
+/* ── Theme: Studio (clean light) ─────────────────────────── */
+[data-theme="studio"] {
+  --bg: #f4f2ee;
+  --bg2: #eae7e2;
+  --surface: rgba(244,242,238,0.96);
+  --surface2: rgba(244,242,238,0.85);
+  --surface3: rgba(244,242,238,0.97);
+  --overlay: rgba(244,242,238,0.88);
+  --overlay2: rgba(235,232,226,0.94);
+  --overlay3: rgba(235,232,226,0.96);
+  --overlay4: rgba(235,232,226,0.96);
+  --overlay5: rgba(235,232,226,0.97);
+  --overlay6: rgba(235,232,226,0.98);
+  --overlay7: rgba(235,232,226,0.99);
+  --overlay8: rgba(240,237,232,0.99);
+  --start-bg: rgba(220,240,228,0.9);
+  --end-bg: rgba(245,225,220,0.9);
+  --dot-grid: rgba(0,0,0,0.04);
+  --panel: rgba(0,0,0,0.03);
+  --panel2: rgba(0,0,0,0.05);
+  --panel3: rgba(0,0,0,0.08);
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.12);
+  --border3: rgba(0,0,0,0.18);
+  --text: rgba(28,26,24,0.9);
+  --muted: rgba(28,26,24,0.55);
+  --faint: rgba(28,26,24,0.38);
+  --ghost: rgba(28,26,24,0.22);
+  --hairline: rgba(28,26,24,0.07);
+  --amber: 180,120,45;
+  --green: 60,140,95;
+  --blue: 65,120,170;
+  --purple: 155,90,75;
+  --pink: 175,90,110;
+  --yellow: 180,150,50;
+  --red: 190,75,70;
+  --teal: 50,155,140;
+  --indigo: 95,100,170;
+  --orange: 185,115,50;
+  --cyan: 40,155,165;
+  --lime: 105,160,55;
+  --accent: var(--amber);
+  --node-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06);
+  --conn-opacity: 0.45;
+  --search-icon: rgba(0,0,0,0.3);
+}
+
+
+/* ── Theme: Daybreak (soft blue-white / sky / cloud) ────── */
+[data-theme="daybreak"] {
+  --bg: #f0f4f8;
+  --bg2: #e4eaf0;
+  --surface: rgba(240,244,248,0.96);
+  --surface2: rgba(240,244,248,0.85);
+  --surface3: rgba(240,244,248,0.97);
+  --overlay: rgba(240,244,248,0.88);
+  --overlay2: rgba(228,234,240,0.94);
+  --overlay3: rgba(228,234,240,0.96);
+  --overlay4: rgba(228,234,240,0.96);
+  --overlay5: rgba(228,234,240,0.97);
+  --overlay6: rgba(228,234,240,0.98);
+  --overlay7: rgba(228,234,240,0.99);
+  --overlay8: rgba(234,239,244,0.99);
+  --start-bg: rgba(220,235,248,0.9);
+  --end-bg: rgba(240,225,230,0.9);
+  --dot-grid: rgba(0,0,0,0.03);
+  --panel: rgba(0,0,0,0.025);
+  --panel2: rgba(0,0,0,0.04);
+  --panel3: rgba(0,0,0,0.065);
+  --border: rgba(0,0,0,0.07);
+  --border2: rgba(0,0,0,0.11);
+  --border3: rgba(0,0,0,0.16);
+  --text: rgba(20,30,44,0.9);
+  --muted: rgba(20,30,44,0.52);
+  --faint: rgba(20,30,44,0.35);
+  --ghost: rgba(20,30,44,0.2);
+  --hairline: rgba(20,30,44,0.06);
+  --amber: 58,120,180;        /* → slate blue (primary in daybreak) */
+  --green: 40,145,110;
+  --blue: 55,105,175;
+  --purple: 95,85,170;
+  --pink: 155,70,120;
+  --yellow: 165,140,40;
+  --red: 185,65,65;
+  --teal: 35,150,145;
+  --indigo: 75,80,165;
+  --orange: 175,105,40;
+  --cyan: 30,145,160;
+  --lime: 85,150,50;
+  --accent: var(--amber);
+  --node-shadow: 0 4px 16px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  --conn-opacity: 0.45;
+  --search-icon: rgba(0,0,0,0.3);
+}
+
+
+/* Studio light-mode overrides for SVG icons & shadows */
+[data-theme="studio"] .sb-search input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='rgba(0,0,0,0.3)' stroke-width='2'%3E%3Ccircle cx='6' cy='6' r='4.5'/%3E%3Cpath d='M9.5 9.5L13 13'/%3E%3C/svg%3E");
+}
+[data-theme="studio"] .cnode { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+[data-theme="studio"] .tb-btn.run { color: rgb(var(--green)); font-weight: 700; }
+[data-theme="studio"] .warn { background: rgba(0,0,0,0.25); }
+[data-theme="studio"] .insp-field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6' fill='rgba(0,0,0,0.3)'/%3E%3C/svg%3E");
+}
+
+
+/* ── Theme transition smoothing ──────────────────────────── */
+html { transition: background 0.35s ease, color 0.35s ease; }
+body { transition: background 0.35s ease, color 0.35s ease; }
+.topbar, .ao-nav { transition: background 0.35s ease; }
+.sidebar { transition: background 0.35s ease; }
+.canvas-wrap { transition: background 0.35s ease; }
+
+
+/* ── Theme persistence helper (inline in pages or via JS) ─
+   document.addEventListener('DOMContentLoaded', () => {
+     const saved = localStorage.getItem('ao_theme');
+     if (saved) document.documentElement.dataset.theme = saved;
+   });
+   ─────────────────────────────────────────────────────────── */

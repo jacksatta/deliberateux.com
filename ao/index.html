@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-9MSXWF3TX3"></script>
@@ -14,36 +14,13 @@
   <title>AO — Autonomous Operations</title>
   <meta name="description" content="The agent operating system for one-person companies. Seven AI agents, one protocol, real products shipping." />
   <link rel="icon" href="/assets/favicon.svg" />
+  <link rel="stylesheet" href="ao-theme.css">
+  <script>/* theme persistence */ (function(){var t=localStorage.getItem('ao_theme');if(t)document.documentElement.dataset.theme=t})()</script>
   <style>
-    /* ── Reset + tokens ─────────────────────────────────────── */
+    /* ── Page overrides ─────────────────────────────────────── */
     :root {
-      --bg: #070812;
-      --bg2: #0b1021;
-      --panel: rgba(255,255,255,0.06);
-      --panel2: rgba(255,255,255,0.08);
-      --border: rgba(255,255,255,0.10);
-      --border2: rgba(255,255,255,0.14);
-      --text: rgba(255,255,255,0.92);
-      --muted: rgba(255,255,255,0.68);
-      --faint: rgba(255,255,255,0.52);
-      --ghost: rgba(255,255,255,0.28);
-      --hairline: rgba(255,255,255,0.08);
-      --shadow-soft: 0 10px 30px rgba(0,0,0,0.35);
       --radius-lg: 24px;
       --radius-md: 18px;
-      --max: 960px;
-      --pad: 28px;
-      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      --ease: cubic-bezier(.2,.8,.2,1);
-      /* Agent colors */
-      --c-ea: 168,139,250;
-      --c-mkt: 244,114,182;
-      --c-dev: 96,165,250;
-      --c-uxr: 52,211,153;
-      --c-qa: 251,191,36;
-      --c-biz: 147,197,253;
-      --c-cs: 110,231,183;
     }
     *, *::before, *::after { box-sizing: border-box; }
     html { height: 100%; }
@@ -54,22 +31,22 @@
       color: var(--text);
       background-color: var(--bg);
       background-image:
-        radial-gradient(1200px 900px at 20% -10%, rgba(142,72,255,0.25), transparent 55%),
-        radial-gradient(900px 700px at 90% 0%, rgba(0,168,255,0.18), transparent 55%),
-        radial-gradient(900px 900px at 70% 90%, rgba(255,88,198,0.12), transparent 55%),
+        radial-gradient(1200px 900px at 20% -10%, rgba(var(--amber),0.18), transparent 55%),
+        radial-gradient(900px 700px at 90% 0%, rgba(var(--blue),0.14), transparent 55%),
+        radial-gradient(900px 900px at 70% 90%, rgba(var(--pink),0.08), transparent 55%),
         linear-gradient(180deg, var(--bg2), var(--bg));
       background-attachment: fixed;
       -webkit-font-smoothing: antialiased;
     }
     img { max-width: 100%; display: block; }
     a { color: var(--text); text-decoration: none; }
-    ::selection { background: rgba(140,90,255,0.35); }
+    ::selection { background: rgba(var(--amber),0.25); }
     .container { width: min(var(--max), calc(100% - 64px)); margin: 0 auto; }
 
     /* ── Shared sticky nav ───────────────────────────────── */
     .ao-nav {
       position: sticky; top: 0; z-index: 200;
-      background: rgba(7,8,18,0.88);
+      background: var(--surface);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid rgba(255,255,255,0.07);

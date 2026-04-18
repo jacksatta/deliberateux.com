@@ -6,26 +6,11 @@
   <title>Work Queue — AO</title>
   <meta name="description" content="Live work queue for AO agent operations. Watch tasks flow through agents with auto-heal on failures." />
   <link rel="icon" href="/assets/favicon.svg" />
+  <link rel="stylesheet" href="ao-theme.css">
+  <script>/* theme persistence */ (function(){var t=localStorage.getItem('ao_theme');if(t)document.documentElement.dataset.theme=t})()</script>
   <style>
     :root {
-      --bg: #070812; --bg2: #0b1021;
-      --panel: rgba(255,255,255,0.05); --panel2: rgba(255,255,255,0.08);
-      --border: rgba(255,255,255,0.09); --border2: rgba(255,255,255,0.14);
-      --text: rgba(255,255,255,0.92); --muted: rgba(255,255,255,0.58);
-      --faint: rgba(255,255,255,0.38); --ghost: rgba(255,255,255,0.22);
-      --hairline: rgba(255,255,255,0.07);
       --max: 860px;
-      --font: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-      --mono: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
-      --ease: cubic-bezier(.2,.8,.2,1);
-      /* agent colors */
-      --c-admin: 168,139,250; --c-mkt: 244,114,182; --c-dev: 96,165,250;
-      --c-uxr: 52,211,153; --c-qa: 251,191,36; --c-biz: 147,197,253;
-      --c-cs: 110,231,183; --c-ops: 248,113,113;
-      /* status */
-      --s-done: 52,211,153; --s-progress: 96,165,250;
-      --s-queued: 255,255,255; --s-blocked: 248,113,113;
-      --s-healing: 245,158,11;
     }
     *,*::before,*::after{box-sizing:border-box}
     html{height:100%}
@@ -42,7 +27,7 @@
     ::selection{background:rgba(96,165,250,0.25)}
 
     /* ── Nav ──────────────────────────────────────────── */
-    .ao-nav{position:sticky;top:0;z-index:200;background:rgba(7,8,18,0.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.07)}
+    .ao-nav{position:sticky;top:0;z-index:200;background:var(--surface);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.07)}
     .ao-nav-inner{width:min(var(--max),calc(100% - 48px));margin:0 auto;display:flex;align-items:center;height:54px}
     .ao-nav-logo{font-size:0.95rem;font-weight:700;display:flex;align-items:center;gap:8px;color:var(--text);text-decoration:none;margin-right:auto}
     .ao-nav-context{font-weight:400;color:var(--muted);margin-left:2px}

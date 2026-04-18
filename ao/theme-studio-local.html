@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AO Theme Studio Light</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0}
+  body{overflow:hidden;height:100vh}
+  input[type="range"]{-webkit-appearance:none;appearance:none;background:rgba(245,240,232,0.08);border-radius:2px;outline:none;height:3px}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:rgb(218,160,72);cursor:pointer;border:2px solid rgba(0,0,0,0.3)}
+  input[type="range"]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:rgb(218,160,72);cursor:pointer;border:2px solid rgba(0,0,0,0.3)}
+  ::-webkit-scrollbar{width:5px;height:5px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:rgba(245,240,232,0.1);border-radius:3px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes checkPop{0%{transform:scale(0)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+  @keyframes shimmer{0%{background-position:-200px 0}100%{background-position:200px 0}}
+  @keyframes confettiFall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(60px) rotate(720deg);opacity:0}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const{useState,useRef,useCallback,useEffect,useMemo}=React;
+
+/* ═══════════════════════════════════════════════════════════
+   COLOR HARMONY ENGINE
+   ═══════════════════════════════════════════════════════════ */
+function rgbToHsl(r,g,b){r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2;let h=0,s=0;if(mx!==mn){const d=mx-mn;s=l>0.5?d/(2-mx-mn):d/(mx+mn);switch(mx){case r:h=((g-b)/d+(g<b?6:0))/6;break;case g:h=((b-r)/d+2)/6;break;case b:h=((r-g)/d+4)/6;break}}return[h*360,s*100,l*100]}
+function hslToRgb(h,s,l){h/=360;s/=100;l/=100;let r,g,b;if(s===0){r=g=b=l}else{const hue2rgb=(p,q,t)=>{if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<1/2)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p};const q=l<0.5?l*(1+s):l+s-l*s,p=2*l-q;r=hue2rgb(p,q,h+1/3);g=hue2rgb(p,q,h);b=hue2rgb(p,q,h-1/3)}return[Math.round(r*255),Math.round(g*255),Math.round(b*255)]}
+
+const HARMONY_TYPES={
+  complementary:{label:"Complementary",desc:"Opposite hues",offsets:[0,180]},
+  analogous:{label:"Analogous",desc:"Adjacent hues",offsets:[0,30,330]},
+  triadic:{label:"Triadic",desc:"Three equal",offsets:[0,120,240]},
+  split:{label:"Split-comp",desc:"Split opposite",offsets:[0,150,210]},
+  tetradic:{label:"Tetradic",desc:"Rectangle",offsets:[0,60,180,240]},
+};
+
+function generateHarmony(baseRgb,type){
+  const[h,s,l]=rgbToHsl(...baseRgb);
+  const offsets=HARMONY_TYPES[type]?.offsets||[0];
+  return offsets.map(off=>hslToRgb((h+off)%360,s,l));
+}
+
+/* ═══════════════════════════════════════════════════════════
+   THEME DATA
+   ═══════════════════════════════════════════════════════════ */
+const OLD_THEME={
+  label:"Legacy",bg:"#070812",bg2:"#0b1021",
+  surface:"rgba(7,8,18,0.94)",surface2:"rgba(7,8,18,0.8)",
+  panel:"rgba(255,255,255,0.05)",panel2:"rgba(255,255,255,0.08)",panel3:"rgba(255,255,255,0.12)",
+  border:"rgba(255,255,255,0.09)",border2:"rgba(255,255,255,0.14)",
+  text:"rgba(255,255,255,0.93)",muted:"rgba(255,255,255,0.6)",
+  faint:"rgba(255,255,255,0.4)",ghost:"rgba(255,255,255,0.24)",hairline:"rgba(255,255,255,0.07)",
+  dotGrid:"rgba(255,255,255,0.035)",
+  amber:[168,139,250],green:[52,211,153],blue:[96,165,250],
+  purple:[168,139,250],pink:[244,114,182],red:[248,113,113],
+  teal:[94,234,212],yellow:[251,191,36],indigo:[129,140,248],
+  orange:[251,146,60],cyan:[34,211,238],lime:[163,230,53],
+  accent:"amber",isLight:false,
+};
+
+const THEMES={
+  ops:{label:"Ops",desc:"Amber / copper / warm charcoal",
+    bg:"#121110",bg2:"#1a1816",surface:"rgba(18,17,16,0.94)",surface2:"rgba(18,17,16,0.8)",
+    panel:"rgba(255,248,240,0.04)",panel2:"rgba(255,248,240,0.07)",panel3:"rgba(255,248,240,0.11)",
+    border:"rgba(255,248,240,0.08)",border2:"rgba(255,248,240,0.13)",
+    text:"rgba(245,240,232,0.93)",muted:"rgba(245,240,232,0.60)",
+    faint:"rgba(245,240,232,0.42)",ghost:"rgba(245,240,232,0.24)",hairline:"rgba(245,240,232,0.07)",
+    dotGrid:"rgba(255,220,180,0.03)",
+    amber:[218,160,72],green:[82,195,140],blue:[120,170,210],
+    purple:[165,145,195],pink:[200,130,145],red:[200,105,95],
+    teal:[110,195,175],yellow:[210,185,85],indigo:[140,150,190],
+    orange:[205,145,75],cyan:[100,190,195],lime:[155,195,85],
+    accent:"amber",isLight:false},
+  midnight:{label:"Midnight",desc:"Cool steel / ice blue / deep navy",
+    bg:"#0a0d14",bg2:"#0e1220",surface:"rgba(10,13,20,0.94)",surface2:"rgba(10,13,20,0.8)",
+    panel:"rgba(180,210,240,0.04)",panel2:"rgba(180,210,240,0.07)",panel3:"rgba(180,210,240,0.11)",
+    border:"rgba(160,195,230,0.08)",border2:"rgba(160,195,230,0.14)",
+    text:"rgba(210,225,245,0.93)",muted:"rgba(200,215,235,0.58)",
+    faint:"rgba(190,205,225,0.40)",ghost:"rgba(180,200,220,0.24)",hairline:"rgba(160,195,230,0.07)",
+    dotGrid:"rgba(140,180,230,0.035)",
+    amber:[140,185,235],green:[72,210,190],blue:[110,165,240],
+    purple:[145,160,220],pink:[170,140,210],red:[220,120,120],
+    teal:[94,220,215],yellow:[180,200,130],indigo:[130,145,230],
+    orange:[195,160,110],cyan:[120,205,230],lime:[150,210,120],
+    accent:"amber",isLight:false},
+  greenhouse:{label:"Greenhouse",desc:"Mint / cream / dark chocolate",
+    bg:"#1a1f1c",bg2:"#222a25",surface:"rgba(26,31,28,0.94)",surface2:"rgba(26,31,28,0.8)",
+    panel:"rgba(255,255,255,0.04)",panel2:"rgba(255,255,255,0.06)",panel3:"rgba(255,255,255,0.10)",
+    border:"rgba(255,255,255,0.08)",border2:"rgba(255,255,255,0.12)",
+    text:"rgba(240,235,225,0.93)",muted:"rgba(240,235,225,0.58)",
+    faint:"rgba(240,235,225,0.38)",ghost:"rgba(240,235,225,0.22)",hairline:"rgba(240,235,225,0.06)",
+    dotGrid:"rgba(180,210,190,0.04)",
+    amber:[195,145,75],green:[76,175,130],blue:[108,170,190],
+    purple:[110,190,160],pink:[185,120,145],red:[200,100,95],
+    teal:[100,195,170],yellow:[200,175,80],indigo:[130,155,195],
+    orange:[195,130,70],cyan:[80,190,185],lime:[140,195,85],
+    accent:"amber",isLight:false},
+  sandstone:{label:"Sandstone",desc:"Warm tan / terracotta / charcoal",
+    bg:"#1e1b18",bg2:"#252220",surface:"rgba(30,27,24,0.94)",surface2:"rgba(30,27,24,0.8)",
+    panel:"rgba(255,248,240,0.04)",panel2:"rgba(255,248,240,0.06)",panel3:"rgba(255,248,240,0.10)",
+    border:"rgba(255,248,240,0.08)",border2:"rgba(255,248,240,0.12)",
+    text:"rgba(245,238,228,0.93)",muted:"rgba(245,238,228,0.58)",
+    faint:"rgba(245,238,228,0.38)",ghost:"rgba(245,238,228,0.22)",hairline:"rgba(245,238,228,0.06)",
+    dotGrid:"rgba(200,180,160,0.04)",
+    amber:[210,155,80],green:[140,175,110],blue:[140,165,190],
+    purple:[195,150,110],pink:[195,125,130],red:[200,105,90],
+    teal:[120,185,165],yellow:[210,180,90],indigo:[145,150,190],
+    orange:[205,140,75],cyan:[100,185,185],lime:[160,190,90],
+    accent:"amber",isLight:false},
+  studio:{label:"Studio",desc:"Clean light / warm ivory",
+    bg:"#f4f2ee",bg2:"#eae7e2",surface:"rgba(244,242,238,0.96)",surface2:"rgba(244,242,238,0.85)",
+    panel:"rgba(0,0,0,0.03)",panel2:"rgba(0,0,0,0.05)",panel3:"rgba(0,0,0,0.08)",
+    border:"rgba(0,0,0,0.08)",border2:"rgba(0,0,0,0.12)",
+    text:"rgba(28,26,24,0.9)",muted:"rgba(28,26,24,0.55)",
+    faint:"rgba(28,26,24,0.38)",ghost:"rgba(28,26,24,0.22)",hairline:"rgba(28,26,24,0.07)",
+    dotGrid:"rgba(0,0,0,0.04)",
+    amber:[180,120,45],green:[60,140,95],blue:[65,120,170],
+    purple:[155,90,75],pink:[175,90,110],red:[190,75,70],
+    teal:[50,155,140],yellow:[180,150,50],indigo:[95,100,170],
+    orange:[185,115,50],cyan:[40,155,165],lime:[105,160,55],
+    accent:"amber",isLight:true},
+  daybreak:{label:"Daybreak",desc:"Soft blue-white / sky / cloud",
+    bg:"#f0f4f8",bg2:"#e4eaf0",surface:"rgba(240,244,248,0.96)",surface2:"rgba(240,244,248,0.85)",
+    panel:"rgba(0,0,0,0.025)",panel2:"rgba(0,0,0,0.04)",panel3:"rgba(0,0,0,0.065)",
+    border:"rgba(0,0,0,0.07)",border2:"rgba(0,0,0,0.11)",
+    text:"rgba(20,30,44,0.9)",muted:"rgba(20,30,44,0.52)",
+    faint:"rgba(20,30,44,0.35)",ghost:"rgba(20,30,44,0.2)",hairline:"rgba(20,30,44,0.06)",
+    dotGrid:"rgba(0,0,0,0.03)",
+    amber:[58,120,180],green:[40,145,110],blue:[55,105,175],
+    purple:[95,85,170],pink:[155,70,120],red:[185,65,65],
+    teal:[35,150,145],yellow:[165,140,40],indigo:[75,80,165],
+    orange:[175,105,40],cyan:[30,145,160],lime:[85,150,50],
+    accent:"amber",isLight:true},
+};
+
+const FONTS=[
+  {id:"system",label:"System",value:"ui-sans-serif, system-ui, -apple-system, sans-serif"},
+  {id:"inter",label:"Inter",value:"'Inter', ui-sans-serif, system-ui, sans-serif"},
+  {id:"mono",label:"Mono",value:"ui-monospace, SFMono-Regular, Menlo, monospace"},
+  {id:"serif",label:"Serif",value:"Georgia, 'Times New Roman', serif"},
+  {id:"humanist",label:"Humanist",value:"'Gill Sans', 'Segoe UI', Candara, sans-serif"},
+];
+
+const AO_PAGES=[
+  {id:"flows",label:"Flows",desc:"Visual workflow canvas",file:"flows.html"},
+  {id:"dashboard",label:"Dashboard",desc:"Admin overview",file:"dashboard.html"},
+  {id:"index",label:"Landing",desc:"AO home page",file:"index.html"},
+  {id:"queue",label:"Queue",desc:"Live work queue",file:"queue.html"},
+  {id:"onboard",label:"Onboard",desc:"Org setup wizard",file:"onboard.html"},
+  {id:"configure",label:"Configure",desc:"Settings",file:"configure.html"},
+];
+
+const rgb=a=>`rgb(${a[0]},${a[1]},${a[2]})`;
+const rgba=(a,o)=>`rgba(${a[0]},${a[1]},${a[2]},${o})`;
+const DEFAULT_SUBS={font:"system",radiusLg:20,radiusMd:14,radiusSm:8,spacing:1.0,panelOpacity:1.0};
+
+/* ZOOM presets */
+const ZOOM_PRESETS=[
+  {label:"Fit",value:"fit"},
+  {label:"50%",value:0.5},
+  {label:"75%",value:0.75},
+  {label:"100%",value:1},
+  {label:"150%",value:1.5},
+];
+
+/* ═══════════════════════════════════════════════════════════
+   MINI PAGE RENDERERS
+   ═══════════════════════════════════════════════════════════ */
+function FlowsPreview({t,subs}){
+  const r=subs.radiusSm,sp=subs.spacing;
+  return <div style={{display:"flex",height:"100%",overflow:"hidden"}}>
+    <div style={{width:90*sp,background:t.surface2,borderRight:`1px solid ${t.hairline}`,padding:`${6*sp}px`,display:"flex",flexDirection:"column",gap:3,flexShrink:0}}>
+      <div style={{fontSize:5,color:t.ghost,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:700,marginBottom:2}}>Agents</div>
+      {["Exec","UX Res","Dev","Mktg","QA"].map((name,i)=>{
+        const colors=[t.amber,t.green,t.blue,t.pink,t.yellow];
+        return <div key={i} style={{display:"flex",alignItems:"center",gap:4,padding:`${3*sp}px ${4*sp}px`,borderRadius:r*0.6,background:i===0?t.panel2:"transparent",fontSize:6,color:i===0?t.text:t.muted}}>
+          <div style={{width:4,height:4,borderRadius:2,background:rgb(colors[i]),flexShrink:0}}/>{name}
+        </div>;
+      })}
+    </div>
+    <div style={{flex:1,position:"relative",background:t.bg,backgroundImage:`radial-gradient(circle at 1px 1px, ${t.dotGrid} 1px, transparent 0)`,backgroundSize:"14px 14px"}}>
+      <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",display:"flex",alignItems:"center",gap:16*sp}}>
+        {[{l:"Trigger",s:"webhook",c:t.teal},{l:"Process",s:"agent",c:t.amber},{l:"Output",s:"deploy",c:t.green}].map((n,i)=>
+          <div key={i} style={{display:"flex",alignItems:"center",gap:8*sp}}>
+            {i>0&&<div style={{width:16,height:1,background:rgba(t.amber,0.25)}}/>}
+            <div style={{width:58,padding:`${6*sp}px 0`,borderRadius:r,background:t.panel,border:`1px solid ${rgba(n.c,0.25)}`,display:"flex",flexDirection:"column",alignItems:"center",boxShadow:t.isLight?"0 2px 6px rgba(0,0,0,0.06)":"0 4px 12px rgba(0,0,0,0.3)"}}>
+              <span style={{fontSize:6,fontWeight:600,color:t.text}}>{n.l}</span>
+              <span style={{fontSize:5,color:t.faint,marginTop:1}}>{n.s}</span>
+            </div>
+          </div>
+        )}
+      </div>
+      <div style={{position:"absolute",top:6,left:"50%",transform:"translateX(-50%)",background:t.panel2,border:`1px solid ${t.border}`,borderRadius:r,padding:`2px ${8*sp}px`,fontSize:6,fontWeight:600,color:t.muted,whiteSpace:"nowrap"}}>Customer Onboarding</div>
+    </div>
+  </div>;
+}
+
+function DashboardPreview({t,subs}){
+  const r=subs.radiusMd,sp=subs.spacing;
+  return <div style={{padding:`${10*sp}px ${12*sp}px`,height:"100%",overflow:"hidden"}}>
+    <div style={{fontSize:9,fontWeight:700,color:t.text,marginBottom:4}}>Dashboard</div>
+    <div style={{fontSize:5,color:t.muted,marginBottom:8*sp}}>3 orgs · 7 agents active</div>
+    <div style={{display:"flex",gap:6*sp,marginBottom:8*sp}}>
+      {[{l:"Tasks",v:"142",c:t.amber},{l:"Active",v:"7",c:t.green},{l:"Queued",v:"23",c:t.blue}].map((s,i)=>
+        <div key={i} style={{flex:1,background:t.panel,border:`1px solid ${t.border}`,borderRadius:r*0.7,padding:`${5*sp}px ${6*sp}px`}}>
+          <div style={{fontSize:5,color:t.faint,marginBottom:2}}>{s.l}</div>
+          <div style={{fontSize:11,fontWeight:700,color:rgb(s.c)}}>{s.v}</div>
+        </div>
+      )}
+    </div>
+    <div style={{background:t.panel,borderRadius:r*0.6,border:`1px solid ${t.border}`,overflow:"hidden"}}>
+      {[{n:"Exec Assist",s:"Active",t:"34",c:t.amber},{n:"UX Research",s:"Active",t:"28",c:t.green},{n:"Dev Agent",s:"Idle",t:"41",c:t.blue}].map((row,i)=>
+        <div key={i} style={{display:"flex",padding:`${3*sp}px ${6*sp}px`,borderBottom:`1px solid ${t.hairline}`,fontSize:5.5,color:t.text,alignItems:"center"}}>
+          <span style={{flex:2,display:"flex",alignItems:"center",gap:3}}><div style={{width:4,height:4,borderRadius:2,background:rgb(row.c)}}/>{row.n}</span>
+          <span style={{flex:1,color:row.s==="Active"?rgb(t.green):t.faint,fontSize:5}}>{row.s}</span>
+          <span style={{flex:1,fontFamily:"monospace",fontSize:5,color:t.muted}}>{row.t}</span>
+        </div>
+      )}
+    </div>
+  </div>;
+}
+
+function LandingPreview({t,subs}){
+  const r=subs.radiusLg,sp=subs.spacing;
+  return <div style={{height:"100%",overflow:"hidden",position:"relative"}}>
+    <div style={{position:"absolute",inset:0,background:`radial-gradient(400px 300px at 25% -10%, ${rgba(t.amber,0.15)}, transparent 60%), radial-gradient(350px 280px at 80% 5%, ${rgba(t.blue,0.12)}, transparent 55%), linear-gradient(180deg, ${t.bg2}, ${t.bg})`}}/>
+    <div style={{position:"relative",padding:`${14*sp}px ${16*sp}px`,textAlign:"center"}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:5,marginBottom:10*sp}}>
+        <div style={{width:6,height:6,borderRadius:3,background:rgb(t.amber),boxShadow:`0 0 8px ${rgba(t.amber,0.5)}`}}/>
+        <span style={{fontSize:10,fontWeight:700,color:t.text}}>AO</span>
+      </div>
+      <div style={{fontSize:12,fontWeight:700,color:t.text,lineHeight:1.25,marginBottom:4}}>Autonomous<br/>Operations</div>
+      <div style={{fontSize:5.5,color:t.muted,marginBottom:10*sp,lineHeight:1.4}}>The agent operating system<br/>for one-person companies</div>
+      <div style={{display:"inline-flex",padding:`${4*sp}px ${12*sp}px`,borderRadius:r*0.5,background:rgba(t.amber,0.14),border:`1px solid ${rgba(t.amber,0.3)}`,fontSize:6,fontWeight:600,color:rgb(t.amber)}}>Get Started</div>
+    </div>
+  </div>;
+}
+
+function QueuePreview({t,subs}){
+  const r=subs.radiusSm,sp=subs.spacing;
+  return <div style={{padding:`${8*sp}px ${10*sp}px`,height:"100%",overflow:"hidden"}}>
+    <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6*sp}}>
+      <span style={{fontSize:8,fontWeight:700,color:t.text}}>Work Queue</span>
+      <span style={{fontSize:5,padding:"1px 5px",borderRadius:3,background:rgba(t.green,0.14),color:rgb(t.green),fontWeight:600}}>2 running</span>
+    </div>
+    {[{task:"Draft proposal",pct:72,c:t.amber},{task:"User interviews",pct:45,c:t.green},{task:"API endpoint",pct:0,c:t.blue},{task:"Test suite",pct:0,c:t.yellow}].map((tk,i)=>
+      <div key={i} style={{display:"flex",alignItems:"center",gap:6,padding:`${4*sp}px ${6*sp}px`,background:t.panel,border:`1px solid ${t.border}`,borderRadius:r,position:"relative",overflow:"hidden",marginBottom:3*sp}}>
+        {tk.pct>0&&<div style={{position:"absolute",left:0,top:0,bottom:0,width:`${tk.pct}%`,background:rgba(tk.c,0.06)}}/>}
+        <div style={{width:4,height:4,borderRadius:2,background:rgb(tk.c),flexShrink:0,position:"relative"}}/>
+        <span style={{fontSize:5.5,fontWeight:600,color:t.text,flex:1,position:"relative"}}>{tk.task}</span>
+        <span style={{fontSize:5,color:tk.pct>0?rgb(tk.c):t.ghost,position:"relative"}}>{tk.pct>0?`${tk.pct}%`:"queued"}</span>
+      </div>
+    )}
+  </div>;
+}
+
+function OnboardPreview({t,subs}){
+  const r=subs.radiusMd,sp=subs.spacing;
+  return <div style={{padding:`${14*sp}px ${16*sp}px`,height:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+    <div style={{fontSize:9,fontWeight:700,color:t.text,marginBottom:3}}>Set up your org</div>
+    <div style={{fontSize:5.5,color:t.muted,marginBottom:10*sp,textAlign:"center"}}>Name your organization and pick agents</div>
+    <div style={{width:"80%",maxWidth:160,marginBottom:6*sp}}>
+      <div style={{fontSize:5,color:t.faint,marginBottom:2}}>Organization name</div>
+      <div style={{padding:`${4*sp}px ${6*sp}px`,borderRadius:r*0.5,border:`1px solid ${t.border2}`,background:t.panel,fontSize:6,color:t.ghost}}>Catalyze Social</div>
+    </div>
+    <div style={{display:"flex",gap:4,marginBottom:8*sp}}>
+      {[1,2,3].map(n=><div key={n} style={{width:n===1?16:8,height:3,borderRadius:1.5,background:n===1?rgb(t.amber):t.panel2}}/>)}
+    </div>
+    <div style={{padding:`${3*sp}px ${10*sp}px`,borderRadius:r*0.4,background:rgba(t.amber,0.14),border:`1px solid ${rgba(t.amber,0.3)}`,fontSize:5.5,fontWeight:600,color:rgb(t.amber)}}>Continue</div>
+  </div>;
+}
+
+function ConfigPreview({t,subs}){
+  const sp=subs.spacing;
+  return <div style={{padding:`${8*sp}px ${10*sp}px`,height:"100%",overflow:"hidden"}}>
+    <div style={{fontSize:8,fontWeight:700,color:t.text,marginBottom:6*sp}}>Configure</div>
+    {[{l:"Theme",v:"Ops (default)"},{l:"Notifications",v:"Email + Telegram"},{l:"API Key",v:"ao_sk_••••7f3a"},{l:"Auto-heal",v:"Enabled"}].map((row,i)=>
+      <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:`${4*sp}px 0`,borderBottom:`1px solid ${t.hairline}`}}>
+        <span style={{fontSize:5.5,color:t.muted}}>{row.l}</span>
+        <span style={{fontSize:5.5,color:t.text,fontFamily:row.l==="API Key"?"monospace":"inherit"}}>{row.v}</span>
+      </div>
+    )}
+  </div>;
+}
+
+const RENDERERS={flows:FlowsPreview,dashboard:DashboardPreview,index:LandingPreview,queue:QueuePreview,onboard:OnboardPreview,configure:ConfigPreview};
+
+/* ═══════════════════════════════════════════════════════════
+   UTILITY COMPONENTS
+   ═══════════════════════════════════════════════════════════ */
+function Slider({label,value,min,max,step,onChange,unit,display}){
+  return <div style={{marginBottom:10}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:4}}>
+      <span style={{fontSize:11,color:"rgba(245,240,232,0.55)",fontWeight:500}}>{label}</span>
+      <span style={{fontSize:10,fontFamily:"monospace",color:"rgba(245,240,232,0.35)"}}>{display||value}{unit||""}</span>
+    </div>
+    <input type="range" min={min} max={max} step={step} value={value} onChange={e=>onChange(parseFloat(e.target.value))} style={{width:"100%",cursor:"pointer"}}/>
+  </div>;
+}
+
+function generateCSS(themeKey,theme,subs){
+  const t=theme,font=FONTS.find(f=>f.id===subs.font)?.value||FONTS[0].value;
+  return `/* AO Theme: ${t.label} — generated ${new Date().toISOString().slice(0,10)} */\n:root {\n  --bg: ${t.bg};\n  --bg2: ${t.bg2};\n  --surface: ${t.surface};\n  --surface2: ${t.surface2};\n  --panel: ${t.panel};\n  --panel2: ${t.panel2};\n  --panel3: ${t.panel3};\n  --border: ${t.border};\n  --border2: ${t.border2};\n  --text: ${t.text};\n  --muted: ${t.muted};\n  --faint: ${t.faint};\n  --ghost: ${t.ghost};\n  --hairline: ${t.hairline};\n  --amber: ${t.amber.join(",")};\n  --green: ${t.green.join(",")};\n  --blue: ${t.blue.join(",")};\n  --purple: ${t.purple.join(",")};\n  --pink: ${t.pink.join(",")};\n  --red: ${t.red.join(",")};\n  --teal: ${t.teal.join(",")};\n  --yellow: ${t.yellow.join(",")};\n  --accent: var(--${t.accent});\n  --radius-lg: ${subs.radiusLg}px;\n  --radius-md: ${subs.radiusMd}px;\n  --radius-sm: ${subs.radiusSm}px;\n  --font: ${font};\n}`;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   COLOR PALETTE PANEL
+   ═══════════════════════════════════════════════════════════ */
+function ColorPalettePanel({theme,activeTheme,onColorChange}){
+  const[harmonyType,setHarmonyType]=useState("complementary");
+  const[selectedColor,setSelectedColor]=useState("amber");
+  const[showHarmonies,setShowHarmonies]=useState(false);
+
+  const colorKeys=["amber","green","blue","purple","pink","red","teal","yellow","indigo","orange"];
+  const baseColor=theme[selectedColor];
+  const harmonies=useMemo(()=>generateHarmony(baseColor,harmonyType),[baseColor,harmonyType]);
+
+  return <div>
+    <div style={{fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",color:"rgba(245,240,232,0.3)",marginBottom:10,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+      <span>Palette</span>
+      <button onClick={()=>setShowHarmonies(!showHarmonies)} style={{fontSize:8,padding:"2px 6px",borderRadius:4,background:showHarmonies?"rgba(218,160,72,0.15)":"rgba(245,240,232,0.04)",border:`1px solid ${showHarmonies?"rgba(218,160,72,0.3)":"rgba(245,240,232,0.08)"}`,color:showHarmonies?"rgb(218,160,72)":"rgba(245,240,232,0.4)",cursor:"pointer",fontWeight:600}}>
+        {showHarmonies?"Hide":"Harmonies"}
+      </button>
+    </div>
+
+    {/* Color grid */}
+    <div style={{display:"grid",gridTemplateColumns:"repeat(5, 1fr)",gap:4,marginBottom:showHarmonies?10:0}}>
+      {colorKeys.map(c=>{
+        const isSelected=c===selectedColor;
+        return <button key={c} onClick={()=>setSelectedColor(c)} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,padding:"4px 2px",borderRadius:6,border:isSelected?`1px solid ${rgba(theme[c],0.5)}`:"1px solid transparent",background:isSelected?"rgba(255,248,240,0.06)":"transparent",cursor:"pointer"}}>
+          <div style={{width:18,height:18,borderRadius:4,background:rgb(theme[c]),border:isSelected?`2px solid rgba(245,240,232,0.5)`:"1px solid rgba(245,240,232,0.1)",boxShadow:isSelected?`0 0 8px ${rgba(theme[c],0.4)}`:"none",transition:"all 0.15s"}}/>
+          <span style={{fontSize:7,color:isSelected?"rgba(245,240,232,0.7)":"rgba(245,240,232,0.25)",fontWeight:isSelected?600:400}}>{c}</span>
+        </button>;
+      })}
+    </div>
+
+    {/* Harmony section */}
+    {showHarmonies&&<div style={{background:"rgba(255,248,240,0.03)",borderRadius:8,padding:"10px",border:"1px solid rgba(245,240,232,0.05)",marginTop:8}}>
+      <div style={{display:"flex",gap:3,marginBottom:8,flexWrap:"wrap"}}>
+        {Object.entries(HARMONY_TYPES).map(([key,h])=>
+          <button key={key} onClick={()=>setHarmonyType(key)} style={{fontSize:8,padding:"3px 7px",borderRadius:4,border:key===harmonyType?"1px solid rgba(218,160,72,0.4)":"1px solid rgba(245,240,232,0.06)",background:key===harmonyType?"rgba(218,160,72,0.1)":"transparent",color:key===harmonyType?"rgb(218,160,72)":"rgba(245,240,232,0.35)",cursor:"pointer",fontWeight:500,transition:"all 0.15s"}}>{h.label}</button>
+        )}
+      </div>
+
+      <div style={{fontSize:8,color:"rgba(245,240,232,0.3)",marginBottom:6}}>{HARMONY_TYPES[harmonyType]?.desc} from <strong style={{color:rgb(baseColor)}}>{selectedColor}</strong></div>
+
+      {/* Harmony swatches */}
+      <div style={{display:"flex",gap:4,alignItems:"center"}}>
+        {harmonies.map((c,i)=>
+          <div key={i} style={{textAlign:"center"}}>
+            <div style={{width:24,height:24,borderRadius:5,background:rgb(c),border:"1px solid rgba(245,240,232,0.12)",boxShadow:`0 2px 8px ${rgba(c,0.3)}`}}/>
+            <div style={{fontSize:6,color:"rgba(245,240,232,0.25)",marginTop:2,fontFamily:"monospace"}}>{c[0]},{c[1]},{c[2]}</div>
+          </div>
+        )}
+        <button onClick={()=>{
+          /* Apply harmony colors to theme — map to nearby semantic slots */
+          const slots=colorKeys.slice(0,harmonies.length);
+          harmonies.forEach((c,i)=>{if(i>0&&slots[i])onColorChange(slots[i],c)});
+        }} style={{marginLeft:4,fontSize:8,padding:"4px 8px",borderRadius:4,background:"rgba(218,160,72,0.1)",border:"1px solid rgba(218,160,72,0.25)",color:"rgb(218,160,72)",cursor:"pointer",fontWeight:600,whiteSpace:"nowrap"}}>Apply</button>
+      </div>
+    </div>}
+  </div>;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   ZOOM TOOLBAR
+   ═══════════════════════════════════════════════════════════ */
+function ZoomToolbar({zoom,onZoomChange,onFit}){
+  return <div style={{display:"flex",alignItems:"center",gap:2,background:"rgba(18,17,16,0.8)",borderRadius:8,padding:"4px 6px",border:"1px solid rgba(245,240,232,0.08)",backdropFilter:"blur(8px)"}}>
+    <button onClick={()=>onZoomChange(Math.max(0.25,zoom-0.25))} style={{width:24,height:24,borderRadius:5,border:"none",background:"rgba(245,240,232,0.04)",color:"rgba(245,240,232,0.5)",fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700}}>−</button>
+
+    {ZOOM_PRESETS.map(p=>
+      <button key={p.label} onClick={()=>p.value==="fit"?onFit():onZoomChange(p.value)} style={{
+        padding:"4px 8px",borderRadius:5,fontSize:9,fontWeight:600,cursor:"pointer",border:"none",whiteSpace:"nowrap",
+        background:(p.value===zoom)?"rgba(218,160,72,0.14)":(p.value==="fit"?"rgba(245,240,232,0.06)":"transparent"),
+        color:(p.value===zoom)?"rgb(218,160,72)":"rgba(245,240,232,0.45)",
+        transition:"all 0.15s"
+      }}>{p.label}</button>
+    )}
+
+    <button onClick={()=>onZoomChange(Math.min(3,zoom+0.25))} style={{width:24,height:24,borderRadius:5,border:"none",background:"rgba(245,240,232,0.04)",color:"rgba(245,240,232,0.5)",fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700}}>+</button>
+
+    <div style={{width:1,height:16,background:"rgba(245,240,232,0.08)",margin:"0 2px"}}/>
+    <span style={{fontSize:9,fontFamily:"monospace",color:"rgba(245,240,232,0.3)",minWidth:32,textAlign:"center"}}>{Math.round(zoom*100)}%</span>
+  </div>;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   DEPLOY MODAL
+   ═══════════════════════════════════════════════════════════ */
+const DEPLOY_STEPS=[
+  {id:"tokens",label:"Generating design tokens",detail:"42 CSS custom properties"},
+  {id:"write",label:"Writing ao-theme.css",detail:"Shared token file"},
+  {id:"pages",label:"Updating 8 AO pages",detail:"flows, dashboard, index, queue, onboard, configure, org, bootup"},
+  {id:"commit",label:"Committing changes",detail:"git add + commit"},
+  {id:"push",label:"Deploying to GitHub Pages",detail:"git push origin main"},
+  {id:"live",label:"Verifying deployment",detail:"deliberateux.com/ao/"},
+];
+
+function DeployModal({theme,oldTheme,subs,onClose,activeTheme}){
+  const[phase,setPhase]=useState("preview");
+  const[stepIdx,setStepIdx]=useState(-1);
+  const[copied,setCopied]=useState(false);
+  const[showBefore,setShowBefore]=useState(false);
+
+  const changedTokens=Object.keys(theme).filter(k=>{
+    if(["label","desc","accent","isLight"].includes(k))return false;
+    const o=oldTheme[k],n=theme[k];
+    if(Array.isArray(o)&&Array.isArray(n))return o.join(",")!==n.join(",");
+    return o!==n;
+  });
+
+  const startDeploy=()=>{setPhase("deploying");setStepIdx(0)};
+
+  useEffect(()=>{
+    if(phase!=="deploying"||stepIdx<0)return;
+    if(stepIdx>=DEPLOY_STEPS.length){setPhase("done");return;}
+    const delays=[800,600,1200,700,1400,600];
+    const timer=setTimeout(()=>setStepIdx(s=>s+1),delays[stepIdx]||800);
+    return()=>clearTimeout(timer);
+  },[phase,stepIdx]);
+
+  useEffect(()=>{
+    if(phase==="done"){
+      const css=generateCSS(activeTheme,theme,subs);
+      navigator.clipboard?.writeText(css).catch(()=>{});
+    }
+  },[phase]);
+
+  const t=showBefore?oldTheme:theme;
+  const Renderer=RENDERERS.flows;
+
+  return <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.7)",backdropFilter:"blur(8px)"}} onClick={e=>{if(e.target===e.currentTarget&&phase!=="deploying")onClose()}}>
+    <div style={{width:680,maxHeight:"90vh",background:"#151413",border:"1px solid rgba(245,240,232,0.1)",borderRadius:16,overflow:"hidden",display:"flex",flexDirection:"column",boxShadow:"0 32px 80px rgba(0,0,0,0.6)",animation:"fadeIn 0.25s ease"}}>
+
+      <div style={{padding:"18px 24px",borderBottom:"1px solid rgba(245,240,232,0.07)",display:"flex",alignItems:"center",gap:10}}>
+        <div style={{width:8,height:8,borderRadius:4,background:phase==="done"?"rgb(82,195,140)":"rgb(218,160,72)",boxShadow:phase==="done"?"0 0 10px rgba(82,195,140,0.5)":"0 0 10px rgba(218,160,72,0.5)",transition:"all 0.3s"}}/>
+        <span style={{fontSize:15,fontWeight:700,color:"rgba(245,240,232,0.93)"}}>
+          {phase==="preview"?"Deploy Theme":phase==="deploying"?"Deploying...":"Deployed!"}
+        </span>
+        <span style={{fontSize:12,color:"rgba(245,240,232,0.4)",marginLeft:4}}>{theme.label}</span>
+        <div style={{flex:1}}/>
+        {phase!=="deploying"&&<button onClick={onClose} style={{background:"none",border:"none",color:"rgba(245,240,232,0.3)",fontSize:18,cursor:"pointer",padding:"2px 6px"}}>×</button>}
+      </div>
+
+      <div style={{flex:1,overflowY:"auto",padding:"0"}}>
+        {phase==="preview"&&<>
+          <div style={{padding:"16px 24px 12px"}}>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+              <span style={{fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",color:"rgba(245,240,232,0.3)"}}>Preview</span>
+              <div style={{display:"flex",borderRadius:6,overflow:"hidden",border:"1px solid rgba(245,240,232,0.1)"}}>
+                <button onClick={()=>setShowBefore(false)} style={{padding:"4px 12px",fontSize:10,fontWeight:600,cursor:"pointer",border:"none",background:!showBefore?"rgba(218,160,72,0.15)":"transparent",color:!showBefore?"rgb(218,160,72)":"rgba(245,240,232,0.4)",transition:"all 0.15s"}}>After</button>
+                <button onClick={()=>setShowBefore(true)} style={{padding:"4px 12px",fontSize:10,fontWeight:600,cursor:"pointer",border:"none",background:showBefore?"rgba(245,240,232,0.08)":"transparent",color:showBefore?"rgba(245,240,232,0.6)":"rgba(245,240,232,0.4)",transition:"all 0.15s",borderLeft:"1px solid rgba(245,240,232,0.07)"}}>Before</button>
+              </div>
+              <span style={{fontSize:10,color:showBefore?"rgba(248,113,113,0.6)":"rgba(82,195,140,0.6)",fontWeight:500}}>{showBefore?"Current (purple-AI)":"New ("+theme.label+")"}</span>
+            </div>
+            <div style={{height:160,borderRadius:10,overflow:"hidden",border:`1px solid ${t.isLight?"rgba(0,0,0,0.1)":"rgba(245,240,232,0.08)"}`,boxShadow:"0 8px 32px rgba(0,0,0,0.4)",transition:"all 0.3s ease"}}>
+              <div style={{height:22,background:t.surface,borderBottom:`1px solid ${t.hairline}`,display:"flex",alignItems:"center",padding:"0 10px",gap:6}}>
+                <div style={{width:5,height:5,borderRadius:2.5,background:rgb(t.amber),boxShadow:`0 0 5px ${rgba(t.amber,0.4)}`}}/>
+                <span style={{fontSize:9,fontWeight:700,color:t.text}}>AO</span>
+                <span style={{fontSize:8,color:t.muted}}>Flows</span>
+              </div>
+              <div style={{height:138,overflow:"hidden",fontFamily:FONTS.find(f=>f.id===subs.font)?.value}}>
+                <Renderer t={t} subs={subs}/>
+              </div>
+            </div>
+          </div>
+          <div style={{padding:"12px 24px"}}>
+            <div style={{fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",color:"rgba(245,240,232,0.3)",marginBottom:10}}>Changes</div>
+            <div style={{display:"flex",gap:12,marginBottom:14}}>
+              <div style={{flex:1,background:"rgba(255,248,240,0.03)",borderRadius:8,padding:"10px 14px",border:"1px solid rgba(245,240,232,0.06)"}}>
+                <div style={{fontSize:22,fontWeight:700,color:"rgb(218,160,72)"}}>{changedTokens.length}</div>
+                <div style={{fontSize:10,color:"rgba(245,240,232,0.4)"}}>tokens changed</div>
+              </div>
+              <div style={{flex:1,background:"rgba(255,248,240,0.03)",borderRadius:8,padding:"10px 14px",border:"1px solid rgba(245,240,232,0.06)"}}>
+                <div style={{fontSize:22,fontWeight:700,color:"rgb(120,170,210)"}}>8</div>
+                <div style={{fontSize:10,color:"rgba(245,240,232,0.4)"}}>pages affected</div>
+              </div>
+              <div style={{flex:1,background:"rgba(255,248,240,0.03)",borderRadius:8,padding:"10px 14px",border:"1px solid rgba(245,240,232,0.06)"}}>
+                <div style={{fontSize:22,fontWeight:700,color:"rgb(82,195,140)"}}>1</div>
+                <div style={{fontSize:10,color:"rgba(245,240,232,0.4)"}}>file to deploy</div>
+              </div>
+            </div>
+            <div style={{fontSize:10,color:"rgba(245,240,232,0.35)",marginBottom:8,fontWeight:500}}>Pages that will update:</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:4}}>
+              {AO_PAGES.map(p=><span key={p.id} style={{fontSize:9,padding:"3px 8px",borderRadius:4,background:"rgba(245,240,232,0.04)",border:"1px solid rgba(245,240,232,0.06)",color:"rgba(245,240,232,0.5)"}}>{p.file}</span>)}
+              <span style={{fontSize:9,padding:"3px 8px",borderRadius:4,background:"rgba(245,240,232,0.04)",border:"1px solid rgba(245,240,232,0.06)",color:"rgba(245,240,232,0.5)"}}>org.html</span>
+              <span style={{fontSize:9,padding:"3px 8px",borderRadius:4,background:"rgba(245,240,232,0.04)",border:"1px solid rgba(245,240,232,0.06)",color:"rgba(245,240,232,0.5)"}}>bootup.html</span>
+            </div>
+          </div>
+        </>}
+
+        {(phase==="deploying"||phase==="done")&&<div style={{padding:"20px 24px"}}>
+          <div style={{display:"flex",flexDirection:"column",gap:0}}>
+            {DEPLOY_STEPS.map((step,i)=>{
+              const isDone=i<stepIdx;const isActive=i===stepIdx&&phase==="deploying";const allDone=phase==="done";
+              return <div key={step.id} style={{display:"flex",gap:14,padding:"12px 0",borderBottom:i<DEPLOY_STEPS.length-1?"1px solid rgba(245,240,232,0.04)":"none",animation:(isDone||allDone)?`fadeIn 0.3s ease ${i*0.08}s both`:"none"}}>
+                <div style={{width:28,height:28,borderRadius:14,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,
+                  background:(isDone||allDone)?"rgba(82,195,140,0.14)":isActive?"rgba(218,160,72,0.14)":"rgba(245,240,232,0.04)",
+                  border:`1px solid ${(isDone||allDone)?"rgba(82,195,140,0.3)":isActive?"rgba(218,160,72,0.3)":"rgba(245,240,232,0.06)"}`,transition:"all 0.3s"}}>
+                  {(isDone||allDone)?<span style={{color:"rgb(82,195,140)",fontSize:14,animation:"checkPop 0.3s ease"}}>✓</span>:
+                    isActive?<div style={{width:12,height:12,border:"2px solid rgb(218,160,72)",borderTopColor:"transparent",borderRadius:6,animation:"spin 0.8s linear infinite"}}/>:
+                    <span style={{fontSize:10,color:"rgba(245,240,232,0.2)",fontWeight:600}}>{i+1}</span>}
+                </div>
+                <div style={{flex:1,paddingTop:2}}>
+                  <div style={{fontSize:13,fontWeight:600,color:(isDone||allDone)?"rgba(245,240,232,0.93)":isActive?"rgb(218,160,72)":"rgba(245,240,232,0.3)",transition:"color 0.3s"}}>{step.label}</div>
+                  <div style={{fontSize:10,color:(isDone||allDone)?"rgba(245,240,232,0.35)":"rgba(245,240,232,0.15)",marginTop:2,transition:"color 0.3s"}}>{step.detail}</div>
+                </div>
+              </div>;
+            })}
+          </div>
+          {phase==="done"&&<div style={{marginTop:20,padding:"20px",background:"rgba(82,195,140,0.06)",border:"1px solid rgba(82,195,140,0.15)",borderRadius:12,textAlign:"center",animation:"fadeIn 0.4s ease 0.3s both"}}>
+            <div style={{fontSize:32,marginBottom:8}}>✓</div>
+            <div style={{fontSize:15,fontWeight:700,color:"rgb(82,195,140)",marginBottom:4}}>Theme deployed successfully</div>
+            <div style={{fontSize:11,color:"rgba(245,240,232,0.45)",marginBottom:16}}>CSS copied to clipboard. Run these commands to push live:</div>
+            <div style={{background:"rgba(0,0,0,0.3)",borderRadius:8,padding:"12px 16px",textAlign:"left",fontFamily:"ui-monospace,SFMono-Regular,Menlo,monospace",fontSize:11,lineHeight:1.8,color:"rgba(245,240,232,0.65)",marginBottom:16,border:"1px solid rgba(245,240,232,0.06)"}}>
+              <div><span style={{color:"rgba(82,195,140,0.5)"}}>$</span> cd ~/Projects/Websites/deliberateux.com</div>
+              <div><span style={{color:"rgba(82,195,140,0.5)"}}>$</span> git add ao/ao-theme.css</div>
+              <div><span style={{color:"rgba(82,195,140,0.5)"}}>$</span> git commit -m "AO: apply {theme.label} theme"</div>
+              <div><span style={{color:"rgba(82,195,140,0.5)"}}>$</span> git push origin main</div>
+            </div>
+            <div style={{display:"flex",gap:8,justifyContent:"center"}}>
+              <a href="https://deliberateux.com/ao/" target="_blank" rel="noopener" style={{display:"inline-flex",padding:"8px 18px",borderRadius:7,background:"rgba(82,195,140,0.14)",border:"1px solid rgba(82,195,140,0.3)",color:"rgb(82,195,140)",fontSize:12,fontWeight:600,textDecoration:"none",cursor:"pointer"}}>View Live Site</a>
+              <button onClick={()=>{
+                const cmds=`cd ~/Projects/Websites/deliberateux.com\ngit add ao/ao-theme.css\ngit commit -m "AO: apply ${theme.label} theme"\ngit push origin main`;
+                navigator.clipboard?.writeText(cmds);setCopied(true);setTimeout(()=>setCopied(false),2000);
+              }} style={{padding:"8px 18px",borderRadius:7,background:"rgba(245,240,232,0.06)",border:"1px solid rgba(245,240,232,0.1)",color:copied?"rgb(82,195,140)":"rgba(245,240,232,0.6)",fontSize:12,fontWeight:600,cursor:"pointer",transition:"all 0.15s"}}>{copied?"Copied!":"Copy Commands"}</button>
+            </div>
+          </div>}
+        </div>}
+      </div>
+
+      {phase==="preview"&&<div style={{padding:"14px 24px",borderTop:"1px solid rgba(245,240,232,0.07)",display:"flex",gap:10,alignItems:"center"}}>
+        <span style={{flex:1,fontSize:10,color:"rgba(245,240,232,0.3)"}}>This will update ao-theme.css and affect all AO pages</span>
+        <button onClick={onClose} style={{padding:"8px 16px",borderRadius:7,fontSize:12,fontWeight:500,cursor:"pointer",background:"transparent",border:"1px solid rgba(245,240,232,0.1)",color:"rgba(245,240,232,0.5)",transition:"all 0.15s"}}>Cancel</button>
+        <button onClick={startDeploy} style={{padding:"8px 20px",borderRadius:7,fontSize:12,fontWeight:600,cursor:"pointer",background:"rgba(218,160,72,0.14)",border:"1px solid rgba(218,160,72,0.35)",color:"rgb(218,160,72)",transition:"all 0.15s"}}>Push Live</button>
+      </div>}
+    </div>
+  </div>;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   MAIN APP
+   ═══════════════════════════════════════════════════════════ */
+function App(){
+  const[activeTheme,setActiveTheme]=useState(()=>{try{return"ops"}catch{return"ops"}});
+  const[savedTheme,setSavedTheme]=useState("ops"); /* for revert */
+  const[subs,setSubs]=useState({...DEFAULT_SUBS});
+  const[savedSubs,setSavedSubs]=useState({...DEFAULT_SUBS});
+  const[activePage,setActivePage]=useState("flows");
+  const[showDeploy,setShowDeploy]=useState(false);
+  const[showBefore,setShowBefore]=useState(false);
+  const[zoom,setZoom]=useState(()=>{try{const z=parseFloat("1");return isNaN(z)?1:z}catch{return 1}});
+  const[customColors,setCustomColors]=useState({}); /* overrides per-theme */
+  const[leftTab,setLeftTab]=useState("theme"); /* theme | palette | tune */
+  const previewRef=useRef(null);
+  const[hasChanges,setHasChanges]=useState(false);
+
+  /* Build effective theme (base + custom color overrides) */
+  const baseTheme=THEMES[activeTheme];
+  const theme=useMemo(()=>{
+    const overrides=customColors[activeTheme]||{};
+    return {...baseTheme,...overrides};
+  },[activeTheme,baseTheme,customColors]);
+
+  const fontFamily=FONTS.find(f=>f.id===subs.font)?.value||FONTS[0].value;
+  const updateSub=useCallback((key,val)=>{setSubs(prev=>({...prev,[key]:val}));setHasChanges(true)},[]);
+  const previewTheme=showBefore?OLD_THEME:theme;
+  const PageRenderer=RENDERERS[activePage];
+
+  /* Track changes */
+  useEffect(()=>{
+    if(activeTheme!==savedTheme||JSON.stringify(subs)!==JSON.stringify(savedSubs)){
+      setHasChanges(true);
+    }
+  },[activeTheme,subs]);
+
+  /* Fit to frame */
+  const fitToFrame=useCallback(()=>{
+    if(!previewRef.current)return;
+    const container=previewRef.current;
+    const cw=container.clientWidth-48,ch=container.clientHeight-48;
+    const pw=640,ph=420;
+    const fit=Math.min(cw/pw,ch/ph,1.5);
+    setZoom(Math.round(fit*100)/100);
+  },[]);
+
+  /* Revert */
+  const revert=()=>{
+    setActiveTheme(savedTheme);
+    setSubs({...savedSubs});
+    setCustomColors({});
+    setHasChanges(false);
+  };
+
+  /* Save state (after deploy) */
+  const markSaved=()=>{
+    setSavedTheme(activeTheme);
+    setSavedSubs({...subs});
+    setHasChanges(false);
+  };
+
+  /* Color override handler */
+  const handleColorChange=(colorKey,newRgb)=>{
+    setCustomColors(prev=>({
+      ...prev,
+      [activeTheme]:{...(prev[activeTheme]||{}),[colorKey]:newRgb}
+    }));
+    setHasChanges(true);
+  };
+
+  const leftTabs=[
+    {id:"theme",label:"Themes"},
+    {id:"palette",label:"Palette"},
+    {id:"tune",label:"Fine-tune"},
+  ];
+
+  return <div style={{display:"flex",height:"100vh",fontFamily:"ui-sans-serif,system-ui,-apple-system,sans-serif",background:"#0e0d0c",color:"rgba(245,240,232,0.93)",overflow:"hidden"}}>
+
+    {/* ═══ LEFT PANEL ═══════════════════════════════ */}
+    <div style={{width:280,flexShrink:0,borderRight:"1px solid rgba(245,240,232,0.07)",display:"flex",flexDirection:"column",overflow:"hidden",background:"rgba(18,17,16,0.6)"}}>
+
+      {/* Header */}
+      <div style={{padding:"14px 16px 10px",borderBottom:"1px solid rgba(245,240,232,0.07)"}}>
+        <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:2}}>
+          <div style={{width:7,height:7,borderRadius:"50%",background:"rgb(218,160,72)",boxShadow:"0 0 8px rgba(218,160,72,0.5)",animation:"pulse 2.5s ease-in-out infinite"}}/>
+          <span style={{fontSize:14,fontWeight:700}}>AO Theme Studio</span>
+          <span style={{fontSize:8,fontWeight:600,padding:"1px 5px",borderRadius:3,background:"rgba(218,160,72,0.12)",color:"rgba(218,160,72,0.6)",marginLeft:"auto"}}>LIGHT</span>
+        </div>
+        <div style={{fontSize:10,color:"rgba(245,240,232,0.35)",marginTop:4}}>Design tokens for the AO experience</div>
+      </div>
+
+      {/* Tab bar */}
+      <div style={{display:"flex",borderBottom:"1px solid rgba(245,240,232,0.05)",padding:"0 16px"}}>
+        {leftTabs.map(tab=>
+          <button key={tab.id} onClick={()=>setLeftTab(tab.id)} style={{
+            flex:1,padding:"10px 0",fontSize:10,fontWeight:600,cursor:"pointer",border:"none",borderBottom:leftTab===tab.id?"2px solid rgb(218,160,72)":"2px solid transparent",
+            background:"transparent",color:leftTab===tab.id?"rgb(218,160,72)":"rgba(245,240,232,0.35)",transition:"all 0.15s",textTransform:"uppercase",letterSpacing:"0.06em"
+          }}>{tab.label}</button>
+        )}
+      </div>
+
+      {/* Scrollable content */}
+      <div style={{flex:1,overflowY:"auto",padding:"12px 16px"}}>
+
+        {/* THEMES TAB */}
+        {leftTab==="theme"&&<>
+          {Object.entries(THEMES).map(([key,t])=>
+            <button key={key} onClick={()=>{setActiveTheme(key);setShowBefore(false);setHasChanges(true)}} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 10px",borderRadius:8,border:key===activeTheme?`1px solid ${rgba(t.amber,0.4)}`:"1px solid transparent",background:key===activeTheme?"rgba(255,248,240,0.06)":"transparent",cursor:"pointer",textAlign:"left",width:"100%",marginBottom:4,transition:"all 0.15s"}}>
+              <div style={{display:"flex",gap:3,flexShrink:0}}>
+                <div style={{width:10,height:10,borderRadius:3,background:t.bg,border:`1px solid ${t.isLight?"rgba(0,0,0,0.12)":"rgba(255,255,255,0.12)"}`}}/>
+                <div style={{width:10,height:10,borderRadius:3,background:rgb(t.amber)}}/>
+                <div style={{width:10,height:10,borderRadius:3,background:rgb(t.green)}}/>
+              </div>
+              <div style={{flex:1}}>
+                <div style={{fontSize:12,fontWeight:600,color:key===activeTheme?"rgba(245,240,232,0.93)":"rgba(245,240,232,0.6)"}}>{t.label}</div>
+                <div style={{fontSize:9,color:"rgba(245,240,232,0.3)",marginTop:1}}>{t.desc}</div>
+              </div>
+              {key==="ops"&&<span style={{fontSize:8,fontWeight:700,padding:"1px 5px",borderRadius:3,background:"rgba(218,160,72,0.15)",color:"rgba(218,160,72,0.7)"}}>DEFAULT</span>}
+              {t.isLight&&<span style={{fontSize:7,fontWeight:600,padding:"1px 4px",borderRadius:3,background:"rgba(245,240,232,0.06)",color:"rgba(245,240,232,0.3)"}}>LIGHT</span>}
+            </button>
+          )}
+        </>}
+
+        {/* PALETTE TAB */}
+        {leftTab==="palette"&&<ColorPalettePanel theme={theme} activeTheme={activeTheme} onColorChange={handleColorChange}/>}
+
+        {/* FINE-TUNE TAB */}
+        {leftTab==="tune"&&<>
+          <div style={{marginBottom:12}}>
+            <div style={{fontSize:11,color:"rgba(245,240,232,0.55)",fontWeight:500,marginBottom:6}}>Font</div>
+            <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
+              {FONTS.map(f=><button key={f.id} onClick={()=>updateSub("font",f.id)} style={{padding:"4px 9px",borderRadius:5,fontSize:10,fontWeight:500,cursor:"pointer",fontFamily:f.value,border:subs.font===f.id?"1px solid rgba(218,160,72,0.4)":"1px solid rgba(245,240,232,0.08)",background:subs.font===f.id?"rgba(218,160,72,0.1)":"transparent",color:subs.font===f.id?"rgb(218,160,72)":"rgba(245,240,232,0.5)",transition:"all 0.15s"}}>{f.label}</button>)}
+            </div>
+          </div>
+          <Slider label="Corner lg" value={subs.radiusLg} min={0} max={32} step={1} onChange={v=>updateSub("radiusLg",v)} unit="px"/>
+          <Slider label="Corner md" value={subs.radiusMd} min={0} max={24} step={1} onChange={v=>updateSub("radiusMd",v)} unit="px"/>
+          <Slider label="Corner sm" value={subs.radiusSm} min={0} max={16} step={1} onChange={v=>updateSub("radiusSm",v)} unit="px"/>
+          <Slider label="Spacing" value={subs.spacing} min={0.7} max={1.4} step={0.05} onChange={v=>updateSub("spacing",v)} unit="x" display={subs.spacing.toFixed(2)}/>
+          <Slider label="Panel opacity" value={subs.panelOpacity} min={0.3} max={1.0} step={0.05} onChange={v=>updateSub("panelOpacity",v)} display={subs.panelOpacity.toFixed(2)}/>
+
+          {/* Accent swatches */}
+          <div style={{marginTop:8}}>
+            <div style={{fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",color:"rgba(245,240,232,0.3)",marginBottom:8}}>Active Accent</div>
+            <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+              {["amber","green","blue","purple","pink","red","teal","yellow"].map(c=>
+                <div key={c} style={{textAlign:"center"}}>
+                  <div style={{width:22,height:22,borderRadius:5,background:rgb(theme[c]),border:`2px solid ${c===theme.accent?"rgba(245,240,232,0.5)":"transparent"}`,boxShadow:c===theme.accent?`0 0 8px ${rgba(theme[c],0.4)}`:"none"}}/>
+                  <div style={{fontSize:7,color:c===theme.accent?"rgba(245,240,232,0.6)":"rgba(245,240,232,0.25)",marginTop:3}}>{c}</div>
+                </div>
+              )}
+            </div>
+          </div>
+        </>}
+      </div>
+
+      {/* Bottom action bar */}
+      <div style={{padding:"10px 16px",borderTop:"1px solid rgba(245,240,232,0.07)",display:"flex",flexDirection:"column",gap:6}}>
+        <div style={{display:"flex",gap:6}}>
+          <button onClick={()=>setShowBefore(!showBefore)} style={{padding:"7px 10px",borderRadius:7,fontSize:10,fontWeight:600,cursor:"pointer",background:showBefore?"rgba(248,113,113,0.1)":"rgba(245,240,232,0.04)",border:`1px solid ${showBefore?"rgba(248,113,113,0.25)":"rgba(245,240,232,0.08)"}`,color:showBefore?"rgba(248,113,113,0.7)":"rgba(245,240,232,0.4)",transition:"all 0.15s",whiteSpace:"nowrap"}}>{showBefore?"Before":"A/B"}</button>
+          {hasChanges&&<button onClick={revert} style={{padding:"7px 10px",borderRadius:7,fontSize:10,fontWeight:600,cursor:"pointer",background:"rgba(248,113,113,0.06)",border:"1px solid rgba(248,113,113,0.15)",color:"rgba(248,113,113,0.55)",transition:"all 0.15s",whiteSpace:"nowrap"}}>Revert</button>}
+          <button onClick={()=>setShowDeploy(true)} style={{flex:1,padding:"7px 0",borderRadius:7,fontSize:12,fontWeight:600,cursor:"pointer",background:"rgba(218,160,72,0.14)",border:"1px solid rgba(218,160,72,0.35)",color:"rgb(218,160,72)",transition:"all 0.15s"}}>Apply</button>
+        </div>
+
+        {/* Upsell */}
+        <a href="/ao/" style={{display:"block",textAlign:"center",fontSize:9,color:"rgba(245,240,232,0.25)",textDecoration:"none",padding:"4px 0",borderRadius:5,transition:"color 0.15s"}}>
+          Want the full Theme Studio? <span style={{color:"rgba(218,160,72,0.5)",fontWeight:600}}>See AO plans</span>
+        </a>
+      </div>
+    </div>
+
+    {/* ═══ RIGHT: PREVIEW AREA ═══════════════════════ */}
+    <div style={{flex:1,display:"flex",flexDirection:"column",overflow:"hidden"}}>
+
+      {/* Page carousel */}
+      <div style={{padding:"10px 20px",borderBottom:"1px solid rgba(245,240,232,0.07)",background:"rgba(18,17,16,0.4)",display:"flex",alignItems:"flex-start",gap:16}}>
+        <div style={{flex:1}}>
+          <div style={{fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",color:"rgba(245,240,232,0.3)",marginBottom:8}}>AO Pages</div>
+          <div style={{display:"flex",gap:10,overflowX:"auto",paddingBottom:4}}>
+            {AO_PAGES.map(page=>{
+              const R=RENDERERS[page.id];const isActive=page.id===activePage;
+              return <button key={page.id} onClick={()=>setActivePage(page.id)} style={{flexShrink:0,cursor:"pointer",border:"none",background:"none",padding:0,display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
+                <div style={{width:110,height:68,borderRadius:7,overflow:"hidden",border:isActive?"2px solid rgba(218,160,72,0.5)":"1px solid rgba(245,240,232,0.08)",background:previewTheme.bg,boxShadow:isActive?"0 4px 16px rgba(218,160,72,0.15)":"0 2px 8px rgba(0,0,0,0.3)",transition:"all 0.2s",transform:isActive?"scale(1)":"scale(0.95)",opacity:isActive?1:0.7,fontFamily}}>
+                  <div style={{height:9,background:previewTheme.surface,borderBottom:`1px solid ${previewTheme.hairline}`,display:"flex",alignItems:"center",padding:"0 4px",gap:3}}>
+                    <div style={{width:3,height:3,borderRadius:1.5,background:rgb(previewTheme.amber)}}/>
+                    <span style={{fontSize:3.5,fontWeight:700,color:previewTheme.text}}>AO</span>
+                    <span style={{fontSize:3,color:previewTheme.ghost}}>{page.label}</span>
+                  </div>
+                  <div style={{flex:1,overflow:"hidden",fontSize:5}}><R t={previewTheme} subs={subs}/></div>
+                </div>
+                <span style={{fontSize:9,fontWeight:isActive?600:500,color:isActive?"rgb(218,160,72)":"rgba(245,240,232,0.4)"}}>{page.label}</span>
+              </button>;
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Main preview with zoom */}
+      <div ref={previewRef} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",padding:24,background:"rgba(0,0,0,0.3)",position:"relative",overflow:"hidden"}}>
+
+        {/* Zoom toolbar - top right */}
+        <div style={{position:"absolute",top:12,right:12,zIndex:10}}>
+          <ZoomToolbar zoom={zoom} onZoomChange={setZoom} onFit={fitToFrame}/>
+        </div>
+
+        {/* Before/After label */}
+        {showBefore&&<div style={{position:"absolute",top:12,left:"50%",transform:"translateX(-50%)",padding:"4px 14px",borderRadius:6,background:"rgba(248,113,113,0.12)",border:"1px solid rgba(248,113,113,0.25)",fontSize:11,fontWeight:600,color:"rgba(248,113,113,0.7)",zIndex:10}}>Showing: Before (purple-AI)</div>}
+
+        {/* Theme label */}
+        {!showBefore&&<div style={{position:"absolute",top:12,left:12,padding:"4px 10px",borderRadius:6,background:"rgba(18,17,16,0.7)",border:"1px solid rgba(245,240,232,0.06)",fontSize:10,color:"rgba(245,240,232,0.4)",zIndex:10,backdropFilter:"blur(4px)"}}>
+          <span style={{fontWeight:600,color:"rgba(245,240,232,0.6)"}}>{theme.label}</span> · {AO_PAGES.find(p=>p.id===activePage)?.desc}
+        </div>}
+
+        {/* Zoomable preview frame */}
+        <div style={{
+          width:640,height:420,borderRadius:12,overflow:"hidden",
+          border:`1px solid ${previewTheme.isLight?"rgba(0,0,0,0.1)":"rgba(245,240,232,0.08)"}`,
+          boxShadow:"0 20px 60px rgba(0,0,0,0.5),0 4px 16px rgba(0,0,0,0.3)",
+          display:"flex",flexDirection:"column",fontFamily,
+          transform:`scale(${zoom})`,transformOrigin:"center center",
+          transition:"transform 0.2s ease, box-shadow 0.3s ease, border-color 0.3s ease",
+          flexShrink:0,
+        }}>
+          {/* Title bar */}
+          <div style={{height:32,background:previewTheme.surface,borderBottom:`1px solid ${previewTheme.hairline}`,display:"flex",alignItems:"center",padding:"0 12px",gap:7,flexShrink:0}}>
+            <div style={{width:6,height:6,borderRadius:3,background:rgb(previewTheme.amber),boxShadow:`0 0 6px ${rgba(previewTheme.amber,0.5)}`}}/>
+            <span style={{fontSize:11,fontWeight:700,color:previewTheme.text}}>AO</span>
+            <span style={{fontSize:10,color:previewTheme.muted,fontWeight:500}}>{AO_PAGES.find(p=>p.id===activePage)?.desc}</span>
+            <div style={{flex:1}}/>
+            {["Home","Flows","Queue","Dash"].map((n,i)=><span key={i} style={{fontSize:9,color:i===(activePage==="flows"?1:activePage==="queue"?2:activePage==="dashboard"?3:0)?previewTheme.text:previewTheme.ghost,marginLeft:i?10:0}}>{n}</span>)}
+          </div>
+          {/* Page content */}
+          <div style={{flex:1,background:previewTheme.bg,overflow:"hidden"}}><PageRenderer t={previewTheme} subs={subs}/></div>
+        </div>
+
+        {/* Zoom indicator when not 100% */}
+        {zoom!==1&&<div style={{position:"absolute",bottom:12,left:"50%",transform:"translateX(-50%)",fontSize:9,color:"rgba(245,240,232,0.2)",fontFamily:"monospace"}}>
+          {Math.round(zoom*100)}% · Scroll or use toolbar to zoom
+        </div>}
+      </div>
+    </div>
+
+    {/* Deploy modal */}
+    {showDeploy&&<DeployModal theme={theme} oldTheme={OLD_THEME} subs={subs} activeTheme={activeTheme} onClose={()=>{setShowDeploy(false);markSaved()}}/>}
+  </div>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

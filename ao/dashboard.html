@@ -1,36 +1,16 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Dashboard — AO Admin</title>
   <meta name="description" content="AO admin dashboard. Manage organizations, monitor agents, run ops." />
   <link rel="icon" href="/assets/favicon.svg" />
+  <link rel="stylesheet" href="ao-theme.css">
+  <script>/* theme persistence */ (function(){var t=localStorage.getItem('ao_theme');if(t)document.documentElement.dataset.theme=t})()</script>
   <style>
     :root {
-      --bg: #070812;
-      --bg2: #0b1021;
-      --panel: rgba(255,255,255,0.05);
-      --panel2: rgba(255,255,255,0.08);
-      --border: rgba(255,255,255,0.09);
-      --border2: rgba(255,255,255,0.14);
-      --text: rgba(255,255,255,0.92);
-      --muted: rgba(255,255,255,0.58);
-      --faint: rgba(255,255,255,0.38);
-      --ghost: rgba(255,255,255,0.22);
-      --hairline: rgba(255,255,255,0.07);
-      --amber: 245,158,11;
-      --purple: 168,139,250;
-      --green: 52,211,153;
-      --blue: 96,165,250;
-      --pink: 244,114,182;
-      --radius-lg: 20px;
-      --radius-md: 14px;
-      --radius-sm: 8px;
       --max: 1060px;
-      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      --ease: cubic-bezier(.2,.8,.2,1);
     }
     *, *::before, *::after { box-sizing: border-box; }
     html { height: 100%; }
@@ -40,7 +20,7 @@
       background-color: var(--bg);
       background-image:
         radial-gradient(1000px 700px at 15% -5%, rgba(245,158,11,0.08), transparent 50%),
-        radial-gradient(800px 600px at 90% 5%, rgba(168,139,250,0.10), transparent 50%),
+        radial-gradient(800px 600px at 90% 5%, rgba(120,170,210,0.08), transparent 50%),
         linear-gradient(180deg, var(--bg2), var(--bg));
       background-attachment: fixed;
       -webkit-font-smoothing: antialiased;
@@ -51,7 +31,7 @@
     /* ── Nav ─────────────────────────────────────────────── */
     .ao-nav {
       position: sticky; top: 0; z-index: 200;
-      background: rgba(7,8,18,0.92);
+      background: var(--surface);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid rgba(255,255,255,0.07);
@@ -171,8 +151,8 @@
     }
     .focus-tag {
       font-size: 0.72rem; padding: 3px 9px; border-radius: 20px;
-      background: rgba(var(--purple),0.1); color: rgba(var(--purple),0.9);
-      border: 1px solid rgba(var(--purple),0.18);
+      background: rgba(var(--amber),0.1); color: rgba(var(--amber),0.9);
+      border: 1px solid rgba(var(--amber),0.18);
     }
     .org-meta {
       display: flex; gap: 16px; margin-bottom: 16px;
@@ -186,10 +166,10 @@
     .btn-manage {
       flex: 1; font-family: var(--font); font-size: 0.82rem; font-weight: 600;
       padding: 9px 14px; border-radius: var(--radius-sm); text-align: center;
-      background: rgba(var(--purple),0.12); border: 1px solid rgba(var(--purple),0.22);
-      color: rgb(var(--purple)); text-decoration: none; transition: all 0.2s var(--ease);
+      background: rgba(var(--amber),0.12); border: 1px solid rgba(var(--amber),0.22);
+      color: rgb(var(--amber)); text-decoration: none; transition: all 0.2s var(--ease);
     }
-    .btn-manage:hover { background: rgba(var(--purple),0.2); }
+    .btn-manage:hover { background: rgba(var(--amber),0.2); }
     .btn-run {
       flex: 1; font-family: var(--font); font-size: 0.82rem; font-weight: 600;
       padding: 9px 14px; border-radius: var(--radius-sm); text-align: center;
@@ -212,7 +192,7 @@
       transition: border-color 0.2s;
     }
     .org-search::placeholder { color: var(--ghost); }
-    .org-search:focus { border-color: rgba(var(--purple),0.4); }
+    .org-search:focus { border-color: rgba(var(--amber),0.4); }
     .filter-btn {
       font-family: var(--font); font-size: 0.78rem; font-weight: 600;
       padding: 8px 14px; border-radius: var(--radius-sm);
@@ -222,8 +202,8 @@
     }
     .filter-btn:hover { border-color: var(--border2); color: var(--muted); }
     .filter-btn.active {
-      background: rgba(var(--purple),0.12); border-color: rgba(var(--purple),0.3);
-      color: rgb(var(--purple));
+      background: rgba(var(--amber),0.12); border-color: rgba(var(--amber),0.3);
+      color: rgb(var(--amber));
     }
 
     /* ── Empty state ─────────────────────────────────────── */
