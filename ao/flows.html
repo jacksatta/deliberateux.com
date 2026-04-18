@@ -1328,7 +1328,8 @@
       setTimeout(function(){panel.classList.remove('v');running=false},3500);
     }
     function advanceNode(nid2){
-      node.el.classList.remove('running','selected');
+      var nd=nodes.find(function(n){return n.id===nid2});
+      if(nd)nd.el.classList.remove('running','selected');
       conns.forEach(function(c){if(c.fromId===nid2){c.el.classList.remove('active');c.arrowEl.classList.remove('active')}});
     }
     function runStep(){
