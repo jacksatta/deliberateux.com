@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AO — Agent Operations</title>
+<link rel="icon" href="/assets/favicon.svg">
+<link rel="stylesheet" href="ao-theme.css">
+<script>(function(){var t=localStorage.getItem('ao_theme');if(t)document.documentElement.dataset.theme=t})()</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);color:var(--text);background:var(--bg);display:flex;-webkit-font-smoothing:antialiased}
+
+/* ── Sidebar ─────────────────────────── */
+.sidebar{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--hairline);display:flex;flex-direction:column;overflow:hidden;transition:width 0.2s ease;z-index:100}
+.sidebar.collapsed{width:56px}
+.sidebar.collapsed .sb-text,.sidebar.collapsed .sb-org-name,.sidebar.collapsed .sb-org-sub,
+.sidebar.collapsed .sb-section-label,.sidebar.collapsed .sb-footer-text{display:none}
+.sidebar.collapsed .sb-item{justify-content:center;padding:10px 0}
+.sidebar.collapsed .sb-item .sb-icon{margin:0}
+.sidebar.collapsed .sb-org{padding:12px 0;justify-content:center}
+.sidebar.collapsed .sb-org-dot{margin:0}
+
+/* Logo / Org header */
+.sb-org{display:flex;align-items:center;gap:10px;padding:16px 16px 12px;border-bottom:1px solid var(--hairline);cursor:pointer;transition:background 0.12s}
+.sb-org:hover{background:rgba(var(--amber),0.04)}
+.sb-org-dot{width:8px;height:8px;border-radius:50%;background:rgb(var(--amber));box-shadow:0 0 8px rgba(var(--amber),0.5);flex-shrink:0}
+.sb-org-name{font-size:0.82rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-org-sub{font-size:0.58rem;color:var(--ghost);margin-top:1px}
+
+/* Navigation items */
+.sb-nav{flex:1;overflow-y:auto;padding:8px 0}
+.sb-section{padding:4px 0}
+.sb-section-label{font-size:0.56rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--ghost);padding:10px 16px 4px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:8px 16px;cursor:pointer;transition:all 0.12s;border-left:3px solid transparent;color:var(--muted);text-decoration:none;position:relative}
+.sb-item:hover{background:rgba(var(--amber),0.04);color:var(--text)}
+.sb-item.active{background:rgba(var(--amber),0.08);border-left-color:rgb(var(--amber));color:var(--text)}
+.sb-item.active .sb-icon{color:rgb(var(--amber))}
+.sb-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:0.82rem;flex-shrink:0;transition:color 0.12s}
+.sb-text{font-size:0.76rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-badge{position:absolute;right:12px;font-size:0.5rem;font-weight:700;padding:2px 6px;border-radius:3px;background:rgba(var(--amber),0.12);color:rgb(var(--amber))}
+.sb-divider{height:1px;background:var(--hairline);margin:4px 12px}
+
+/* Footer */
+.sb-footer{border-top:1px solid var(--hairline);padding:10px 12px;display:flex;align-items:center;gap:8px}
+.sb-footer-text{font-size:0.58rem;color:var(--ghost);flex:1}
+.sb-toggle{background:none;border:none;color:var(--ghost);cursor:pointer;font-size:0.7rem;padding:4px 6px;border-radius:4px;transition:all 0.12s}
+.sb-toggle:hover{color:var(--muted);background:rgba(var(--amber),0.06)}
+
+/* ── Main content ────────────────────── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+
+/* Topbar within main */
+.topbar{height:40px;flex-shrink:0;background:var(--surface);border-bottom:1px solid var(--hairline);display:flex;align-items:center;padding:0 16px;gap:10px}
+.tb-breadcrumb{font-size:0.72rem;color:var(--muted);display:flex;align-items:center;gap:6px}
+.tb-breadcrumb span{color:var(--ghost)}
+.tb-page{font-weight:600;color:var(--text)}
+.tb-spacer{flex:1}
+.tb-btn{font-family:var(--font);font-size:0.66rem;font-weight:600;padding:4px 10px;border-radius:5px;border:1px solid var(--border2);background:none;color:var(--muted);cursor:pointer;transition:all 0.12s;white-space:nowrap}
+.tb-btn:hover{color:var(--text);border-color:rgba(var(--amber),0.4)}
+.tb-btn.primary{background:rgba(var(--amber),0.12);border-color:rgba(var(--amber),0.3);color:rgb(var(--amber))}
+.tb-status{display:flex;align-items:center;gap:5px;font-size:0.58rem;color:var(--ghost)}
+.tb-status-dot{width:6px;height:6px;border-radius:50%;background:rgb(var(--green));box-shadow:0 0 4px rgba(var(--green),0.4)}
+
+/* Frame container */
+.frame-wrap{flex:1;position:relative;overflow:hidden}
+.frame-wrap iframe{width:100%;height:100%;border:none;background:var(--bg)}
+
+/* Welcome / placeholder */
+.welcome{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px;text-align:center}
+.welcome.hidden{display:none}
+.welcome-icon{font-size:2rem;opacity:0.4}
+.welcome h2{font-size:1.1rem;font-weight:700;color:var(--text)}
+.welcome p{font-size:0.82rem;color:var(--muted);max-width:400px;line-height:1.6}
+.welcome-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px;max-width:600px;width:100%}
+.welcome-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 14px;cursor:pointer;transition:all 0.15s;text-align:left}
+.welcome-card:hover{border-color:rgba(var(--amber),0.4);box-shadow:0 4px 16px rgba(0,0,0,0.15)}
+.welcome-card h4{font-size:0.78rem;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.welcome-card p{font-size:0.62rem;color:var(--faint);line-height:1.4;margin:0}
+
+/* Theme quick-switch in sidebar */
+.theme-dots{display:flex;gap:4px;padding:8px 16px 4px}
+.theme-dot{width:14px;height:14px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all 0.15s}
+.theme-dot:hover{transform:scale(1.2)}
+.theme-dot.active{border-color:var(--text);box-shadow:0 0 6px rgba(var(--amber),0.3)}
+
+/* Notification pulse */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.sb-badge.pulse{animation:pulse 2s infinite}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="sb-org" id="sb-org" title="Switch org">
+    <div class="sb-org-dot"></div>
+    <div>
+      <div class="sb-org-name" id="org-name">AO</div>
+      <div class="sb-org-sub" id="org-sub">Agent Operations</div>
+    </div>
+  </div>
+
+  <div class="sb-nav">
+    <!-- Core -->
+    <div class="sb-section">
+      <div class="sb-section-label">Core</div>
+      <div class="sb-item active" data-view="dashboard" data-file="dashboard.html" onclick="nav(this)">
+        <span class="sb-icon">▦</span><span class="sb-text">Dashboard</span>
+      </div>
+      <div class="sb-item" data-view="queue" data-file="queue.html" onclick="nav(this)">
+        <span class="sb-icon">≡</span><span class="sb-text">Queue</span>
+        <span class="sb-badge pulse" id="queue-badge" style="display:none">3</span>
+      </div>
+      <div class="sb-item" data-view="flows" data-file="flows.html" onclick="nav(this)">
+        <span class="sb-icon">⤳</span><span class="sb-text">Flows</span>
+      </div>
+      <div class="sb-item" data-view="configure" data-file="configure.html" onclick="nav(this)">
+        <span class="sb-icon">⚙</span><span class="sb-text">Configure</span>
+      </div>
+    </div>
+
+    <div class="sb-divider"></div>
+
+    <!-- Org -->
+    <div class="sb-section">
+      <div class="sb-section-label">Organization</div>
+      <div class="sb-item" data-view="org" data-file="org.html" onclick="nav(this)">
+        <span class="sb-icon">◎</span><span class="sb-text">Org Home</span>
+      </div>
+      <div class="sb-item" data-view="onboard" data-file="onboard.html" onclick="nav(this)">
+        <span class="sb-icon">✦</span><span class="sb-text">Onboard</span>
+      </div>
+    </div>
+
+    <div class="sb-divider"></div>
+
+    <!-- Tools -->
+    <div class="sb-section">
+      <div class="sb-section-label">Tools</div>
+      <div class="sb-item" data-view="sitemap" data-file="ao-sitemap.html" onclick="nav(this)">
+        <span class="sb-icon">◇</span><span class="sb-text">Sitemap</span>
+      </div>
+      <div class="sb-item" data-view="theme" data-file="theme-studio-local.html" onclick="nav(this)">
+        <span class="sb-icon">🎨</span><span class="sb-text">Theme Studio</span>
+      </div>
+    </div>
+
+    <div class="sb-divider"></div>
+
+    <!-- Theme quick-switch -->
+    <div class="theme-dots" id="theme-dots">
+      <div class="theme-dot" data-theme="ops" style="background:#daa048" title="Ops" onclick="setTheme('ops')"></div>
+      <div class="theme-dot" data-theme="midnight" style="background:#8cb9eb" title="Midnight" onclick="setTheme('midnight')"></div>
+      <div class="theme-dot" data-theme="greenhouse" style="background:#6ebea0" title="Greenhouse" onclick="setTheme('greenhouse')"></div>
+      <div class="theme-dot" data-theme="sandstone" style="background:#c3966e" title="Sandstone" onclick="setTheme('sandstone')"></div>
+      <div class="theme-dot" data-theme="studio" style="background:#f4f2ee;border:1px solid #ccc" title="Studio" onclick="setTheme('studio')"></div>
+      <div class="theme-dot" data-theme="daybreak" style="background:#e8ecf4;border:1px solid #bbb" title="Daybreak" onclick="setTheme('daybreak')"></div>
+    </div>
+  </div>
+
+  <div class="sb-footer">
+    <span class="sb-footer-text">v0.1 · <span id="footer-org">—</span></span>
+    <button class="sb-toggle" id="sb-collapse" onclick="toggleSidebar()" title="Collapse sidebar">◀</button>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar" id="topbar">
+    <div class="tb-breadcrumb">
+      <span>AO</span> / <span class="tb-page" id="tb-page">Dashboard</span>
+    </div>
+    <div class="tb-spacer"></div>
+    <div class="tb-status">
+      <div class="tb-status-dot"></div>
+      <span id="tb-status-text">Connected</span>
+    </div>
+    <button class="tb-btn" onclick="openStandalone()" title="Open in new tab">↗ Pop out</button>
+    <button class="tb-btn primary" id="tb-action" style="display:none">Action</button>
+  </div>
+
+  <div class="frame-wrap" id="frame-wrap">
+    <iframe id="frame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"></iframe>
+    <div class="welcome" id="welcome">
+      <div class="welcome-icon">◇</div>
+      <h2>Agent Operations</h2>
+      <p>Unified control center for your agent workforce. Everything in one place — no more tab hopping.</p>
+      <div class="welcome-cards">
+        <div class="welcome-card" onclick="navTo('dashboard')">
+          <h4>▦ Dashboard</h4>
+          <p>Org overview, agent status, services health</p>
+        </div>
+        <div class="welcome-card" onclick="navTo('flows')">
+          <h4>⤳ Flows</h4>
+          <p>Visual workflow canvas with live execution</p>
+        </div>
+        <div class="welcome-card" onclick="navTo('queue')">
+          <h4>≡ Queue</h4>
+          <p>Live task queue with auto-heal</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ── State ──────────────────────────────────────────────
+  var currentView = null;
+  var currentOrg = null;
+  var bc = new BroadcastChannel('ao_app');
+
+  // Load org context
+  function loadOrg(){
+    try{
+      var orgs = JSON.parse(localStorage.getItem('ao_orgs')||'[]');
+      var slug = new URLSearchParams(location.search).get('org');
+      if(slug) currentOrg = orgs.find(function(o){return o.slug===slug});
+      if(!currentOrg && orgs.length) currentOrg = orgs[0];
+      if(currentOrg){
+        document.getElementById('org-name').textContent = currentOrg.name;
+        document.getElementById('org-sub').textContent = currentOrg.type || 'Organization';
+        document.getElementById('footer-org').textContent = currentOrg.slug;
+      }
+    }catch(e){}
+  }
+
+  // ── Navigation ─────────────────────────────────────────
+  window.nav = function(el){
+    var view = el.dataset.view;
+    var file = el.dataset.file;
+    navToFile(view, file);
+  };
+
+  window.navTo = function(view){
+    var item = document.querySelector('[data-view="'+view+'"]');
+    if(item) nav(item);
+  };
+
+  function navToFile(view, file){
+    currentView = view;
+
+    // Update sidebar active
+    document.querySelectorAll('.sb-item').forEach(function(i){
+      i.classList.toggle('active', i.dataset.view === view);
+    });
+
+    // Update topbar
+    var names = {dashboard:'Dashboard',queue:'Queue',flows:'Flows',configure:'Configure',
+                 org:'Org Home',onboard:'Onboard',sitemap:'Sitemap',theme:'Theme Studio'};
+    document.getElementById('tb-page').textContent = names[view] || view;
+
+    // Build URL with org context
+    var url = file;
+    if(currentOrg && (view==='queue'||view==='flows'||view==='configure'||view==='org')){
+      url += (url.indexOf('?')>=0?'&':'?') + 'slug=' + currentOrg.slug;
+    }
+    // Pass admin flag
+    if(localStorage.getItem('ao_admin')==='1'){
+      url += (url.indexOf('?')>=0?'&':'?') + 'admin=1';
+    }
+
+    // Load in iframe
+    document.getElementById('frame').src = url;
+    document.getElementById('welcome').classList.add('hidden');
+
+    // Update URL without reload
+    var newUrl = 'app.html?view=' + view;
+    if(currentOrg) newUrl += '&org=' + currentOrg.slug;
+    history.replaceState(null, '', newUrl);
+
+    // Broadcast navigation to child frames
+    bc.postMessage({type:'nav', view:view, org:currentOrg?currentOrg.slug:null});
+  }
+
+  window.openStandalone = function(){
+    var frame = document.getElementById('frame');
+    if(frame.src && frame.src !== 'about:blank'){
+      window.open(frame.src, '_blank');
+    }
+  };
+
+  // ── Sidebar ────────────────────────────────────────────
+  window.toggleSidebar = function(){
+    var sb = document.getElementById('sidebar');
+    sb.classList.toggle('collapsed');
+    localStorage.setItem('ao_sidebar_collapsed', sb.classList.contains('collapsed')?'1':'0');
+  };
+
+  // Restore sidebar state
+  if(localStorage.getItem('ao_sidebar_collapsed')==='1'){
+    document.getElementById('sidebar').classList.add('collapsed');
+  }
+
+  // ── Theme ──────────────────────────────────────────────
+  window.setTheme = function(t){
+    document.documentElement.setAttribute('data-theme', t);
+    localStorage.setItem('ao_theme', t);
+    updateThemeDots();
+    // Broadcast to child frames
+    bc.postMessage({type:'theme', theme:t});
+    // Also update child frame directly
+    try{
+      var frame = document.getElementById('frame');
+      if(frame.contentDocument){
+        frame.contentDocument.documentElement.setAttribute('data-theme', t);
+      }
+    }catch(e){}
+  };
+
+  function updateThemeDots(){
+    var current = document.documentElement.getAttribute('data-theme') || 'ops';
+    document.querySelectorAll('.theme-dot').forEach(function(d){
+      d.classList.toggle('active', d.dataset.theme === current);
+    });
+  }
+
+  // ── BroadcastChannel (cross-frame state sync) ─────────
+  bc.onmessage = function(e){
+    if(e.data.type === 'theme'){
+      document.documentElement.setAttribute('data-theme', e.data.theme);
+      updateThemeDots();
+    }
+    if(e.data.type === 'queue_count'){
+      var badge = document.getElementById('queue-badge');
+      if(e.data.count > 0){
+        badge.textContent = e.data.count;
+        badge.style.display = '';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+    if(e.data.type === 'org_created'){
+      loadOrg();
+    }
+  };
+
+  // ── Org switcher ───────────────────────────────────────
+  document.getElementById('sb-org').addEventListener('click', function(){
+    try{
+      var orgs = JSON.parse(localStorage.getItem('ao_orgs')||'[]');
+      if(orgs.length <= 1) return;
+      // Cycle to next org
+      var idx = orgs.findIndex(function(o){return currentOrg && o.slug === currentOrg.slug});
+      idx = (idx + 1) % orgs.length;
+      currentOrg = orgs[idx];
+      document.getElementById('org-name').textContent = currentOrg.name;
+      document.getElementById('org-sub').textContent = currentOrg.type || 'Organization';
+      document.getElementById('footer-org').textContent = currentOrg.slug;
+      // Reload current view with new org context
+      if(currentView){
+        var item = document.querySelector('[data-view="'+currentView+'"]');
+        if(item) nav(item);
+      }
+    }catch(e){}
+  });
+
+  // ── Keyboard shortcuts ─────────────────────────────────
+  document.addEventListener('keydown', function(e){
+    if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    // Cmd+1-6 for nav
+    if(e.metaKey || e.ctrlKey){
+      var views = ['dashboard','queue','flows','configure','org','sitemap'];
+      var num = parseInt(e.key);
+      if(num >= 1 && num <= views.length){
+        e.preventDefault();
+        navTo(views[num-1]);
+      }
+      if(e.key === '\\'){
+        e.preventDefault();
+        toggleSidebar();
+      }
+    }
+  });
+
+  // ── Init ───────────────────────────────────────────────
+  loadOrg();
+  updateThemeDots();
+
+  // Check URL for initial view
+  var params = new URLSearchParams(location.search);
+  var initView = params.get('view');
+  if(initView){
+    navTo(initView);
+  } else {
+    // Auto-load dashboard
+    navTo('dashboard');
+  }
+
+  // Simulate queue count for demo
+  setTimeout(function(){
+    var badge = document.getElementById('queue-badge');
+    badge.textContent = '3';
+    badge.style.display = '';
+  }, 2000);
+
+})();
+</script>
+</body>
+</html>

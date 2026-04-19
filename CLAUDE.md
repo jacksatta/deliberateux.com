@@ -87,7 +87,16 @@ AO is the internal operations layer hosted at `deliberateux.com/ao/*` and backed
 - `/ao/configure.html` — Role builder, scoped to an org via `?org=`
 - `/ao/queue.html` — Live work queue, scoped to an org via `?org=`
 - `/ao/flows.html` — Workflow canvas, scoped to an org via `?org=`
-- `/ao/ao-sitemap.html` — Visual IA sitemap (internal reference)
+- `/ao/ao-sitemap.html` — Split-canvas sitemap navigator (left: page tree with audience filters, right: live iframe preview)
+- `/ao/app.html` — **Unified app shell.** Single entry point that embeds all tools via sidebar nav + iframe panels. Shared state via BroadcastChannel. Keyboard shortcuts (Cmd+1-6). Theme quick-switch in sidebar. Org context passed to child frames. This replaces tab-hopping across 12 separate pages.
+
+### AO Flows Architecture (2026-04-18)
+- **Variable schemas:** `NODE_SCHEMAS` object in flows.html defines input/output contracts for every node type (agents, operators, triggers, integrations, biz objects). When a connection is drawn, `autoMapFields()` matches output fields of the source to input fields of the target by name and type.
+- **Schema hints in popover:** The data map editor shows available output/input fields from both connected nodes, with `<datalist>` autocomplete on the field inputs.
+- **UX fix — double-click to edit:** Node text fields (`cn-editable`) are `pointer-events:none` by default. Single-click always initiates drag. Double-click enters text editing mode (adds `.editing` class, focuses field, selects text). On blur, editing mode exits. Hover still shows the edit cursor as a hint.
+- **Template flows (8 total):** Client Onboarding, Lead Qualification, Task Triage, Launch a Product, Ship a Release, Content Pipeline, Growth Experiment, Incident Response. First three have full `logic` (data maps, conditions, SLAs, fallbacks) and `nodeDefaults` (agent prompts, API endpoints, schema definitions).
+- **Run simulation:** BFS topological execution. IF nodes evaluate real JavaScript conditions against the payload. Data maps are resolved during run — showing source field → target field = actual value. Integration nodes make real fetch calls where possible (CRM API). Schema output fields are displayed during execution.
+- **Antigravity:** Not relevant to AO. It was a deprecated Google model provider in the openclaw repo, removed in a breaking change. No action needed.
 
 ### AO Theme System (v3 — shared tokens, all pages wired)
 - **Shared token file:** `/ao/ao-theme.css` — single CSS file defining all design tokens for the entire AO experience. All 8 AO pages import this via `<link rel="stylesheet" href="ao-theme.css">`.
@@ -153,6 +162,12 @@ AO is the internal operations layer hosted at `deliberateux.com/ao/*` and backed
 - Theme Studio: `:18794` (theme-studio.html, ts.html, design-system.html)
 - AO CRM: `:18800` (/api/inbound, /api/leads)
 - Cloudflare Email Routing: deliberateux.com email → routing rules
+
+### Development Environment
+- **Antigravity IDE** (Google's agent-first IDE, VS Code fork): Primary development environment for AO. Workspace: `virtual-agency` with agent definition files (biz-dev.md, customer-service.md, dev.md, etc.), CRM module, dashboard wrangler, queue, scripts.
+- **Claude Code** runs inside Antigravity's integrated terminal for agentic file operations.
+- **Cowork** (Claude desktop) for IA planning, file creation, computer use, and cross-tool orchestration.
+- **Chrome** for live preview of AO pages served from GitHub Pages or VPS.
 
 ## Preferred Workflow
 - No need to confirm routine actions (commit, push, file edits)

@@ -183,10 +183,12 @@
     .endpoint-name{font-size:0.78rem;font-weight:700}
     .endpoint-sub{font-size:0.58rem;color:var(--faint);margin-top:1px}
 
-    /* Inline-editable node fields */
-    .cn-editable{pointer-events:auto;cursor:text;border-radius:3px;padding:0 2px;margin:-1px -2px;transition:background .15s,outline .15s;outline:1px solid transparent;min-height:1em}
-    .cn-editable:hover{background:rgba(255,255,255,0.04);outline-color:var(--border)}
-    .cn-editable:focus{background:rgba(255,255,255,0.07);outline-color:rgba(var(--purple),0.4);color:var(--text)}
+    /* Inline-editable node fields — double-click to edit */
+    .cn-editable{pointer-events:none;cursor:default;border-radius:3px;padding:0 2px;margin:-1px -2px;transition:background .15s,outline .15s;outline:1px solid transparent;min-height:1em}
+    .cn-editable.editing{pointer-events:auto;cursor:text}
+    .cn-editable.editing:hover,.cnode:hover .cn-editable:not(.editing){background:rgba(255,255,255,0.04)}
+    .cnode:hover .cn-editable:not(.editing){outline-color:var(--border);cursor:text;pointer-events:auto}
+    .cn-editable:focus,.cn-editable.editing{background:rgba(255,255,255,0.07);outline-color:rgba(var(--purple),0.4);color:var(--text);pointer-events:auto;cursor:text}
     .cn-editable[data-placeholder]:empty::before{content:attr(data-placeholder);color:var(--ghost);font-style:italic}
     /* Data map editor in popover */
     .cp-dm-row{display:flex;align-items:center;gap:4px;margin-bottom:4px}
@@ -647,6 +649,86 @@
     if(type==='trigger')return TM[id];if(type==='integ')return IM[id];if(type==='endpoint')return EPM[id];return null;
   }
 
+  // ── Node variable schemas (input/output contracts) ────
+  // Each node type declares what data it produces and consumes.
+  // Connectors use these to auto-map matching fields.
+  var NODE_SCHEMAS={
+    // Endpoints
+    'ep-start':  {out:{trigger:'string',timestamp:'string',payload:'object'}},
+    'ep-end':    {in:{status:'string',result:'object',duration_ms:'number'}},
+    // Agents
+    'admin':     {in:{task:'object',context:'object',priority:'string'},out:{decision:'string',routing:'object',notes:'string',assigned_to:'string'}},
+    'mkt':       {in:{brief:'object',target_audience:'string',deadline:'date'},out:{campaign:'object',copy:'string',assets:'array',channel:'string'}},
+    'dev':       {in:{spec:'object',priority:'string',branch:'string'},out:{build_artifact:'string',version:'string',test_coverage:'number',pr_url:'string'}},
+    'uxr':       {in:{product:'object',hypothesis:'string',scope:'string'},out:{findings:'object',score:'number',recommendations:'array',severity:'string'}},
+    'qa':        {in:{build_artifact:'string',test_plan:'object',version:'string'},out:{test_report:'object',passed:'boolean',critical_bugs:'number',qa_sign_off:'boolean'}},
+    'biz':       {in:{prospect:'object',deal_stage:'string',budget:'number'},out:{deal:'object',contract_terms:'object',revenue_forecast:'number',next_step:'string'}},
+    'cs':        {in:{lead:'object',ticket:'object',channel:'string'},out:{score:'number',tier:'string',qualified:'boolean',sentiment:'string',notes:'string'}},
+    'ops':       {in:{alert:'object',severity:'string',service:'string'},out:{incident_id:'string',status:'string',resolution:'string',downtime_min:'number'}},
+    'data':      {in:{dataset:'string',query:'object',timeframe:'string'},out:{metrics:'object',insights:'array',confidence:'number',visualization_url:'string'}},
+    'content':   {in:{topic:'string',audience:'string',format:'string'},out:{draft:'string',word_count:'number',seo_score:'number',publish_ready:'boolean'}},
+    // Business Objects
+    'biz-product':  {in:{name:'string',version:'string',status:'string'},out:{product_id:'string',name:'string',version:'string',status:'string',launch_url:'string'}},
+    'biz-pricing':  {in:{tier:'string',features:'array'},out:{plan_id:'string',price_usd:'number',billing_cycle:'string',trial_days:'number'}},
+    'biz-customer': {in:{name:'string',email:'string',company:'string'},out:{customer_id:'string',name:'string',email:'string',tier:'string',status:'string',account_id:'string'}},
+    'biz-contract': {in:{party:'string',terms:'object'},out:{contract_id:'string',status:'string',signed_at:'date',value_usd:'number'}},
+    'biz-invoice':  {in:{customer_id:'string',amount:'number'},out:{invoice_id:'string',status:'string',due_date:'date',paid:'boolean'}},
+    'biz-campaign': {in:{name:'string',budget:'number',channel:'string'},out:{campaign_id:'string',impressions:'number',clicks:'number',conversion_rate:'number'}},
+    'biz-feature':  {in:{title:'string',priority:'string',requester:'string'},out:{feature_id:'string',status:'string',estimated_effort:'string',assigned_to:'string'}},
+    'biz-ticket':   {in:{subject:'string',priority:'string',reporter:'string'},out:{ticket_id:'string',status:'string',assigned_to:'string',resolution:'string'}},
+    // Operators
+    'op-if':        {in:{input:'object'},out:{result:'object',branch:'string'}},
+    'op-merge':     {in:{input_a:'object',input_b:'object'},out:{merged:'object'}},
+    'op-delay':     {in:{input:'object'},out:{input:'object'}},
+    'op-loop':      {in:{input:'object',iteration:'number'},out:{output:'object',iteration:'number',done:'boolean'}},
+    'op-gate':      {in:{input:'object',approver:'string'},out:{input:'object',approved:'boolean',approved_by:'string'}},
+    'op-filter':    {in:{items:'array',criteria:'object'},out:{matched:'array',rejected:'array',count:'number'}},
+    'op-notify':    {in:{message:'string',channel:'string',urgency:'string'},out:{sent:'boolean',notification_id:'string'}},
+    'op-transform': {in:{input:'object',mapping:'object'},out:{output:'object'}},
+    // Triggers
+    'tr-schedule':  {out:{trigger:'string',scheduled_at:'string',cron:'string'}},
+    'tr-webhook':   {out:{method:'string',headers:'object',body:'object',url:'string'}},
+    'tr-form':      {out:{form_id:'string',fields:'object',submitted_at:'string',submitter_email:'string'}},
+    'tr-event':     {out:{event_type:'string',source:'string',payload:'object',timestamp:'string'}},
+    // Integrations
+    'int-email':    {in:{to:'string',subject:'string',body:'string',template:'string'},out:{sent:'boolean',message_id:'string'}},
+    'int-slack':    {in:{channel:'string',text:'string',blocks:'array'},out:{sent:'boolean',ts:'string',channel_id:'string'}},
+    'int-crm':      {in:{action:'string',record:'object',filters:'object'},out:{records:'array',count:'number',status:'string'}},
+    'int-analytics':{in:{event:'string',properties:'object'},out:{tracked:'boolean',event_id:'string'}},
+    'int-storage':  {in:{action:'string',path:'string',data:'object'},out:{url:'string',size_bytes:'number',status:'string'}},
+    'int-api':      {in:{method:'string',url:'string',headers:'object',body:'object'},out:{status_code:'number',body:'object',headers:'object'}}
+  };
+
+  // Schema-aware data mapping: match output fields of source to input fields of target
+  function autoMapFields(fromItemId,toItemId){
+    var fromSchema=NODE_SCHEMAS[fromItemId],toSchema=NODE_SCHEMAS[toItemId];
+    if(!fromSchema||!toSchema)return[];
+    var fromOut=fromSchema.out||{},toIn=toSchema.in||{},maps=[];
+    // Direct name matches first
+    Object.keys(fromOut).forEach(function(fk){
+      if(toIn[fk]){maps.push({from:fk,to:fk})}
+    });
+    // Type-compatible fuzzy matches (common patterns)
+    if(!maps.length){
+      Object.keys(fromOut).forEach(function(fk){
+        Object.keys(toIn).forEach(function(tk){
+          if(maps.some(function(m){return m.to===tk}))return; // already mapped
+          // Match by type + heuristic name similarity
+          if(fromOut[fk]===toIn[tk]){
+            // Prefer obvious pairs
+            if(fk.indexOf(tk)>=0||tk.indexOf(fk)>=0||
+               (fk==='output'&&tk==='input')||(fk==='result'&&tk==='input')||
+               (fk==='score'&&tk.indexOf('score')>=0)||
+               (fk==='name'&&tk==='name')||(fk==='email'&&tk==='email')||
+               (fk==='status'&&tk==='status'))
+              maps.push({from:fk,to:tk});
+          }
+        });
+      });
+    }
+    return maps;
+  }
+
   // ── Per-node config storage ───────────────────────────
   // nodeConfigs[nodeId] = { label, notes, fields:{...} }
   var nodeConfigs={};
@@ -822,13 +904,31 @@
   function setupDrag(node){
     node.el.addEventListener('mousedown',function(e){
       if(e.target.classList.contains('cn-port')||e.target.classList.contains('cn-remove'))return;
-      // If clicking an editable field, let it focus — don't drag
-      if(e.target.classList.contains('cn-editable')||e.target.getAttribute('contenteditable'))return;
+      // Only block drag if the editable field is actively being edited
+      if(e.target.classList.contains('editing'))return;
       if(spaceHeld)return;var r=node.el.getBoundingClientRect();
       dragging={node:node,ox:(e.clientX-r.left)/zoom,oy:(e.clientY-r.top)/zoom,moved:false};node.el.style.zIndex=10;
       document.querySelectorAll('.cnode').forEach(function(n){n.classList.remove('selected')});node.el.classList.add('selected');
     });
+    // Double-click to enter text editing mode
+    node.el.addEventListener('dblclick',function(e){
+      var editable=e.target.closest('.cn-editable');
+      if(!editable)return;
+      // Exit any other editing fields first
+      document.querySelectorAll('.cn-editable.editing').forEach(function(f){f.classList.remove('editing');f.blur()});
+      editable.classList.add('editing');
+      editable.focus();
+      // Select all text in the field
+      var sel=window.getSelection(),range=document.createRange();
+      range.selectNodeContents(editable);sel.removeAllRanges();sel.addRange(range);
+    });
   }
+  // Exit editing mode on blur for any editable field
+  document.addEventListener('focusout',function(e){
+    if(e.target&&e.target.classList&&e.target.classList.contains('cn-editable')){
+      setTimeout(function(){e.target.classList.remove('editing')},100);
+    }
+  });
 
   // ── Ports + connections ───────────────────────────────
   function setupPorts(el,nodeId){
@@ -855,11 +955,18 @@
     if(fn&&tn){
       var fi=lookupItem(fn.itemId,fn.type),ti=lookupItem(tn.itemId,tn.type);
       logic.title=(fi?fi.name:'?')+' → '+(ti?ti.name:'?');
-      if(fn.type==='agent'&&tn.type==='agent'){logic.dataMap=[{from:'task_output',to:'task_input'}]}
-      if(fn.type==='trigger'||fn.type==='endpoint'){logic.dataMap=[{from:'event_payload',to:'input_data'}]}
-      if(tn.type==='integ'){logic.dataMap=[{from:'result',to:'api_payload'}]}
-      if(fn.type==='biz'){logic.dataMap=[{from:fn.itemId.replace('biz-','')+'_data',to:'context'}]}
-      if(tn.type==='endpoint'){logic.dataMap=[{from:'final_result',to:'output'}]}
+      // Schema-aware auto-mapping: match real output fields to input fields
+      var schemaMap=autoMapFields(fn.itemId,tn.itemId);
+      if(schemaMap.length){
+        logic.dataMap=schemaMap;
+      } else {
+        // Fallback to type-based heuristics
+        if(fn.type==='agent'&&tn.type==='agent'){logic.dataMap=[{from:'task_output',to:'task_input'}]}
+        else if(fn.type==='trigger'||fn.type==='endpoint'){logic.dataMap=[{from:'event_payload',to:'input_data'}]}
+        else if(tn.type==='integ'){logic.dataMap=[{from:'result',to:'api_payload'}]}
+        else if(fn.type==='biz'){logic.dataMap=[{from:fn.itemId.replace('biz-','')+'_data',to:'context'}]}
+        else if(tn.type==='endpoint'){logic.dataMap=[{from:'final_result',to:'output'}]}
+      }
     }
     var conn={fromId:fromId,fromPort:fromPort,toId:toId,toPort:toPort,el:line,hitEl:hitA,arrowEl:arrow,labelEl:labelEl,logic:logic,particles:[]};
     conns.push(conn);
@@ -933,8 +1040,30 @@
     hdr.innerHTML+='<button class="cp-close" id="cp-close-btn">&times;</button>';
     document.getElementById('cp-close-btn').addEventListener('click',closePop);
     var dm=document.getElementById('cp-data-map');dm.innerHTML='';
+    // Schema hints for autocomplete
+    var fromSchema=fn?NODE_SCHEMAS[fn.itemId]:null,toSchema=tn?NODE_SCHEMAS[tn.itemId]:null;
+    var fromFields=fromSchema&&fromSchema.out?Object.keys(fromSchema.out):[];
+    var toFields=toSchema&&toSchema.in?Object.keys(toSchema.in):[];
     function addDMRow(from,to){dm.insertBefore(makeDMRow(from,to),dm.querySelector('.cp-dm-add'))}
-    function makeDMRow(from,to){var row=document.createElement('div');row.className='cp-dm-row';row.innerHTML='<input class="cp-dm-input" value="'+escH(from||'')+'" placeholder="source field" /><span class="cp-dm-arrow">→</span><input class="cp-dm-input" value="'+escH(to||'')+'" placeholder="target field" /><button class="cp-dm-del">&times;</button>';row.querySelector('.cp-dm-del').addEventListener('click',function(){row.remove()});return row}
+    function makeDMRow(from,to){
+      var row=document.createElement('div');row.className='cp-dm-row';
+      var fromPh=fromFields.length?fromFields.join(', '):'source field';
+      var toPh=toFields.length?toFields.join(', '):'target field';
+      row.innerHTML='<input class="cp-dm-input" value="'+escH(from||'')+'" placeholder="'+escH(fromPh)+'" list="dm-from-list" /><span class="cp-dm-arrow">→</span><input class="cp-dm-input" value="'+escH(to||'')+'" placeholder="'+escH(toPh)+'" list="dm-to-list" /><button class="cp-dm-del">&times;</button>';
+      row.querySelector('.cp-dm-del').addEventListener('click',function(){row.remove()});return row
+    }
+    // Create datalists for autocomplete
+    var fromList=document.getElementById('dm-from-list');if(!fromList){fromList=document.createElement('datalist');fromList.id='dm-from-list';document.body.appendChild(fromList)}
+    var toList=document.getElementById('dm-to-list');if(!toList){toList=document.createElement('datalist');toList.id='dm-to-list';document.body.appendChild(toList)}
+    fromList.innerHTML='';toList.innerHTML='';
+    fromFields.forEach(function(f){var o=document.createElement('option');o.value=f;fromList.appendChild(o)});
+    toFields.forEach(function(f){var o=document.createElement('option');o.value=f;toList.appendChild(o)});
+    // Show schema hints
+    if(fromFields.length||toFields.length){
+      var hintEl=document.createElement('div');hintEl.style.cssText='font-size:0.58rem;color:var(--faint);margin-bottom:6px;line-height:1.4';
+      hintEl.innerHTML=(fromFields.length?'<span style="color:rgba(var(--green),0.7)">Output:</span> '+fromFields.join(', '):'')+(fromFields.length&&toFields.length?' · ':'')+(toFields.length?'<span style="color:rgba(var(--blue),0.7)">Input:</span> '+toFields.join(', '):'');
+      dm.appendChild(hintEl);
+    }
     (l.dataMap||[]).forEach(function(m){dm.appendChild(makeDMRow(m.from,m.to))});
     var addBtn=document.createElement('button');addBtn.className='cp-dm-add';addBtn.textContent='+ Add mapping';addBtn.addEventListener('click',function(){dm.insertBefore(makeDMRow('',''),addBtn)});dm.appendChild(addBtn);
     var f=pPos(conn.fromId,conn.fromPort),t=pPos(conn.toId,conn.toPort);
@@ -1286,6 +1415,111 @@
         12:{outputSchema:'status: success | error\ncustomer_id: string\nrecords_created: number\nnotifications_sent: number',onComplete:'return'}
       }
     },
+    {name:'Lead Qualification',cat:'growth',icon:'🎯',desc:'Webhook → CS scores → IF enterprise → Biz Dev deal or auto-enroll → CRM + Slack → End.',
+      nodes:[
+        {r:'ep-start',t:'endpoint',x:0,y:180},
+        {r:'tr-webhook',t:'trigger',x:180,y:180},
+        {r:'cs',t:'agent',x:380,y:180},
+        {r:'op-if',t:'op',x:590,y:180},
+        {r:'biz',t:'agent',x:790,y:60},
+        {r:'biz-customer',t:'biz',x:990,y:60},
+        {r:'op-transform',t:'op',x:790,y:310},
+        {r:'biz-customer',t:'biz',x:990,y:310},
+        {r:'int-crm',t:'integ',x:1190,y:130},
+        {r:'int-slack',t:'integ',x:1190,y:260},
+        {r:'int-email',t:'integ',x:1390,y:130},
+        {r:'ep-end',t:'endpoint',x:1570,y:190}
+      ],
+      conns:[
+        [0,'out',1,'in'],[1,'out',2,'in'],[2,'out',3,'in'],
+        [3,'out',4,'in'],[3,'out2',6,'in'],
+        [4,'out',5,'in'],[5,'out',8,'in'],
+        [6,'out',7,'in'],[7,'out',8,'in'],
+        [8,'out',9,'in'],[8,'out',10,'in'],
+        [9,'out',11,'in'],[10,'out',11,'in']
+      ],
+      logic:{
+        0:{title:'Start → Webhook',desc:'Flow triggered by inbound lead webhook (website form, ad, referral)',dataMap:[{from:'trigger',to:'method'},{from:'payload',to:'body'}]},
+        1:{title:'Webhook → CS Qualify',desc:'Raw lead data arrives — CS agent scores it',dataMap:[{from:'body',to:'lead'},{from:'headers',to:'channel'}],sla:'5 min'},
+        2:{title:'CS → Branch',desc:'Lead scored and qualified, routing decision',dataMap:[{from:'score',to:'input'},{from:'tier',to:'input'},{from:'qualified',to:'input'}],condition:'input.score >= 0'},
+        3:{title:'Enterprise path',desc:'High-value lead → Biz Dev for deal negotiation',condition:'input.score >= 70 && input.tier === "enterprise"',dataMap:[{from:'lead',to:'prospect'},{from:'score',to:'deal_stage'}]},
+        4:{title:'Standard path',desc:'Auto-enroll into self-serve onboarding',condition:'input.score < 70',dataMap:[{from:'lead',to:'input'},{from:'tier',to:'mapping'}]},
+        5:{title:'Biz Dev → Customer Record',desc:'Deal negotiated, create enterprise customer',sla:'2 days',dataMap:[{from:'deal',to:'name'},{from:'contract_terms',to:'terms'},{from:'revenue_forecast',to:'amount'}]},
+        6:{title:'Transform → Customer Record',desc:'Map standard lead to customer profile',dataMap:[{from:'output',to:'name'},{from:'output',to:'email'}]},
+        7:{title:'Customer → CRM',desc:'Upsert customer record in CRM system',dataMap:[{from:'customer_id',to:'record'},{from:'name',to:'record'},{from:'tier',to:'record'}]},
+        8:{title:'CRM → Slack',desc:'Notify team about new qualified lead',dataMap:[{from:'status',to:'text'},{from:'count',to:'text'}],sla:'immediate'},
+        9:{title:'CRM → Welcome Email',desc:'Send onboarding email based on tier',dataMap:[{from:'records',to:'to'},{from:'status',to:'template'}],sla:'immediate'},
+        10:{title:'Slack + Email → End',desc:'Lead fully qualified, routed, and notified',dataMap:[{from:'sent',to:'status'}]},
+        11:{title:'Email → End',desc:'All notifications sent, lead in system',dataMap:[{from:'sent',to:'status'}]}
+      },
+      nodeDefaults:{
+        0:{trigType:'manual',manualLabel:'Qualify Lead',inputSchema:'name: string\nemail: string\ncompany: string\nemployees: number\nsource: website | referral | ads | partner\nbudget_range: string'},
+        1:{endpoint:'/api/leads/inbound',method:'POST',authType:'bearer'},
+        2:{role:'support',prompt:'Score this lead 0-100 based on: company size (>100 emp = +30), budget mention (+20), source quality (referral +25, partner +20, website +15, ads +10), email domain (corporate +10, free -5). Set tier: enterprise (70+), growth (40-69), starter (<40). Flag spam signals.',skills:'crm_lookup, email_validate, company_enrich'},
+        3:{condition:'input.score >= 70 && input.tier === "enterprise"',trueLabel:'Enterprise',falseLabel:'Standard'},
+        4:{role:'business',prompt:'Negotiate enterprise deal. Review prospect company, prepare custom pricing, draft SOW. Target close within 2 weeks.',skills:'proposal_gen, pricing_calc, contract_draft'},
+        5:{schema:'customer_id: string\nname: string\nemail: string\ntier: enterprise | growth | starter\nstatus: active | pending\naccount_id: string',defaults:'{"status":"pending","tier":"enterprise"}'},
+        6:{expression:'{"name": input.name, "email": input.email, "tier": input.tier || "starter", "status": "active", "auto_enrolled": true}'},
+        7:{schema:'customer_id: string\nname: string\nemail: string\ntier: enterprise | growth | starter\nstatus: active | pending',defaults:'{"status":"active"}'},
+        8:{endpoint:'/api/crm/leads',method:'POST',authType:'bearer',bodyTpl:'{"name":"$name","email":"$email","tier":"$tier","score":$score,"source":"$source"}'},
+        9:{endpoint:'/api/slack/message',method:'POST',bodyTpl:'{"channel":"#new-leads","text":"New $tier lead: $name ($company) — score: $score"}'},
+        10:{endpoint:'/api/email/send',method:'POST',bodyTpl:'{"to":"$email","template":"welcome-$tier","vars":{"name":"$name","tier":"$tier"}}'},
+        11:{outputSchema:'status: qualified | rejected\ncustomer_id: string\ntier: string\nnotifications_sent: number\ncrm_synced: boolean'}
+      }
+    },
+    {name:'Task Triage',cat:'support',icon:'📋',desc:'Event → Admin routes → IF type → Dev/CS/Ops → Merge → SLA track → End.',
+      nodes:[
+        {r:'ep-start',t:'endpoint',x:0,y:200},
+        {r:'tr-event',t:'trigger',x:180,y:200},
+        {r:'admin',t:'agent',x:380,y:200},
+        {r:'op-if',t:'op',x:580,y:200},
+        {r:'dev',t:'agent',x:780,y:60},
+        {r:'cs',t:'agent',x:780,y:200},
+        {r:'ops',t:'agent',x:780,y:350},
+        {r:'op-merge',t:'op',x:1000,y:200},
+        {r:'biz-ticket',t:'biz',x:1200,y:200},
+        {r:'int-slack',t:'integ',x:1200,y:60},
+        {r:'int-analytics',t:'integ',x:1400,y:130},
+        {r:'ep-end',t:'endpoint',x:1580,y:200}
+      ],
+      conns:[
+        [0,'out',1,'in'],[1,'out',2,'in'],[2,'out',3,'in'],
+        [3,'out',4,'in'],[3,'out2',5,'in'],
+        [5,'out',6,'in'],
+        [4,'out',7,'in'],[5,'out',7,'in2'],[6,'out',7,'in'],
+        [7,'out',8,'in'],[7,'out',9,'in'],
+        [8,'out',10,'in'],[9,'out',10,'in'],
+        [10,'out',11,'in']
+      ],
+      logic:{
+        0:{title:'Start → Event Trigger',desc:'System event fires (ticket created, alert, user action)',dataMap:[{from:'trigger',to:'event_type'},{from:'payload',to:'payload'}]},
+        1:{title:'Event → Admin Triage',desc:'Admin classifies and prioritizes the incoming task',dataMap:[{from:'event_type',to:'task'},{from:'payload',to:'context'},{from:'source',to:'priority'}],sla:'10 min'},
+        2:{title:'Admin → Route',desc:'Task classified, routing to appropriate handler',dataMap:[{from:'decision',to:'input'},{from:'routing',to:'input'},{from:'assigned_to',to:'input'}],condition:'input.routing !== null'},
+        3:{title:'Engineering task',desc:'Bug, feature request, or technical issue → Dev Lead',condition:'input.routing.type === "engineering" || input.routing.type === "bug"',dataMap:[{from:'routing',to:'spec'},{from:'notes',to:'priority'}]},
+        4:{title:'Support task',desc:'Customer issue, question, or complaint → CS',condition:'input.routing.type === "support" || input.routing.type === "question"',dataMap:[{from:'routing',to:'ticket'},{from:'notes',to:'channel'}]},
+        5:{title:'Dev → Merge',desc:'Engineering work complete, ready for tracking',sla:'4 hours',dataMap:[{from:'build_artifact',to:'input_a'},{from:'pr_url',to:'input_a'}]},
+        6:{title:'CS → Merge',desc:'Customer issue resolved or escalated',sla:'2 hours',dataMap:[{from:'notes',to:'input_b'},{from:'sentiment',to:'input_b'}]},
+        7:{title:'Merge → Ticket Record',desc:'All handler outputs merged, create ticket record',dataMap:[{from:'merged',to:'subject'},{from:'merged',to:'priority'}]},
+        8:{title:'Merge → Slack Notify',desc:'Post completion to relevant channel',dataMap:[{from:'merged',to:'text'}],sla:'immediate'},
+        9:{title:'Ticket → Analytics',desc:'Track task metrics: time to resolve, handler, outcome',dataMap:[{from:'ticket_id',to:'event'},{from:'status',to:'properties'}]},
+        10:{title:'Slack → Analytics',desc:'Track notification delivery',dataMap:[{from:'sent',to:'event'},{from:'ts',to:'properties'}]},
+        11:{title:'Analytics → End',desc:'Task fully triaged, handled, tracked',dataMap:[{from:'tracked',to:'status'}]}
+      },
+      nodeDefaults:{
+        0:{trigType:'manual',manualLabel:'New Task',inputSchema:'type: bug | feature | support | incident\ntitle: string\ndescription: string\npriority: P0 | P1 | P2 | P3\nreporter: string\naffected_service: string'},
+        1:{eventType:'task.created',source:'any',filterExpr:'event.type !== "spam"'},
+        2:{role:'orchestrator',prompt:'Triage incoming task: (1) classify type (engineering/support/ops), (2) set priority based on impact + urgency matrix, (3) assign to correct handler, (4) add context notes. P0 = customer-facing outage, P1 = degraded service, P2 = bug with workaround, P3 = enhancement.',skills:'task_classify, priority_matrix, team_roster'},
+        3:{condition:'input.routing.type === "engineering" || input.routing.type === "bug"',trueLabel:'Dev',falseLabel:'CS / Other'},
+        4:{role:'engineering',prompt:'Handle engineering task: investigate, fix, test, PR. For bugs: reproduce, root cause, patch. For features: scope, estimate, implement. Update ticket with progress.',skills:'code_review, test_run, deploy_preview'},
+        5:{role:'support',prompt:'Handle customer support task: acknowledge, investigate, resolve or escalate. Track sentiment. If escalation needed, route to ops or engineering with full context.',skills:'crm_lookup, knowledge_base, sentiment_analysis'},
+        6:{role:'operations',prompt:'Handle ops incident: assess severity, mitigate, communicate status. Track downtime. Post-incident: write blameless retrospective.',skills:'monitoring, rollback, status_page'},
+        7:{},
+        8:{schema:'ticket_id: string\nsubject: string\npriority: P0|P1|P2|P3\nstatus: open|in_progress|resolved|closed\nassigned_to: string\nresolution: string\nresolved_at: date',defaults:'{"status":"open"}'},
+        9:{endpoint:'/api/slack/message',method:'POST',bodyTpl:'{"channel":"#task-updates","text":"[$priority] $title — $status (assigned: $assigned_to)"}'},
+        10:{endpoint:'/api/analytics/event',method:'POST',bodyTpl:'{"event":"task_resolved","properties":{"ticket_id":"$ticket_id","priority":"$priority","handler":"$assigned_to","resolution_time_min":$resolution_time}}'},
+        11:{outputSchema:'status: resolved | escalated | pending\nticket_id: string\nresolution_time_min: number\nhandler: string\nnotifications_sent: number'}
+      }
+    },
     {name:'Launch a product',cat:'product',icon:'🚀',desc:'Start → Admin approves, dev builds, QA verifies, marketing announces → End.',
       nodes:[{r:'ep-start',t:'endpoint',x:0,y:140},{r:'admin',t:'agent',x:170,y:140},{r:'dev',t:'agent',x:410,y:80},{r:'qa',t:'agent',x:650,y:80},{r:'mkt',t:'agent',x:410,y:240},{r:'biz-product',t:'biz',x:650,y:240},{r:'ep-end',t:'endpoint',x:860,y:160}],
       conns:[[0,'out',1,'in'],[1,'out',2,'in'],[1,'out',4,'in'],[2,'out',3,'in'],[4,'out',5,'in'],[3,'out',6,'in'],[5,'out',6,'in']],
@@ -1489,12 +1723,29 @@
         }
         step++;setTimeout(function(){advanceNode(nid2);runStep()},1800);return;
       }
-      // ── Default: show data map or payload ──
+      // ── Default: show data map + schema-resolved values ──
       var connToMe=conns.find(function(c){return c.toId===nid2});
       var connLogic=connToMe?connToMe.logic:null;
-      if(connLogic&&connLogic.dataMap&&connLogic.dataMap.length){showDataMap(connLogic.dataMap,payload)}
-      else if(node.type==='endpoint'){showPayload(node.itemId==='ep-start'?{trigger:'flow_start',payload:'lead data ready'}:{status:'complete',output:'all systems updated'})}
-      else{showPayload(node.type==='trigger'?payload.lead:{node:item?item.name:'?',input:Object.keys(payload).slice(0,3).join(', ')})}
+      var schema=NODE_SCHEMAS[node.itemId];
+      if(connLogic&&connLogic.dataMap&&connLogic.dataMap.length){
+        // Show data flowing through the mapping with resolved values
+        var el=document.getElementById('r-data');el.innerHTML='';
+        connLogic.dataMap.forEach(function(m){
+          var val=payload[m.from]||payload.lead&&payload.lead[m.from]||'...';
+          if(typeof val==='object')val=JSON.stringify(val).substring(0,40);
+          el.innerHTML+='<div class="r-data-line"><span class="r-data-key">'+escH(m.from)+'</span> → <span class="r-data-val" style="color:rgb(var(--green))">'+escH(m.to)+'</span> <span style="color:var(--ghost);font-size:0.58rem">= '+escH(String(val))+'</span></div>';
+        });
+        // Show output schema if available
+        if(schema&&schema.out){
+          el.innerHTML+='<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--hairline);font-size:0.58rem;color:var(--faint)">Output: '+Object.keys(schema.out).join(', ')+'</div>';
+        }
+      }
+      else if(node.type==='endpoint'){showPayload(node.itemId==='ep-start'?{trigger:'flow_start',payload:'lead data ready',schema:schema?Object.keys(schema.out||{}).join(', '):'—'}:{status:'complete',output:'all systems updated'})}
+      else{
+        var nodePayload=node.type==='trigger'?payload.lead:{node:item?item.name:'?',input:Object.keys(payload).slice(0,3).join(', ')};
+        if(schema&&schema.out)nodePayload.produces=Object.keys(schema.out).join(', ');
+        showPayload(nodePayload);
+      }
       step++;setTimeout(function(){advanceNode(nid2);runStep()},1800);
     }
     runStep();
