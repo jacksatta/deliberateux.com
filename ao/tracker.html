@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="ops">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AO — Work Tracker</title>
+<link rel="stylesheet" href="ao-theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter','SF Pro Text',system-ui,sans-serif;background:var(--bg);color:rgb(var(--text));min-height:100vh}
+
+/* ── Topbar ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;
+  background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:90}
+.topbar h1{font-size:15px;font-weight:600;letter-spacing:.3px;color:rgb(var(--amber))}
+.topbar .meta{font-size:12px;color:rgb(var(--text-secondary))}
+.topbar .actions{display:flex;gap:10px;align-items:center}
+.topbar .actions button{background:var(--panel);border:1px solid var(--border);color:rgb(var(--text-secondary));
+  padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer;transition:.2s}
+.topbar .actions button:hover{border-color:rgb(var(--amber));color:rgb(var(--amber))}
+.topbar .actions button.active{background:rgba(var(--amber),.15);border-color:rgb(var(--amber));color:rgb(var(--amber))}
+
+/* ── Filter chips ── */
+.filters{display:flex;gap:8px;padding:16px 28px;background:var(--bg);border-bottom:1px solid var(--border)}
+.chip{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;
+  background:var(--panel);border:1px solid var(--border);color:rgb(var(--text-secondary));transition:.2s}
+.chip:hover,.chip.active{background:rgba(var(--amber),.12);border-color:rgb(var(--amber));color:rgb(var(--amber))}
+.chip .count{margin-left:5px;opacity:.6}
+
+/* ── Stats bar ── */
+.stats{display:flex;gap:24px;padding:12px 28px;font-size:12px;color:rgb(var(--text-secondary))}
+.stat-val{font-weight:700;color:rgb(var(--text));margin-right:4px}
+.stat-live{color:rgb(var(--green))}
+.stat-wip{color:rgb(var(--amber))}
+
+/* ── Table ── */
+.table-wrap{padding:0 28px 40px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 12px;font-size:11px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.6px;color:rgb(var(--amber));background:rgba(var(--amber),.08);
+  border-bottom:2px solid rgba(var(--amber),.25);position:sticky;top:49px;z-index:10}
+td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.45}
+
+/* Domain group header */
+tr.domain-header td{padding:12px 12px 6px;font-size:12px;font-weight:600;
+  color:rgb(var(--text-secondary));background:var(--bg);border-bottom:1px solid var(--border);
+  letter-spacing:.3px;cursor:pointer;user-select:none}
+tr.domain-header td .hex{color:rgb(var(--amber));margin-right:6px;font-size:14px}
+tr.domain-header td .host{color:rgb(var(--text-secondary));font-weight:400;margin-left:6px;opacity:.6}
+tr.domain-header:hover td{background:var(--panel)}
+
+/* Section header */
+tr.section-header td{padding:20px 12px 8px;font-size:13px;font-weight:700;
+  color:rgb(var(--amber));background:rgba(var(--amber),.06);border-bottom:2px solid rgba(var(--amber),.2);
+  text-transform:uppercase;letter-spacing:1px}
+
+/* Data rows */
+tr.data-row{transition:background .15s}
+tr.data-row:hover{background:var(--panel)}
+tr.data-row td{background:transparent}
+
+/* Status badges */
+.badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:600;letter-spacing:.3px}
+.badge-live{background:rgba(var(--green),.12);color:rgb(var(--green))}
+.badge-wip{background:rgba(var(--amber),.12);color:rgb(var(--amber))}
+.badge-ready{background:rgba(var(--blue),.12);color:rgb(var(--blue,140,185,235))}
+.badge-new{background:rgba(var(--purple),.12);color:rgb(var(--purple))}
+
+/* Access badges */
+.access{font-size:11px;font-weight:500}
+.access-public{color:rgb(var(--green))}
+.access-admin{color:rgb(var(--purple))}
+.access-both{color:rgb(var(--amber))}
+
+/* URL links */
+.url-link{color:rgb(var(--purple));text-decoration:none;font-weight:500;font-size:12px;
+  border-bottom:1px solid transparent;transition:.2s}
+.url-link:hover{border-bottom-color:rgb(var(--purple))}
+.url-none{color:rgb(var(--text-secondary));opacity:.4;font-size:12px}
+
+/* Domain tag */
+.domain-tag{font-size:11px;color:rgb(var(--text-secondary));background:var(--panel);
+  padding:2px 8px;border-radius:4px;display:inline-block;white-space:nowrap}
+
+/* File name */
+.file-name{font-size:12px;color:rgb(var(--text-secondary));font-family:'SF Mono',monospace}
+
+/* Num column */
+.num{color:rgb(var(--text-secondary));font-size:12px;opacity:.5;font-weight:500}
+
+/* Details */
+.details{color:rgb(var(--text-secondary));font-size:12px;line-height:1.5;max-width:340px}
+
+/* Collapsible */
+tr.collapsed{display:none}
+
+/* Infra section */
+.infra-table{margin-top:8px}
+.infra-table td{font-size:12px;padding:8px 12px}
+.infra-comp{font-weight:600;color:rgb(var(--text))}
+.infra-stack{color:rgb(var(--text-secondary))}
+.infra-notes{color:rgb(var(--text-secondary));opacity:.7;font-size:11px}
+
+/* Responsive */
+@media(max-width:900px){
+  .topbar{padding:12px 16px}
+  .filters{padding:12px 16px}
+  .table-wrap{padding:0 8px 40px}
+  td,th{padding:6px 8px;font-size:12px}
+  .details{max-width:200px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <h1>AO — Work Tracker</h1>
+    <div class="meta">Last updated: April 19, 2026 &nbsp;·&nbsp; Jack Satta / DeliberateUX</div>
+  </div>
+  <div class="actions">
+    <button onclick="toggleAll()" title="Expand / Collapse all groups">±</button>
+    <button onclick="window.open('https://docs.google.com/spreadsheets/d/11ikRhmCsG3f8bXg0iMbxnH7pDIQ1x0_X/edit')" title="Open source spreadsheet">📊 Sheet</button>
+  </div>
+</div>
+
+<div class="filters" id="filters"></div>
+<div class="stats" id="stats"></div>
+
+<div class="table-wrap">
+  <table id="tracker">
+    <thead>
+      <tr>
+        <th style="width:32px">#</th>
+        <th>Feature</th>
+        <th style="width:60px">Status</th>
+        <th style="width:56px">Access</th>
+        <th style="width:110px">Domain</th>
+        <th style="width:280px">Details</th>
+        <th style="width:140px">File(s)</th>
+        <th>URL</th>
+        <th style="width:70px">Date</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<script>
+var DATA = {
+  sections: [
+    {
+      title: "Public — Theme Builder / Demo Mode",
+      groups: [
+        {
+          domain: "VPS Theme Studio",
+          host: "100.71.12.80:18794",
+          items: [
+            {n:1,feature:"Theme Studio Editor",status:"Live",access:"Public",domain:"VPS :18794",
+             details:"Left panel controls + live preview. 10 presets, custom sliders, WCAG a11y checking",
+             files:"theme-studio.html",url:"/theme-studio.html",href:"http://100.71.12.80:18794/theme-studio.html",date:"Mar 2026"},
+            {n:2,feature:"Theme Studio Landing",status:"Live",access:"Public",domain:"VPS :18794",
+             details:"Marketing/feature overview page, links to all tools",
+             files:"ts.html",url:"/ts.html",href:"http://100.71.12.80:18794/ts.html",date:"Mar 2026"},
+            {n:3,feature:"Design System Reference",status:"Live",access:"Public",domain:"VPS :18794",
+             details:"Live design tokens page, reflects applied theme CSS vars",
+             files:"design-system.html",url:"/design-system.html",href:"http://100.71.12.80:18794/design-system.html",date:"Mar 2026"},
+            {n:4,feature:"Demo Mode (?demo=true)",status:"Live",access:"Public",domain:"VPS :18794",
+             details:"Guest-safe sharing: auto-rotates presets, hides admin nav, disables Apply All",
+             files:"theme-control.js",url:"?demo=true",href:"http://100.71.12.80:18794/ts.html?demo=true",date:"Mar 2026"},
+            {n:5,feature:"Pricing Page",status:"Live",access:"Public",domain:"VPS :18794",
+             details:"Freemium pricing tiers",
+             files:"pricing.html",url:"/pricing.html",href:"http://100.71.12.80:18794/pricing.html",date:"Mar 2026"}
+          ]
+        },
+        {
+          domain: "Sharing & Analytics",
+          host: "",
+          items: [
+            {n:6,feature:"Tailscale Funnel Sharing",status:"Ready",access:"Public",domain:"Tailscale",
+             details:"tailscale funnel 18794 → shareable https URL for demos",
+             files:"—",url:"*.ts.net",href:null,date:"Mar 2026"},
+            {n:7,feature:"GA4 Analytics",status:"Live",access:"Public",domain:"Google Analytics",
+             details:"G-9MSXWF3TX3 on public pages only, filter by hostname in GA",
+             files:"ts.html + 2 more",url:"—",href:null,date:"Mar 2026"}
+          ]
+        },
+        {
+          domain: "GitHub Pages",
+          host: "deliberateux.com/ao",
+          items: [
+            {n:8,feature:"AO Landing Page",status:"Live",access:"Public",domain:"GitHub Pages",
+             details:"Full AO product page with agent network animation, beta form",
+             files:"ao/index.html",url:"deliberateux.com/ao/",href:"https://deliberateux.com/ao/",date:"Apr 2026"},
+            {n:9,feature:"Contact Form",status:"Live",access:"Public",domain:"GH Pages → CRM",
+             details:"Beta request form on AO landing, POSTs to CRM",
+             files:"ao/index.html",url:"/api/inbound",href:"http://100.71.12.80:18800/api/inbound",date:"Apr 2026"}
+          ]
+        }
+      ]
+    },
+    {
+      title: "Full Access — Admin / Internal Tools",
+      groups: [
+        {
+          domain: "GitHub Pages",
+          host: "deliberateux.com/ao",
+          items: [
+            {n:10,feature:"Onboarding Wizard (5-step)",status:"Live",access:"Admin",domain:"GitHub Pages",
+             details:"Org type → Focus areas → Autonomy slider → Name → Agent roster summary",
+             files:"ao/onboard.html",url:"/ao/onboard.html",href:"https://deliberateux.com/ao/onboard.html",date:"Apr 14"},
+            {n:11,feature:"Bootup Animation",status:"Live",access:"Admin",domain:"GitHub Pages",
+             details:"Agent provisioning animation post-onboard",
+             files:"ao/bootup.html",url:"/ao/bootup.html",href:"https://deliberateux.com/ao/bootup.html",date:"Apr 14"},
+            {n:12,feature:"Configure Page",status:"Live",access:"Admin",domain:"GitHub Pages",
+             details:"Role builder, scoped to org. CTA block + beta link",
+             files:"ao/configure.html",url:"/ao/configure.html",href:"https://deliberateux.com/ao/configure.html",date:"Apr 14"},
+            {n:13,feature:"Admin Dashboard",status:"WIP",access:"Admin",domain:"GitHub Pages",
+             details:"The roof. My Orgs grid (customer) or All Orgs grid (admin) + system services",
+             files:"ao/dashboard.html",url:"/ao/dashboard.html",href:"https://deliberateux.com/ao/dashboard.html",date:"Apr 14"},
+            {n:14,feature:"Flows Canvas",status:"Live",access:"Admin",domain:"GitHub Pages",
+             details:"Workflow builder: 60+ node schemas, auto-mapping, 8 template flows, run simulation",
+             files:"ao/flows.html",url:"/ao/flows.html",href:"https://deliberateux.com/ao/flows.html",date:"Apr 18"},
+            {n:15,feature:"Queue",status:"Live",access:"Admin",domain:"GitHub Pages",
+             details:"Live work queue, scoped to org via ?org=",
+             files:"ao/queue.html",url:"/ao/queue.html",href:"https://deliberateux.com/ao/queue.html",date:"Apr 14"},
+            {n:16,feature:"Org Home",status:"Live",access:"Admin",domain:"GitHub Pages",
+             details:"Single org home — agents, tasks, workspace. Scoped via ?slug=",
+             files:"ao/org.html",url:"/ao/org.html",href:"https://deliberateux.com/ao/org.html",date:"Apr 14"},
+            {n:17,feature:"Sitemap Navigator",status:"Live",access:"Admin",domain:"GitHub Pages",
+             details:"Split-canvas: page tree with audience filters (left), live iframe preview (right)",
+             files:"ao/ao-sitemap.html",url:"/ao/ao-sitemap.html",href:"https://deliberateux.com/ao/ao-sitemap.html",date:"Apr 18"},
+            {n:18,feature:"Unified App Shell",status:"Live",access:"Admin",domain:"GitHub Pages",
+             details:"Single entry point. Sidebar nav + iframe panels. BroadcastChannel state sync. Cmd+1-6",
+             files:"ao/app.html",url:"/ao/app.html",href:"https://deliberateux.com/ao/app.html",date:"Apr 18"},
+            {n:19,feature:"Shared Sticky Nav",status:"WIP",access:"Admin",domain:"GitHub Pages",
+             details:"Normalized dark top bar across index, onboard, configure, dashboard",
+             files:"all ao/*.html",url:"—",href:null,date:"Apr 14"}
+          ]
+        },
+        {
+          domain: "VPS CRM API",
+          host: "100.71.12.80:18800",
+          items: [
+            {n:20,feature:"AO CRM (Leads API)",status:"Live",access:"Admin",domain:"VPS :18800",
+             details:"Express.js REST API + dashboard for beta leads. Docker on VPS",
+             files:"crm/crm-server.js",url:"/api/leads",href:"http://100.71.12.80:18800/api/leads",date:"Apr 14"}
+          ]
+        },
+        {
+          domain: "Infrastructure & Shared",
+          host: "",
+          items: [
+            {n:21,feature:"Cloudflare Email Routing",status:"Live",access:"Admin",domain:"Cloudflare",
+             details:"hello@, jack@, support@, info@ → jacksatta@gmail.com",
+             files:"—",url:"deliberateux.com",href:null,date:"Apr 14"},
+            {n:22,feature:"theme-control.js (canonical)",status:"Live",access:"Both",domain:"All dashboards",
+             details:"Shared theme panel across all dashboards. BroadcastChannel sync, preset API",
+             files:"theme-control.js",url:"all dashboards",href:null,date:"Mar 2026"},
+            {n:23,feature:"VPS Docker Stack",status:"Live",access:"Admin",domain:"Oracle Cloud",
+             details:"Oracle Cloud Free Tier, 10 containers, deploy-vps.sh auto-deploy",
+             files:"docker-compose.yml",url:"100.71.12.80:*",href:null,date:"Ongoing"}
+          ]
+        }
+      ]
+    }
+  ],
+  infra: [
+    {comp:"deliberateux.com",stack:"GitHub Pages + Cloudflare CDN",notes:"GoDaddy DNS → Cloudflare → GH Pages. Push to main auto-deploys"},
+    {comp:"VPS (Oracle Cloud)",stack:"Docker Compose on Tailscale mesh",notes:"Free Tier VM, 100.71.12.80, 10 containers, deploy-vps.sh"},
+    {comp:"CRM",stack:"Express.js + JSON file",notes:"Receives beta form leads, Docker on VPS :18800"},
+    {comp:"Email",stack:"Cloudflare Email Routing",notes:"4 addresses → Gmail forwarding"},
+    {comp:"Theme System",stack:"CSS vars + BroadcastChannel",notes:"theme-control.js canonical at repo root, synced to all dashboards"}
+  ]
+};
+
+// ── Render ──
+var tbody = document.getElementById('tbody');
+var allItems = [];
+var collapsedGroups = {};
+
+function statusBadge(s){
+  var cls = s==='Live'?'badge-live':s==='WIP'?'badge-wip':s==='Ready'?'badge-ready':'badge-new';
+  return '<span class="badge '+cls+'">'+s+'</span>';
+}
+function accessLabel(a){
+  var cls = a==='Public'?'access-public':a==='Admin'?'access-admin':'access-both';
+  return '<span class="access '+cls+'">'+a+'</span>';
+}
+function urlCell(item){
+  if(item.href) return '<a class="url-link" href="'+item.href+'" target="_blank" rel="noopener">'+item.url+'</a>';
+  return '<span class="url-none">'+item.url+'</span>';
+}
+
+function render(filter){
+  tbody.innerHTML = '';
+  var shown = 0, total = 0;
+
+  DATA.sections.forEach(function(sec){
+    // Section header
+    var sr = document.createElement('tr');
+    sr.className = 'section-header';
+    sr.innerHTML = '<td colspan="9">'+sec.title+'</td>';
+    tbody.appendChild(sr);
+
+    sec.groups.forEach(function(grp){
+      var gid = grp.domain.replace(/\s/g,'_');
+      // Domain sub-header
+      var dr = document.createElement('tr');
+      dr.className = 'domain-header';
+      dr.setAttribute('data-group', gid);
+      var hostLabel = grp.host ? ' <span class="host">• '+grp.host+'</span>' : '';
+      dr.innerHTML = '<td colspan="9"><span class="hex">⬡</span>'+grp.domain+hostLabel+
+        ' <span style="float:right;opacity:.4;font-size:11px">'+grp.items.length+'</span></td>';
+      dr.onclick = function(){ toggleGroup(gid); };
+      tbody.appendChild(dr);
+
+      grp.items.forEach(function(item){
+        total++;
+        if(filter && filter!=='all'){
+          if(filter==='live' && item.status!=='Live') return;
+          if(filter==='wip' && item.status!=='WIP') return;
+          if(filter==='public' && item.access!=='Public') return;
+          if(filter==='admin' && item.access!=='Admin') return;
+          if(filter==='ghpages' && item.domain.indexOf('GitHub')===- 1) return;
+          if(filter==='vps' && item.domain.indexOf('VPS')===-1 && item.domain.indexOf('Oracle')===-1) return;
+        }
+        shown++;
+        var tr = document.createElement('tr');
+        tr.className = 'data-row';
+        tr.setAttribute('data-group', gid);
+        if(collapsedGroups[gid]) tr.classList.add('collapsed');
+        tr.innerHTML =
+          '<td class="num">'+item.n+'</td>'+
+          '<td style="font-weight:500">'+item.feature+'</td>'+
+          '<td>'+statusBadge(item.status)+'</td>'+
+          '<td>'+accessLabel(item.access)+'</td>'+
+          '<td><span class="domain-tag">'+item.domain+'</span></td>'+
+          '<td class="details">'+item.details+'</td>'+
+          '<td class="file-name">'+item.files+'</td>'+
+          '<td>'+urlCell(item)+'</td>'+
+          '<td style="font-size:12px;color:rgb(var(--text-secondary))">'+item.date+'</td>';
+        tbody.appendChild(tr);
+      });
+    });
+  });
+
+  // Infra section
+  var ir = document.createElement('tr');
+  ir.className = 'section-header';
+  ir.innerHTML = '<td colspan="9">Infrastructure</td>';
+  tbody.appendChild(ir);
+  DATA.infra.forEach(function(inf){
+    var tr = document.createElement('tr');
+    tr.className = 'data-row';
+    tr.innerHTML = '<td></td><td class="infra-comp">'+inf.comp+'</td><td colspan="3" class="infra-stack">'+inf.stack+
+      '</td><td colspan="4" class="infra-notes">'+inf.notes+'</td>';
+    tbody.appendChild(tr);
+  });
+
+  // Stats
+  var liveCount=0, wipCount=0;
+  DATA.sections.forEach(function(s){s.groups.forEach(function(g){g.items.forEach(function(i){
+    if(i.status==='Live')liveCount++;
+    if(i.status==='WIP')wipCount++;
+  })})});
+  document.getElementById('stats').innerHTML =
+    '<div><span class="stat-val">'+total+'</span> deliverables</div>'+
+    '<div><span class="stat-val stat-live">'+liveCount+'</span> live</div>'+
+    '<div><span class="stat-val stat-wip">'+wipCount+'</span> WIP</div>'+
+    '<div><span class="stat-val">'+shown+'</span> shown</div>';
+}
+
+function toggleGroup(gid){
+  collapsedGroups[gid] = !collapsedGroups[gid];
+  document.querySelectorAll('tr[data-group="'+gid+'"]').forEach(function(tr){
+    if(!tr.classList.contains('domain-header')){
+      tr.classList.toggle('collapsed', collapsedGroups[gid]);
+    }
+  });
+}
+function toggleAll(){
+  var anyOpen = Object.keys(collapsedGroups).some(function(k){return !collapsedGroups[k]});
+  DATA.sections.forEach(function(s){s.groups.forEach(function(g){
+    var gid = g.domain.replace(/\s/g,'_');
+    collapsedGroups[gid] = anyOpen;
+  })});
+  render(activeFilter);
+}
+
+// Filters
+var activeFilter = 'all';
+var filters = [
+  {id:'all',label:'All'},
+  {id:'live',label:'Live'},
+  {id:'wip',label:'WIP'},
+  {id:'public',label:'Public'},
+  {id:'admin',label:'Admin'},
+  {id:'ghpages',label:'GH Pages'},
+  {id:'vps',label:'VPS'}
+];
+var filtersEl = document.getElementById('filters');
+filters.forEach(function(f){
+  var chip = document.createElement('span');
+  chip.className = 'chip' + (f.id==='all'?' active':'');
+  chip.textContent = f.label;
+  chip.onclick = function(){
+    activeFilter = f.id;
+    document.querySelectorAll('.chip').forEach(function(c){c.classList.remove('active')});
+    chip.classList.add('active');
+    render(f.id);
+  };
+  filtersEl.appendChild(chip);
+});
+
+// Theme persistence
+(function(){
+  var t = localStorage.getItem('ao_theme');
+  if(t) document.documentElement.setAttribute('data-theme', t);
+})();
+
+render('all');
+</script>
+</body>
+</html>
