@@ -273,87 +273,99 @@ AOFlowEngine.prototype.run = function(flowId, inputData){
     return mapped;
   }
 
-  // Execute nodes sequentially with visual pacing
-  function executeStep(i){
-    if(i >= order.length){
-      execution.status = 'completed';
-      execution.endTime = Date.now();
-      execution.duration = execution.endTime - execution.startTime;
-      try { self._persist(execution); } catch(e){ console.warn('Persist error:', e); }
-      try { self._broadcastResult(execution); } catch(e){ console.warn('Broadcast error:', e); }
-      return Promise.resolve(execution);
-    }
+  // Execute nodes sequentially with visual pacing (iterative async loop)
+  function runAll(){
+    return new Promise(function(resolveAll){
+      var i = 0;
 
-    var nid = order[i];
-    if(skipped[nid]){
-      return executeStep(i + 1);
-    }
+      function next(){
+        if(i >= order.length){
+          execution.status = 'completed';
+          execution.endTime = Date.now();
+          execution.duration = execution.endTime - execution.startTime;
+          try { self._persist(execution); } catch(e){ console.warn('Persist error:', e); }
+          try { self._broadcastResult(execution); } catch(e){ console.warn('Broadcast error:', e); }
+          resolveAll(execution);
+          return;
+        }
 
-    var node = nodeMap[nid];
-    var executor = executors[node.type];
-    if(!executor){
-      ctx.log(node, 'No executor for type: ' + node.type, {});
-      return executeStep(i + 1);
-    }
+        var nid = order[i];
+        i++;
 
-    // Gather input from upstream data maps
-    var inEdges = flow.edges.filter(function(e){ return e.to === nid && !skipped[e.from]; });
-    var nodeInput = {};
-    inEdges.forEach(function(e){
-      var srcOut = execution.nodeOutputs[e.from] || {};
-      var mapped = resolveDataMap(e, srcOut);
-      Object.assign(nodeInput, mapped);
-    });
-    if(!inEdges.length) nodeInput = inputData;
+        if(skipped[nid]) { next(); return; }
 
-    // Execute
-    var result = executor(node, nodeInput, ctx);
-    var handleResult = function(output){
-      execution.nodeOutputs[nid] = output;
+        var node = nodeMap[nid];
+        var executor = executors[node.type];
+        if(!executor){
+          ctx.log(node, 'No executor for type: ' + node.type, {});
+          next(); return;
+        }
 
-      // Handle branching for op-if
-      if(node.type === 'op-if' && output._branchResult !== undefined){
-        var branchVal = output._branchResult;
-        flow.edges.forEach(function(e){
-          if(e.from === nid){
-            if(e.branch === 'true' && !branchVal) skipped[e.to] = true;
-            if(e.branch === 'false' && branchVal) skipped[e.to] = true;
-          }
+        // Gather input from upstream data maps
+        var inEdges = flow.edges.filter(function(e){ return e.to === nid && !skipped[e.from]; });
+        var nodeInput = {};
+        inEdges.forEach(function(e){
+          var srcOut = execution.nodeOutputs[e.from] || {};
+          var mapped = resolveDataMap(e, srcOut);
+          Object.assign(nodeInput, mapped);
         });
-        // Propagate skip to downstream nodes
-        var skipQueue = Object.keys(skipped).filter(function(k){ return skipped[k]; });
-        while(skipQueue.length){
-          var sk = skipQueue.shift();
-          (adj[sk]||[]).forEach(function(downstream){
-            // Only skip if ALL incoming edges are from skipped nodes
-            var allSkipped = flow.edges.filter(function(e){ return e.to === downstream; })
-              .every(function(e){ return skipped[e.from]; });
-            if(allSkipped && !skipped[downstream]){
-              skipped[downstream] = true;
-              skipQueue.push(downstream);
+        if(!inEdges.length) nodeInput = inputData;
+
+        // Execute
+        var result = executor(node, nodeInput, ctx);
+
+        function handleResult(output){
+          execution.nodeOutputs[nid] = output;
+
+          // Handle branching for op-if
+          if(node.type === 'op-if' && output._branchResult !== undefined){
+            var branchVal = output._branchResult;
+            flow.edges.forEach(function(e){
+              if(e.from === nid){
+                if(e.branch === 'true' && !branchVal) skipped[e.to] = true;
+                if(e.branch === 'false' && branchVal) skipped[e.to] = true;
+              }
+            });
+            // Propagate skip to downstream nodes
+            var skipQueue = Object.keys(skipped).filter(function(k){ return skipped[k]; });
+            while(skipQueue.length){
+              var sk = skipQueue.shift();
+              (adj[sk]||[]).forEach(function(downstream){
+                var allSkipped = flow.edges.filter(function(e){ return e.to === downstream; })
+                  .every(function(e){ return skipped[e.from]; });
+                if(allSkipped && !skipped[downstream]){
+                  skipped[downstream] = true;
+                  skipQueue.push(downstream);
+                }
+              });
             }
+          }
+
+          // Update context payload with latest output
+          Object.assign(ctx.payload, output);
+
+          // Pace with 200ms delay
+          setTimeout(next, 200);
+        }
+
+        if(result && typeof result.then === 'function'){
+          result.then(handleResult).catch(function(e){
+            ctx.log(node, 'Error: ' + e.message, {error: true});
+            setTimeout(next, 200);
           });
+        } else {
+          handleResult(result);
         }
       }
 
-      // Update context payload with latest output
-      Object.assign(ctx.payload, output);
-
-      return new Promise(function(resolve){
-        setTimeout(function(){ resolve(executeStep(i + 1)); }, 200);
-      });
-    };
-
-    if(result && typeof result.then === 'function'){
-      return result.then(handleResult);
-    }
-    return handleResult(result);
+      next();
+    });
   }
 
   // Broadcast start
   if(BC) BC.postMessage({type:'flow_start', execution: execution.id, flowName: flow.name, input: inputData});
 
-  return executeStep(0);
+  return runAll();
 };
 
 // Safe JSON stringify that handles circular references
