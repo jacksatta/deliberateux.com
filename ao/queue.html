@@ -470,6 +470,10 @@
   setInterval(tick, 1500);
   setInterval(injectTask, 6000 + Math.random() * 4000);
 
+  // Expose for cross-script flow integration
+  window.__qTasks = tasks;
+  window.__qRender = render;
+
 })();
 </script>
 <script>
@@ -492,8 +496,8 @@
       if(e.data && e.data.type === 'flow_complete' && e.data.task){
         var ft = e.data.task;
         // Inject as a real queue task
-        if(typeof tasks !== 'undefined' && typeof render === 'function'){
-          tasks.push({
+        if(window.__qTasks && window.__qRender){
+          window.__qTasks.push({
             id: ft.id || Date.now(),
             agent: ft.agent || 'cs',
             task: ft.task || 'Flow result',
@@ -507,7 +511,7 @@
             tier: ft.tier,
             lead: ft.lead
           });
-          render();
+          window.__qRender();
           // Flash notification
           var banner = document.createElement('div');
           banner.style.cssText = 'position:fixed;top:12px;right:12px;padding:10px 18px;background:rgba(var(--green),0.15);'+
@@ -527,8 +531,8 @@
       pending.forEach(function(ft){
         if(shown.indexOf(ft.id) >= 0) return;
         shown.push(ft.id);
-        if(typeof tasks !== 'undefined'){
-          tasks.push({
+        if(window.__qTasks){
+          window.__qTasks.push({
             id: ft.id, agent: ft.agent || 'cs', task: ft.task || 'Flow result',
             status: 'queued', born: ft.born || Date.now(),
             healState: null, healReason: null,
@@ -537,7 +541,7 @@
         }
       });
       sessionStorage.setItem('ao_flow_shown', JSON.stringify(shown));
-      if(pending.length && typeof render === 'function') render();
+      if(pending.length && window.__qRender) window.__qRender();
     } catch(e){}
   })();
 </script>
