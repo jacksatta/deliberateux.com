@@ -112,30 +112,8 @@ var executors = {
     var endpoint = (node.config && node.config.endpoint) || '/api/crm/leads';
     var record = {name: input.name, email: input.email, tier: input.tier, score: input.score, customer_id: input.customer_id};
     ctx.log(node, 'CRM upsert → ' + endpoint, {method:'POST', record: record, status: 'synced'});
-    // Try real CRM API with timeout, fall back gracefully
-    return new Promise(function(resolve){
-      var resolved = false;
-      var fallback = function(){
-        if(resolved) return;
-        resolved = true;
-        ctx.log(node, 'CRM API unreachable — record staged locally', {api:'local', record:record});
-        resolve({records:[record], count:1, status:'staged', api:'local'});
-      };
-      // Timeout after 3s regardless
-      setTimeout(fallback, 3000);
-      try {
-        var crmBase = 'http://100.71.12.80:18800';
-        fetch(crmBase + '/api/leads', {method:'GET', mode:'cors'})
-          .then(function(r){ return r.json(); })
-          .then(function(data){
-            if(resolved) return;
-            resolved = true;
-            ctx.log(node, 'CRM API responded: ' + (data.length||0) + ' existing leads', {api:'live', count:data.length});
-            resolve({records:[record], count:1, status:'synced', api:'live'});
-          })
-          .catch(fallback);
-      } catch(e){ fallback(); }
-    });
+    // Sync CRM staging (real API call skipped on HTTPS — mixed content hangs forever)
+    return {records:[record], count:1, status:'staged', api:'local'};
   },
   'int-slack': function(node, input, ctx){
     var msg = 'New ' + (input.tier||'') + ' lead: ' + (input.name||'unknown') + ' — score: ' + (input.score||'?');
