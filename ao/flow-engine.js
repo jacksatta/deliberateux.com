@@ -279,8 +279,8 @@ AOFlowEngine.prototype.run = function(flowId, inputData){
       execution.status = 'completed';
       execution.endTime = Date.now();
       execution.duration = execution.endTime - execution.startTime;
-      self._persist(execution);
-      self._broadcastResult(execution);
+      try { self._persist(execution); } catch(e){ console.warn('Persist error:', e); }
+      try { self._broadcastResult(execution); } catch(e){ console.warn('Broadcast error:', e); }
       return Promise.resolve(execution);
     }
 
@@ -356,6 +356,18 @@ AOFlowEngine.prototype.run = function(flowId, inputData){
   return executeStep(0);
 };
 
+// Safe JSON stringify that handles circular references
+function safeStringify(obj){
+  var seen = new WeakSet();
+  return JSON.stringify(obj, function(key, val){
+    if(typeof val === 'object' && val !== null){
+      if(seen.has(val)) return '[circular]';
+      seen.add(val);
+    }
+    return val;
+  });
+}
+
 AOFlowEngine.prototype._persist = function(execution){
   this.executions.push({
     id: execution.id,
@@ -371,8 +383,8 @@ AOFlowEngine.prototype._persist = function(execution){
   });
   // Keep last 50
   if(this.executions.length > 50) this.executions = this.executions.slice(-50);
-  localStorage.setItem('ao_flow_executions', JSON.stringify(this.executions));
-  localStorage.setItem('ao_last_execution', JSON.stringify(execution));
+  localStorage.setItem('ao_flow_executions', safeStringify(this.executions));
+  localStorage.setItem('ao_last_execution', safeStringify(execution));
 };
 
 AOFlowEngine.prototype._broadcastResult = function(execution){
