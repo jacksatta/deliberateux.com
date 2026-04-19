@@ -35,14 +35,14 @@ body{font-family:'Inter','SF Pro Text',system-ui,sans-serif;background:var(--bg)
 
 /* ── Table ── */
 .table-wrap{padding:0 28px 40px}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;padding:8px 12px;font-size:11px;font-weight:600;text-transform:uppercase;
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;padding:10px 14px;font-size:12px;font-weight:600;text-transform:uppercase;
   letter-spacing:.6px;color:rgb(var(--amber));background:rgba(var(--amber),.08);
   border-bottom:2px solid rgba(var(--amber),.25);position:sticky;top:49px;z-index:10}
-td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.45}
+td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.5}
 
 /* Domain group header */
-tr.domain-header td{padding:12px 12px 6px;font-size:12px;font-weight:600;
+tr.domain-header td{padding:14px 14px 8px;font-size:13px;font-weight:600;
   color:rgb(var(--text-secondary));background:var(--bg);border-bottom:1px solid var(--border);
   letter-spacing:.3px;cursor:pointer;user-select:none}
 tr.domain-header td .hex{color:rgb(var(--amber));margin-right:6px;font-size:14px}
@@ -60,7 +60,7 @@ tr.data-row:hover{background:var(--panel)}
 tr.data-row td{background:transparent}
 
 /* Status badges */
-.badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:600;letter-spacing:.3px}
+.badge{display:inline-block;padding:3px 11px;border-radius:12px;font-size:12px;font-weight:600;letter-spacing:.3px}
 .badge-live{background:rgba(var(--green),.12);color:rgb(var(--green))}
 .badge-wip{background:rgba(var(--amber),.12);color:rgb(var(--amber))}
 .badge-ready{background:rgba(var(--blue),.12);color:rgb(var(--blue,140,185,235))}
@@ -73,23 +73,23 @@ tr.data-row td{background:transparent}
 .access-both{color:rgb(var(--amber))}
 
 /* URL links */
-.url-link{color:rgb(var(--purple));text-decoration:none;font-weight:500;font-size:12px;
+.url-link{color:rgb(var(--purple));text-decoration:none;font-weight:500;font-size:13px;
   border-bottom:1px solid transparent;transition:.2s}
 .url-link:hover{border-bottom-color:rgb(var(--purple))}
-.url-none{color:rgb(var(--text-secondary));opacity:.4;font-size:12px}
+.url-none{color:rgb(var(--text-secondary));opacity:.4;font-size:13px}
 
 /* Domain tag */
 .domain-tag{font-size:11px;color:rgb(var(--text-secondary));background:var(--panel);
   padding:2px 8px;border-radius:4px;display:inline-block;white-space:nowrap}
 
 /* File name */
-.file-name{font-size:12px;color:rgb(var(--text-secondary));font-family:'SF Mono',monospace}
+.file-name{font-size:13px;color:rgb(var(--text-secondary))}
 
 /* Num column */
-.num{color:rgb(var(--text-secondary));font-size:12px;opacity:.5;font-weight:500}
+.num{color:rgb(var(--text-secondary));font-size:13px;opacity:.5;font-weight:500}
 
 /* Details */
-.details{color:rgb(var(--text-secondary));font-size:12px;line-height:1.5;max-width:340px}
+.details{color:rgb(var(--text-secondary));font-size:13px;line-height:1.5;max-width:340px}
 
 /* Collapsible */
 tr.collapsed{display:none}
@@ -112,6 +112,22 @@ tr.collapsed{display:none}
 </style>
 </head>
 <body>
+
+<script>
+// Admin gate — tracker is internal only
+(function(){
+  var isAdmin = new URLSearchParams(window.location.search).has('admin') ||
+                localStorage.getItem('ao_admin') === '1';
+  if(!isAdmin){
+    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;'+
+      'font-family:Inter,system-ui,sans-serif;color:#888;font-size:15px">'+
+      '<div style="text-align:center"><h2 style="color:#C47A2A;margin-bottom:8px">AO Work Tracker</h2>'+
+      '<p>Admin access required.</p></div></div>';
+    throw new Error('admin gate');
+  }
+  localStorage.setItem('ao_admin','1');
+})();
+</script>
 
 <div class="topbar">
   <div>
