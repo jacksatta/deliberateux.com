@@ -1877,5 +1877,157 @@
   });
 })();
 </script>
+<script src="flow-engine.js"></script>
+<script>
+// ── Real Flow Engine Integration ──
+(function(){
+  var engine = new AOFlowEngine();
+  var bc = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('ao_flow') : null;
+
+  // Add "Run Real" button next to existing Run
+  var runBtn = document.getElementById('btn-run');
+  var realBtn = document.createElement('button');
+  realBtn.className = 'tb-btn run';
+  realBtn.id = 'btn-run-real';
+  realBtn.innerHTML = 'Run Live ⚡';
+  realBtn.style.cssText = 'background:rgba(var(--green),0.15);border-color:rgba(var(--green),0.3);margin-left:6px';
+  runBtn.parentNode.insertBefore(realBtn, runBtn.nextSibling);
+
+  // Execution log panel
+  var logPanel = document.createElement('div');
+  logPanel.id = 'engine-log';
+  logPanel.style.cssText = 'position:fixed;bottom:0;right:0;width:420px;max-height:360px;overflow-y:auto;'+
+    'background:var(--surface);border:1px solid var(--border);border-radius:12px 0 0 0;z-index:200;'+
+    'font-family:SF Mono,monospace;font-size:11px;padding:0;display:none;box-shadow:0 -4px 24px rgba(0,0,0,.4)';
+  logPanel.innerHTML = '<div style="padding:8px 14px;background:rgba(var(--green),0.08);border-bottom:1px solid var(--border);'+
+    'display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1">'+
+    '<span style="font-weight:600;color:rgb(var(--green));font-size:12px">⚡ Live Execution Log</span>'+
+    '<button id="engine-log-close" style="background:none;border:none;color:rgb(var(--text-secondary));cursor:pointer;font-size:14px">✕</button></div>'+
+    '<div id="engine-log-body" style="padding:8px 14px"></div>';
+  document.body.appendChild(logPanel);
+  document.getElementById('engine-log-close').onclick = function(){ logPanel.style.display = 'none'; };
+
+  // Lead input modal
+  function showLeadPicker(callback){
+    var leads = AOFlowEngine.SAMPLE_LEADS;
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;display:flex;align-items:center;justify-content:center';
+    var modal = document.createElement('div');
+    modal.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;width:520px;max-height:80vh;overflow-y:auto';
+    modal.innerHTML = '<h3 style="margin:0 0 4px;font-size:15px;color:rgb(var(--text))">Run Lead Qualification</h3>'+
+      '<p style="margin:0 0 16px;font-size:12px;color:rgb(var(--text-secondary))">Pick a lead or enter custom data. The flow engine will score, qualify, branch, and push to queue — all real.</p>'+
+      '<div id="lead-list" style="display:grid;gap:8px"></div>'+
+      '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">'+
+      '<div style="font-size:11px;color:rgb(var(--text-secondary));margin-bottom:8px">Or enter custom:</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+
+      '<input id="lead-name" placeholder="Name" style="background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:rgb(var(--text));font-size:12px">'+
+      '<input id="lead-email" placeholder="Email" style="background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:rgb(var(--text));font-size:12px">'+
+      '<input id="lead-company" placeholder="Company" style="background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:rgb(var(--text));font-size:12px">'+
+      '<input id="lead-employees" placeholder="Employees (number)" type="number" style="background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:rgb(var(--text));font-size:12px">'+
+      '<select id="lead-source" style="background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:rgb(var(--text));font-size:12px">'+
+      '<option value="website">Website</option><option value="referral">Referral</option><option value="ads">Ads</option><option value="partner">Partner</option><option value="organic">Organic</option></select>'+
+      '<input id="lead-budget" placeholder="Budget range (e.g. 50k-100k)" style="background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:rgb(var(--text));font-size:12px">'+
+      '</div>'+
+      '<button id="lead-custom-run" style="margin-top:10px;width:100%;padding:8px;background:rgba(var(--green),0.15);'+
+      'border:1px solid rgba(var(--green),0.3);border-radius:8px;color:rgb(var(--green));font-weight:600;font-size:13px;cursor:pointer">Run Custom Lead ⚡</button></div>';
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click',function(e){ if(e.target===overlay){ document.body.removeChild(overlay); }});
+
+    var list = modal.querySelector('#lead-list');
+    leads.forEach(function(lead, i){
+      var card = document.createElement('div');
+      card.style.cssText = 'padding:10px 14px;background:var(--panel);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:.15s';
+      card.onmouseenter = function(){ card.style.borderColor='rgb(var(--green))'; };
+      card.onmouseleave = function(){ card.style.borderColor='var(--border)'; };
+      card.innerHTML = '<div style="font-weight:500;font-size:13px;color:rgb(var(--text))">'+lead.name+
+        ' <span style="font-weight:400;color:rgb(var(--text-secondary));font-size:11px">'+lead.email+'</span></div>'+
+        '<div style="font-size:11px;color:rgb(var(--text-secondary));margin-top:2px">'+
+        (lead.company||'(no company)')+' · '+lead.employees+' emp · '+lead.source+
+        (lead.budget_range?' · '+lead.budget_range:'')+'</div>';
+      card.onclick = function(){ document.body.removeChild(overlay); callback(lead); };
+      list.appendChild(card);
+    });
+
+    modal.querySelector('#lead-custom-run').onclick = function(){
+      var custom = {
+        name: document.getElementById('lead-name').value || 'Test Lead',
+        email: document.getElementById('lead-email').value || 'test@example.com',
+        company: document.getElementById('lead-company').value || '',
+        employees: parseInt(document.getElementById('lead-employees').value) || 0,
+        source: document.getElementById('lead-source').value || 'website',
+        budget_range: document.getElementById('lead-budget').value || ''
+      };
+      document.body.removeChild(overlay);
+      callback(custom);
+    };
+  }
+
+  function appendLog(entry){
+    var body = document.getElementById('engine-log-body');
+    var line = document.createElement('div');
+    line.style.cssText = 'padding:4px 0;border-bottom:1px solid rgba(var(--text-secondary),0.08)';
+    var elapsed = (entry.elapsed/1000).toFixed(1);
+    var typeColors = {
+      'ep-start':'var(--green)','ep-end':'var(--green)',
+      'cs':'var(--amber)','biz':'var(--purple)',
+      'op-if':'var(--blue,140,185,235)','op-transform':'var(--blue,140,185,235)',
+      'tr-webhook':'var(--amber)',
+      'int-crm':'var(--green)','int-slack':'var(--purple)','int-email':'var(--amber)',
+      'biz-customer':'var(--purple)'
+    };
+    var col = typeColors[entry.nodeType] || 'var(--text-secondary)';
+    line.innerHTML = '<span style="color:rgb(var(--text-secondary));min-width:36px;display:inline-block">'+elapsed+'s</span> '+
+      '<span style="color:rgb('+col+');font-weight:600">'+entry.nodeLabel+'</span> '+
+      '<span style="color:rgb(var(--text))">'+entry.message+'</span>';
+    // Show data as expandable
+    if(entry.data && Object.keys(entry.data).length){
+      var details = document.createElement('div');
+      details.style.cssText = 'margin:3px 0 3px 40px;padding:4px 8px;background:rgba(var(--text-secondary),0.04);border-radius:4px;font-size:10px;color:rgb(var(--text-secondary));max-height:60px;overflow-y:auto';
+      var keys = Object.keys(entry.data);
+      details.textContent = keys.map(function(k){
+        var v = entry.data[k];
+        if(typeof v === 'object') v = JSON.stringify(v).substring(0,60);
+        return k + ': ' + v;
+      }).join(' · ');
+      line.appendChild(details);
+    }
+    body.appendChild(line);
+    body.scrollTop = body.scrollHeight;
+  }
+
+  realBtn.addEventListener('click', function(){
+    showLeadPicker(function(lead){
+      // Show log panel
+      logPanel.style.display = 'block';
+      document.getElementById('engine-log-body').innerHTML =
+        '<div style="color:rgb(var(--green));font-weight:600;padding:4px 0">▶ Running Lead Qualification for: '+lead.name+'</div>';
+
+      // Listen for step events
+      var stepHandler = function(e){
+        if(e.data && e.data.type === 'flow_step') appendLog(e.data.step);
+      };
+      if(bc) bc.addEventListener('message', stepHandler);
+
+      engine.run('lead-qualification', lead).then(function(execution){
+        if(bc) bc.removeEventListener('message', stepHandler);
+        // Summary
+        var body = document.getElementById('engine-log-body');
+        var summary = document.createElement('div');
+        summary.style.cssText = 'margin-top:8px;padding:10px;background:rgba(var(--green),0.08);border-radius:8px;border:1px solid rgba(var(--green),0.2)';
+        var csOut = execution.nodeOutputs['n2'] || {};
+        summary.innerHTML = '<div style="font-weight:600;color:rgb(var(--green));font-size:12px">✓ Flow Complete — '+execution.duration+'ms</div>'+
+          '<div style="font-size:11px;color:rgb(var(--text));margin-top:4px">'+
+          'Score: <b>'+csOut.score+'</b> · Tier: <b>'+csOut.tier+'</b> · Qualified: <b>'+csOut.qualified+'</b> · Sentiment: <b>'+csOut.sentiment+'</b></div>'+
+          '<div style="font-size:11px;color:rgb(var(--text-secondary));margin-top:4px">'+
+          execution.log.length+' steps · '+Object.keys(execution.nodeOutputs).length+' nodes executed · Result pushed to Queue</div>'+
+          '<div style="font-size:10px;color:rgb(var(--text-secondary));margin-top:2px">Scoring: '+csOut.notes+'</div>';
+        body.appendChild(summary);
+        body.scrollTop = body.scrollHeight;
+      });
+    });
+  });
+})();
+</script>
 </body>
 </html>

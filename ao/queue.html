@@ -482,6 +482,64 @@
     var pill = document.getElementById('admin-pill');
     if (pill) pill.classList.add('visible');
   }
+
+  // ── Flow Engine Integration ──
+  // Listen for real flow results via BroadcastChannel
+  (function(){
+    if(typeof BroadcastChannel === 'undefined') return;
+    var bc = new BroadcastChannel('ao_flow');
+    bc.addEventListener('message', function(e){
+      if(e.data && e.data.type === 'flow_complete' && e.data.task){
+        var ft = e.data.task;
+        // Inject as a real queue task
+        if(typeof tasks !== 'undefined' && typeof render === 'function'){
+          tasks.push({
+            id: ft.id || Date.now(),
+            agent: ft.agent || 'cs',
+            task: ft.task || 'Flow result',
+            status: 'queued',
+            born: Date.now(),
+            healState: null,
+            healReason: null,
+            fromFlow: true,
+            flowName: ft.flowName,
+            score: ft.score,
+            tier: ft.tier,
+            lead: ft.lead
+          });
+          render();
+          // Flash notification
+          var banner = document.createElement('div');
+          banner.style.cssText = 'position:fixed;top:12px;right:12px;padding:10px 18px;background:rgba(var(--green),0.15);'+
+            'border:1px solid rgba(var(--green),0.3);border-radius:10px;color:rgb(var(--green));font-size:13px;font-weight:600;'+
+            'z-index:999;animation:fadeIn .3s ease';
+          banner.textContent = '⚡ Flow result: ' + (ft.lead && ft.lead.name || 'Lead') + ' → ' + (ft.tier || 'scored');
+          document.body.appendChild(banner);
+          setTimeout(function(){ banner.style.opacity='0'; setTimeout(function(){ document.body.removeChild(banner); },300); },3000);
+        }
+      }
+    });
+
+    // Also check localStorage for flow tasks on page load
+    try {
+      var pending = JSON.parse(localStorage.getItem('ao_flow_tasks') || '[]');
+      var shown = JSON.parse(sessionStorage.getItem('ao_flow_shown') || '[]');
+      pending.forEach(function(ft){
+        if(shown.indexOf(ft.id) >= 0) return;
+        shown.push(ft.id);
+        if(typeof tasks !== 'undefined'){
+          tasks.push({
+            id: ft.id, agent: ft.agent || 'cs', task: ft.task || 'Flow result',
+            status: 'queued', born: ft.born || Date.now(),
+            healState: null, healReason: null,
+            fromFlow: true, flowName: ft.flowName, score: ft.score, tier: ft.tier, lead: ft.lead
+          });
+        }
+      });
+      sessionStorage.setItem('ao_flow_shown', JSON.stringify(shown));
+      if(pending.length && typeof render === 'function') render();
+    } catch(e){}
+  })();
 </script>
 
 </body>
