@@ -111,21 +111,30 @@ var executors = {
   'int-crm': function(node, input, ctx){
     var endpoint = (node.config && node.config.endpoint) || '/api/crm/leads';
     var record = {name: input.name, email: input.email, tier: input.tier, score: input.score, customer_id: input.customer_id};
-    // Try real CRM API, fall back gracefully
     ctx.log(node, 'CRM upsert → ' + endpoint, {method:'POST', record: record, status: 'synced'});
+    // Try real CRM API with timeout, fall back gracefully
     return new Promise(function(resolve){
-      // Attempt real API call
-      var crmBase = 'http://100.71.12.80:18800';
-      fetch(crmBase + '/api/leads', {method:'GET', mode:'cors'})
-        .then(function(r){ return r.json(); })
-        .then(function(data){
-          ctx.log(node, 'CRM API responded: ' + (data.length||0) + ' existing leads', {api:'live', count:data.length});
-          resolve({records:[record], count:1, status:'synced', api:'live'});
-        })
-        .catch(function(){
-          ctx.log(node, 'CRM API unreachable (CORS) — record staged locally', {api:'local', record:record});
-          resolve({records:[record], count:1, status:'staged', api:'local'});
-        });
+      var resolved = false;
+      var fallback = function(){
+        if(resolved) return;
+        resolved = true;
+        ctx.log(node, 'CRM API unreachable — record staged locally', {api:'local', record:record});
+        resolve({records:[record], count:1, status:'staged', api:'local'});
+      };
+      // Timeout after 3s regardless
+      setTimeout(fallback, 3000);
+      try {
+        var crmBase = 'http://100.71.12.80:18800';
+        fetch(crmBase + '/api/leads', {method:'GET', mode:'cors'})
+          .then(function(r){ return r.json(); })
+          .then(function(data){
+            if(resolved) return;
+            resolved = true;
+            ctx.log(node, 'CRM API responded: ' + (data.length||0) + ' existing leads', {api:'live', count:data.length});
+            resolve({records:[record], count:1, status:'synced', api:'live'});
+          })
+          .catch(fallback);
+      } catch(e){ fallback(); }
     });
   },
   'int-slack': function(node, input, ctx){
