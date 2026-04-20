@@ -397,12 +397,6 @@ filters.forEach(function(f){
   filtersEl.appendChild(chip);
 });
 
-// Theme persistence
-(function(){
-  var t = localStorage.getItem('ao_theme');
-  if(t) document.documentElement.setAttribute('data-theme', t);
-})();
-
 render('all');
 </script>
 </body>
