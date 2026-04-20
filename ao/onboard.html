@@ -7,7 +7,7 @@
   <meta name="description" content="Spin up your AI-powered organization in under a minute. Choose your structure, pick your focus, and AO configures the right agents for you." />
   <link rel="icon" href="/assets/favicon.svg" />
   <link rel="stylesheet" href="ao-theme.css">
-  <script>/* theme persistence */ (function(){var t=localStorage.getItem('ao_theme');if(t)document.documentElement.dataset.theme=t})()</script>
+  <script src="ao-nav.js"></script>
   <style>
     /* ── Reset & base ─────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -37,37 +37,6 @@
       line-height: 1.6;
       background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
     }
-
-    /* ── AO top bar ────────────────────────────────────────── */
-    .ao-nav {
-      position: sticky; top: 0; z-index: 200;
-      background: var(--surface);
-      border-bottom: 1px solid rgba(255,255,255,0.07);
-    }
-    .ao-nav-inner {
-      width: min(960px, calc(100% - 48px));
-      margin: 0 auto;
-      display: flex; align-items: center; height: 50px;
-    }
-    .ao-nav-logo {
-      font-size: 0.9rem; font-weight: 700;
-      display: flex; align-items: center; gap: 8px;
-      color: rgba(255,255,255,0.9); text-decoration: none;
-      margin-right: auto;
-    }
-    .ao-nav-context { font-weight: 400; color: rgba(255,255,255,0.45); margin-left: 2px; }
-    .ao-nav-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: rgb(var(--amber));
-      box-shadow: 0 0 6px rgba(var(--amber),0.6);
-      animation: navDotPulse 2.5s ease-in-out infinite; flex-shrink: 0;
-    }
-    @keyframes navDotPulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
-    .ao-nav-back {
-      font-size: 0.82rem; color: rgba(255,255,255,0.45);
-      text-decoration: none; transition: color 0.2s;
-    }
-    .ao-nav-back:hover { color: rgba(255,255,255,0.8); }
 
     /* ── Layout ────────────────────────────────────────────── */
     .onboard-shell {
@@ -396,13 +365,6 @@
   </style>
 </head>
 <body>
-
-<nav class="ao-nav">
-  <div class="ao-nav-inner">
-    <a href="/ao/" class="ao-nav-logo"><span class="ao-nav-dot"></span>AO<span class="ao-nav-context">/ Setup</span></a>
-    <a href="/ao/" class="ao-nav-back">← Back to overview</a>
-  </div>
-</nav>
 
 <div class="onboard-shell">
 

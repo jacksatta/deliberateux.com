@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AO — Work Tracker</title>
 <link rel="stylesheet" href="ao-theme.css">
+<script src="ao-nav.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--text-dim:rgba(200,195,185,0.7);--text-mid:rgba(220,215,205,0.85)}
@@ -14,17 +15,6 @@
 [data-theme="studio"]{--text-dim:rgba(80,75,70,0.6);--text-mid:rgba(50,48,45,0.75)}
 [data-theme="daybreak"]{--text-dim:rgba(60,70,90,0.55);--text-mid:rgba(40,50,70,0.72)}
 body{font-family:'Inter','SF Pro Text',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-
-/* ── Topbar ── */
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;
-  background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:90}
-.topbar h1{font-size:15px;font-weight:600;letter-spacing:.3px;color:rgb(var(--amber))}
-.topbar .meta{font-size:13px;color:var(--text-dim)}
-.topbar .actions{display:flex;gap:10px;align-items:center}
-.topbar .actions button{background:var(--panel);border:1px solid var(--border);color:var(--text-dim);
-  padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer;transition:.2s}
-.topbar .actions button:hover{border-color:rgb(var(--amber));color:rgb(var(--amber))}
-.topbar .actions button.active{background:rgba(var(--amber),.15);border-color:rgb(var(--amber));color:rgb(var(--amber))}
 
 /* ── Filter chips ── */
 .filters{display:flex;gap:8px;padding:16px 28px;background:var(--bg);border-bottom:1px solid var(--border)}
@@ -109,7 +99,6 @@ tr.collapsed{display:none}
 
 /* Responsive */
 @media(max-width:900px){
-  .topbar{padding:12px 16px}
   .filters{padding:12px 16px}
   .table-wrap{padding:0 8px 40px}
   td,th{padding:6px 8px;font-size:12px}
@@ -118,33 +107,6 @@ tr.collapsed{display:none}
 </style>
 </head>
 <body>
-
-<script>
-// Admin gate — tracker is internal only
-(function(){
-  var isAdmin = new URLSearchParams(window.location.search).has('admin') ||
-                localStorage.getItem('ao_admin') === '1';
-  if(!isAdmin){
-    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;'+
-      'font-family:Inter,system-ui,sans-serif;color:#888;font-size:15px">'+
-      '<div style="text-align:center"><h2 style="color:#C47A2A;margin-bottom:8px">AO Work Tracker</h2>'+
-      '<p>Admin access required.</p></div></div>';
-    throw new Error('admin gate');
-  }
-  localStorage.setItem('ao_admin','1');
-})();
-</script>
-
-<div class="topbar">
-  <div>
-    <h1>AO — Work Tracker</h1>
-    <div class="meta">Last updated: April 19, 2026 &nbsp;·&nbsp; Jack Satta / DeliberateUX</div>
-  </div>
-  <div class="actions">
-    <button onclick="toggleAll()" title="Expand / Collapse all groups">±</button>
-    <button onclick="window.open('https://docs.google.com/spreadsheets/d/11ikRhmCsG3f8bXg0iMbxnH7pDIQ1x0_X/edit')" title="Open source spreadsheet">📊 Sheet</button>
-  </div>
-</div>
 
 <div class="filters" id="filters"></div>
 <div class="stats" id="stats"></div>

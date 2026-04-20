@@ -7,7 +7,7 @@
   <meta name="description" content="Live work queue for AO agent operations. Watch tasks flow through agents with auto-heal on failures." />
   <link rel="icon" href="/assets/favicon.svg" />
   <link rel="stylesheet" href="ao-theme.css">
-  <script>/* theme persistence */ (function(){var t=localStorage.getItem('ao_theme');if(t)document.documentElement.dataset.theme=t})()</script>
+  <script src="ao-nav.js"></script>
   <style>
     :root {
       --max: 860px;
@@ -25,22 +25,6 @@
     }
     a{color:var(--text);text-decoration:none}
     ::selection{background:rgba(96,165,250,0.25)}
-
-    /* ── Nav ──────────────────────────────────────────── */
-    .ao-nav{position:sticky;top:0;z-index:200;background:var(--surface);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.07)}
-    .ao-nav-inner{width:min(var(--max),calc(100% - 48px));margin:0 auto;display:flex;align-items:center;height:54px}
-    .ao-nav-logo{font-size:0.95rem;font-weight:700;display:flex;align-items:center;gap:8px;color:var(--text);text-decoration:none;margin-right:auto}
-    .ao-nav-context{font-weight:400;color:var(--muted);margin-left:2px}
-    .ao-nav-dot{width:7px;height:7px;border-radius:50%;background:rgb(var(--c-dev));box-shadow:0 0 7px rgba(var(--c-dev),0.6);animation:dp 2.5s ease-in-out infinite}
-    @keyframes dp{0%,100%{opacity:1}50%{opacity:0.35}}
-    .ao-nav-links{display:flex;gap:22px;font-size:0.84rem;margin-right:20px}
-    .ao-nav-links a{color:var(--muted);text-decoration:none;transition:color 0.2s}
-    .ao-nav-links a:hover,.ao-nav-links a.current{color:var(--text)}
-    .ao-nav-cta{font-size:0.8rem;font-weight:600;padding:6px 14px;border-radius:8px;background:rgba(var(--c-admin),0.12);border:1px solid rgba(var(--c-admin),0.25);color:rgb(var(--c-admin));text-decoration:none;transition:all 0.2s;white-space:nowrap}
-    .ao-nav-cta:hover{background:rgba(var(--c-admin),0.22)}
-    .ao-nav-admin{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;padding:4px 10px;border-radius:6px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);color:rgb(245,158,11);margin-left:12px;display:none;align-items:center;text-decoration:none;transition:all 0.2s}
-    .ao-nav-admin.visible{display:inline-flex}
-    .ao-nav-admin:hover{background:rgba(245,158,11,0.2)}
 
     /* ── Layout ───────────────────────────────────────── */
     .container{width:min(var(--max),calc(100% - 48px));margin:0 auto}
@@ -109,27 +93,11 @@
     .q-footer .badge .dot{width:6px;height:6px;border-radius:50%;background:rgb(var(--s-done));box-shadow:0 0 4px rgba(var(--s-done),0.4)}
 
     @media(max-width:600px){
-      .ao-nav-links{gap:12px}.ao-nav-links a:nth-last-child(-n+1){display:none}
       .q-ts{display:none}.q-stats{gap:16px}
     }
   </style>
 </head>
 <body>
-
-  <nav class="ao-nav">
-    <div class="ao-nav-inner">
-      <a href="/ao/" class="ao-nav-logo"><span class="ao-nav-dot"></span>AO<span class="ao-nav-context">/ Queue</span></a>
-      <div class="ao-nav-links">
-        <a href="/ao/">Overview</a>
-        <a href="/ao/onboard.html">Get started</a>
-        <a href="/ao/configure.html">Configure</a>
-        <a href="/ao/queue.html" class="current">Queue</a>
-        <a href="/ao/flows.html">Flows</a>
-      </div>
-      <a href="/ao/onboard.html" class="ao-nav-cta">Get started</a>
-      <a href="/ao/dashboard.html" class="ao-nav-admin" id="admin-pill">Admin</a>
-    </div>
-  </nav>
 
   <div class="container">
 
