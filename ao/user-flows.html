@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="ops">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AO — User Flows</title>
+<link rel="stylesheet" href="ao-theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter','SF Pro Text',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* Admin gate overlay */
+.gate{display:flex;align-items:center;justify-content:center;height:100vh;font-size:15px;color:var(--muted)}
+.gate h2{color:rgb(var(--amber));margin-bottom:8px}
+
+/* Topbar */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;
+  background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:90}
+.topbar h1{font-size:15px;font-weight:600;letter-spacing:.3px;color:rgb(var(--amber))}
+.topbar .sub{font-size:13px;color:var(--muted);margin-top:2px}
+.topbar .tabs{display:flex;gap:6px}
+.topbar .tab{padding:7px 18px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;
+  background:var(--panel);border:1px solid var(--border);color:var(--muted);transition:.2s}
+.topbar .tab:hover{border-color:rgba(var(--amber),.4);color:var(--text)}
+.topbar .tab.active{background:rgba(var(--amber),.12);border-color:rgba(var(--amber),.4);color:rgb(var(--amber))}
+
+/* Legend */
+.legend{display:flex;gap:20px;padding:14px 28px;background:var(--bg);border-bottom:1px solid var(--border);font-size:12px;color:var(--muted)}
+.legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:6px;vertical-align:middle}
+
+/* Flow container */
+.flow-area{padding:28px;overflow-x:auto;min-height:calc(100vh - 140px)}
+.flow-panel{display:none}
+.flow-panel.active{display:block}
+
+/* SVG styles */
+svg.flowchart{width:100%;min-width:800px}
+svg.flowchart text{font-family:'Inter','SF Pro Text',system-ui,sans-serif}
+
+/* Tooltip */
+.tip{position:fixed;padding:10px 16px;background:var(--overlay8);border:1px solid var(--border2);
+  border-radius:8px;font-size:13px;color:var(--text);pointer-events:none;z-index:999;
+  max-width:300px;line-height:1.5;opacity:0;transition:opacity .15s}
+.tip.show{opacity:1}
+.tip .tip-title{font-weight:600;color:rgb(var(--amber));margin-bottom:4px}
+.tip .tip-nav{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* Summary cards below */
+.summary{padding:28px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.summary-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px}
+.summary-card h3{font-size:14px;font-weight:600;margin-bottom:10px}
+.summary-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:6px}
+.summary-card ul{list-style:none;font-size:13px;line-height:1.8;color:var(--muted)}
+.summary-card ul li::before{content:'→ ';color:rgb(var(--amber))}
+
+/* Findings section */
+.findings{padding:0 28px 40px;max-width:900px}
+.findings h2{font-size:16px;font-weight:600;color:rgb(var(--amber));margin-bottom:16px}
+.findings .issue{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:12px}
+.findings .issue h4{font-size:14px;font-weight:600;margin-bottom:6px}
+.findings .issue p{font-size:13px;color:var(--muted);line-height:1.6}
+.findings .issue .tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;margin-right:6px}
+.tag-fix{background:rgba(var(--red),.12);color:rgb(var(--red))}
+.tag-add{background:rgba(var(--green),.12);color:rgb(var(--green))}
+.tag-simplify{background:rgba(var(--amber),.12);color:rgb(var(--amber))}
+</style>
+</head>
+<body>
+
+<script>
+(function(){
+  var isAdmin = new URLSearchParams(window.location.search).has('admin') ||
+                localStorage.getItem('ao_admin') === '1';
+  if(!isAdmin){
+    document.body.innerHTML = '<div class="gate"><div style="text-align:center"><h2>AO User Flows</h2><p>Admin access required.</p></div></div>';
+    throw new Error('admin gate');
+  }
+  localStorage.setItem('ao_admin','1');
+})();
+</script>
+
+<div class="topbar">
+  <div>
+    <h1>AO — User Flows</h1>
+    <div class="sub">Navigation architecture for three audiences</div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" data-flow="new">New User</div>
+    <div class="tab" data-flow="existing">Existing User</div>
+    <div class="tab" data-flow="admin">Admin (You)</div>
+    <div class="tab" data-flow="all">All Three</div>
+  </div>
+</div>
+
+<div class="legend">
+  <div><span class="legend-dot" style="background:rgb(var(--green))"></span> Entry point</div>
+  <div><span class="legend-dot" style="background:rgb(var(--amber))"></span> Core page</div>
+  <div><span class="legend-dot" style="background:rgb(var(--purple))"></span> Tool / workspace</div>
+  <div><span class="legend-dot" style="background:rgb(var(--blue))"></span> Admin-only</div>
+  <div><span class="legend-dot" style="background:rgb(var(--teal))"></span> External / VPS</div>
+  <div><span class="legend-dot" style="background:rgb(var(--red))"></span> Decision point</div>
+</div>
+
+<div class="flow-area">
+  <!-- NEW USER FLOW -->
+  <div class="flow-panel active" id="flow-new">
+    <svg class="flowchart" viewBox="0 0 1100 620" xmlns="http://www.w3.org/2000/svg">
+      <!-- Arrows -->
+      <defs>
+        <marker id="arrow-new" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6" fill="rgba(218,160,72,0.6)"/>
+        </marker>
+      </defs>
+      <!-- Title -->
+      <text x="550" y="30" text-anchor="middle" fill="rgba(218,160,72,0.8)" font-size="16" font-weight="600">New User / Prospect Flow</text>
+      <text x="550" y="50" text-anchor="middle" fill="rgba(245,240,232,0.4)" font-size="12">First visit → explore → sign up → onboard → working org</text>
+
+      <!-- Landing -->
+      <rect x="40" y="80" width="180" height="56" rx="12" fill="rgba(82,195,140,0.15)" stroke="rgba(82,195,140,0.5)" stroke-width="1.5" class="node" data-page="index.html" data-title="AO Landing" data-desc="Marketing page with hero, agent network animation, feature sections, and beta CTA." data-nav="Nav: Architecture, Agents, Protocol, Configure, Queue, Flows"/>
+      <text x="130" y="104" text-anchor="middle" fill="rgb(82,195,140)" font-size="13" font-weight="600">AO Landing</text>
+      <text x="130" y="120" text-anchor="middle" fill="rgba(245,240,232,0.5)" font-size="10">index.html</text>
+
+      <!-- Arrow: Landing → Decision -->
+      <line x1="220" y1="108" x2="290" y2="108" stroke="rgba(218,160,72,0.4)" stroke-width="1.5" marker-end="url(#arrow-new)"/>
+
+      <!-- Decision: CTA -->
+      <polygon points="340,78 410,108 340,138 270,108" fill="rgba(200,105,95,0.12)" stroke="rgba(200,105,95,0.5)" stroke-width="1.5" class="node" data-title="CTA Choice" data-desc="User clicks 'Get started' or 'Try the demo' button on the landing page." data-nav="Two paths diverge"/>
+      <text x="340" y="112" text-anchor="middle" fill="rgb(200,105,95)" font-size="11" font-weight="600">CTA?</text>
+
+      <!-- Arrow: Decision → Onboard -->
+      <line x1="410" y1="98" x2="480" y2="80" stroke="rgba(218,160,72,0.4)" stroke-width="1.5" marker-end="url(#arrow-new)"/>
+      <text x="445" y="78" fill="rgba(245,240,232,0.35)" font-size="10" text-anchor="middle">Get started</text>
+
+      <!-- Arrow: Decision → Demo Dashboard -->
+      <line x1="410" y1="118" x2="480" y2="180" stroke="rgba(218,160,72,0.4)" stroke-width="1.5" marker-end="url(#arrow-new)"/>
+      <text x="455" y="158" fill="rgba(245,240,232,0.35)" font-size="10">Try demo</text>
+
+      <!-- Onboard -->
+      <rect x="480" y="55" width="180" height="56" rx="12" fill="rgba(218,160,72,0.15)" stroke="rgba(218,160,72,0.5)" stroke-width="1.5" class="node" data-page="onboard.html" data-title="Onboard Wizard" data-desc="5-step form: org type, focus areas, autonomy slider, org name, agent roster. Progress pips at top." data-nav="Nav: Back link only. Warm theme override. Progress pips (5 steps)."/>
+      <text x="570" y="79" text-anchor="middle" fill="rgb(218,160,72)" font-size="13" font-weight="600">Onboard (5 steps)</text>
+      <text x="570" y="95" text-anchor="middle" fill="rgba(245,240,232,0.5)" font-size="10">onboard.html</text>
+      <!-- Step dots -->
+      <circle cx="535" cy="102" r="3" fill="rgba(218,160,72,0.6)"/>
+      <circle cx="548" cy="102" r="3" fill="rgba(218,160,72,0.6)"/>
+      <circle cx="561" cy="102" r="3" fill="rgba(218,160,72,0.4)"/>
+      <circle cx="574" cy="102" r="3" fill="rgba(218,160,72,0.3)"/>
+      <circle cx="587" cy="102" r="3" fill="rgba(218,160,72,0.2)"/>
+
+      <!-- Demo Dashboard (read-only) -->
+      <rect x="480" y="165" width="180" height="56" rx="12" fill="rgba(110,195,175,0.12)" stroke="rgba(110,195,175,0.4)" stroke-width="1.5" class="node" data-page="dashboard.html?demo" data-title="Demo Dashboard" data-desc="Pre-seeded 'Acme Inc.' sandbox. Same layout as real dashboard but read-only. Nothing persists." data-nav="Nav: Same as dashboard but demo badge. Links explore only."/>
+      <text x="570" y="189" text-anchor="middle" fill="rgb(110,195,175)" font-size="13" font-weight="600">Demo Dashboard</text>
+      <text x="570" y="205" text-anchor="middle" fill="rgba(245,240,232,0.5)" font-size="10">read-only sandbox</text>
+
+      <!-- Arrow: Onboard → Bootup -->
+      <line x1="660" y1="83" x2="730" y2="83" stroke="rgba(218,160,72,0.4)" stroke-width="1.5" marker-end="url(#arrow-new)"/>
+
+      <!-- Bootup -->
+      <rect x="730" y="55" width="180" height="56" rx="12" fill="rgba(218,160,72,0.15)" stroke="rgba(218,160,72,0.5)" stroke-width="1.5" class="node" data-page="bootup.html" data-title="Bootup Animation" data-desc="Full-screen agent provisioning. Spinning dots, progress bar, agent checklist with checkmarks. Auto-redirects to Configure after 5s." data-nav="Nav: NONE. Full-screen overlay. Auto-redirect."/>
+      <text x="820" y="79" text-anchor="middle" fill="rgb(218,160,72)" font-size="13" font-weight="600">Bootup</text>
+      <text x="820" y="95" text-anchor="middle" fill="rgba(245,240,232,0.5)" font-size="10">bootup.html</text>
+
+      <!-- Arrow: Bootup → Configure -->
+      <line x1="820" y1="111" x2="820" y2="170" stroke="rgba(218,160,72,0.4)" stroke-width="1.5" marker-end="url(#arrow-new)"/>
+      <text x="835" y="145" fill="rgba(245,240,232,0.35)" font-size="10">auto 5s</text>
+
+      <!-- Configure -->
+      <rect x="730" y="175" width="180" height="56" rx="12" fill="rgba(218,160,72,0.15)" stroke="rgba(218,160,72,0.5)" stroke-width="1.5" class="node" data-page="configure.html" data-title="Configure / Role Builder" data-desc="Assign roles to agents, set autonomy levels, define ethics rules. Scoped to ?org=slug." data-nav="Nav: Overview, Get started, Configure, Queue, Flows + admin pill (conditional)"/>
+      <text x="820" y="199" text-anchor="middle" fill="rgb(218,160,72)" font-size="13" font-weight="600">Configure</text>
+      <text x="820" y="215" text-anchor="middle" fill="rgba(245,240,232,0.5)" font-size="10">configure.html</text>
+
+      <!-- Arrow: Configure → Dashboard -->
+      <line x1="820" y1="231" x2="820" y2="290" stroke="rgba(218,160,72,0.4)" stroke-width="1.5" marker-end="url(#arrow-new)"/>
+      <text x="835" y="265" fill="rgba(245,240,232,0.35)" font-size="10">Launch</text>
+
+      <!-- Dashboard -->
+      <rect x="730" y="295" width="180" height="56" rx="12" fill="rgba(218,160,72,0.15)" stroke="rgba(218,160,72,0.5)" stroke-width="1.5" class="node" data-page="dashboard.html" data-title="Dashboard" data-desc="My Orgs grid. See all orgs, recent tasks, system services. The roof of the whole app." data-nav="Nav: Overview, Get started, Configure, Queue, Flows, Dashboard + Admin pill"/>
+      <text x="820" y="319" text-anchor="middle" fill="rgb(218,160,72)" font-size="13" font-weight="600">Dashboard</text>
+      <text x="820" y="335" text-anchor="middle" fill="rgba(245,240,232,0.5)" font-size="10">dashboard.html — THE ROOF</text>
+
+      <!-- Arrow: Dashboard → Org -->
+      <line x1="730" y1="323" x2="660" y2="323" stroke="rgba(218,160,72,0.4)" stroke-width="1.5" marker-end="url(#arrow-new)"/>
+
+      <!-- Org Home -->
+      <rect x="480" y="295" width="180" height="56" rx="12" fill="rgba(165,145,195,0.15)" stroke="rgba(165,145,195,0.4)" stroke-width="1.5" class="node" data-page="org.html" data-title="Org Home" data-desc="Single org view: agents, tasks, workspace preview. Scoped via ?slug=." data-nav="Nav: Same as dashboard. Breadcrumb shows org name."/>
+      <text x="570" y="319" text-anchor="middle" fill="rgb(165,145,195)" font-size="13" font-weight="600">Org Home</text>
+      <text x="570" y="335" text-anchor="middle" fill="rgba(245,240,232,0.5)" font-size="10">org.html?slug=acme</text>
+
+      <!-- Arrow: Org → Queue -->
+      <line x1="480" y1="335" x2="410" y2="380" stroke="rgba(218,160,72,0.4)" stroke-width="1.5" marker-end="url(#arrow-new)"/>
+
+      <!-- Arrow: Org → Flows -->
+      <line x1="480" y1="310" x2="410" y2="310" stroke="rgba(218,160,72,0.4)" stroke-width="1.5" marker-end="url(#arrow-new)"/>
+
+      <!-- Queue -->
+      <rect x="230" y="365" width="180" height="56" rx="12" fill="rgba(165,145,195,0.15)" stroke="rgba(165,145,195,0.4)" stroke-width="1.5" class="node" data-page="queue.html" data-title="Work Queue" data-desc="Live task list. Filter by status. Auto-heals blocked tasks. Receives flow results via BroadcastChannel." data-nav="Nav: Overview, Get started, Configure, Queue (active), Flows"/>
+      <text x="320" y="389" text-anchor="middle" fill="rgb(165,145,195)" font-size="13" font-weight="600">Queue</text>
+      <text x="320" y="405" text-anchor="middle" fill="rgba(245,240,232,0.5)" font-size="10">queue.html</text>
+
+      <!-- Flows -->
+      <rect x="230" y="285" width="180" height="56" rx="12" fill="rgba(165,145,195,0.15)" stroke="rgba(165,145,195,0.4)" stroke-width="1.5" class="node" data-page="flows.html" data-title="Flow Canvas" data-desc="Visual workflow builder. Drag agents + operators onto canvas, connect nodes, run flows live. 8 templates." data-nav="Nav: Overview, Queue, Flows (active), Dashboard, Admin + Templates, Clear, Save, Run, Run Live"/>
+      <text x="320" y="309" text-anchor="middle" fill="rgb(165,145,195)" font-size="13" font-weight="600">Flow Canvas</text>
+      <text x="320" y="325" text-anchor="middle" fill="rgba(245,240,232,0.5)" font-size="10">flows.html</text>
+
+      <!-- New user journey line -->
+      <text x="550" y="480" text-anchor="middle" fill="rgba(218,160,72,0.5)" font-size="13" font-weight="600">Happy path: Landing → Onboard (5 steps) → Bootup → Configure → Dashboard → Work</text>
+      <text x="550" y="500" text-anchor="middle" fill="rgba(245,240,232,0.3)" font-size="12">Total pages touched: 6 · Decision points: 1 · Progress indicators: onboard only</text>
+
+      <!-- Pain points -->
+      <rect x="40" y="530" width="1020" height="70" rx="10" fill="rgba(200,105,95,0.06)" stroke="rgba(200,105,95,0.2)" stroke-width="1"/>
+      <text x="60" y="555" fill="rgba(200,105,95,0.8)" font-size="12" font-weight="600">⚠ Pain points for new users:</text>
+      <text x="60" y="572" fill="rgba(245,240,232,0.5)" font-size="12">• Nav changes between pages (onboard has different chrome than configure/queue)</text>
+      <text x="60" y="588" fill="rgba(245,240,232,0.5)" font-size="12">• No breadcrumb trail showing where they are in the setup process · No "you are here" indicator after bootup</text>
+    </svg>
+  </div>
+
+  <!-- EXISTING USER FLOW -->
+  <div class="flow-panel" id="flow-existing">
+    <svg class="flowchart" viewBox="0 0 1100 550" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow-ex" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6" fill="rgba(82,195,140,0.6)"/>
+        </marker>
+      </defs>
+      <text x="550" y="30" text-anchor="middle" fill="rgba(82,195,140,0.8)" font-size="16" font-weight="600">Existing Customer Flow</text>
+      <text x="550" y="50" text-anchor="middle" fill="rgba(245,240,232,0.4)" font-size="12">Return visit → dashboard → pick org → work (queue, flows, configure)</text>
+
+      <!-- Dashboard (entry) -->
+      <rect x="420" y="75" width="200" height="60" rx="12" fill="rgba(82,195,140,0.15)" stroke="rgba(82,195,140,0.5)" stroke-width="1.5" class="node" data-page="dashboard.html" data-title="Dashboard (Entry)" data-desc="Landing point for return users. Shows My Orgs grid. Click an org to dive in." data-nav="Nav: Overview, Get started, Configure, Queue, Flows, Dashboard"/>
+      <text x="520" y="101" text-anchor="middle" fill="rgb(82,195,140)" font-size="14" font-weight="600">Dashboard</text>
+      <text x="520" y="119" text-anchor="middle" fill="rgba(245,240,232,0.5)" font-size="11">dashboard.html — entry point</text>
+
+      <!-- Arrow: Dashboard → Org -->
+      <line x1="520" y1="135" x2="520" y2="185" stroke="rgba(82,195,140,0.4)" stroke-width="1.5" marker-end="url(#arrow-ex)"/>
+      <text x="535" y="165" fill="rgba(245,240,232,0.35)" font-size="10">click org card</text>
+
+      <!-- Org Home -->
+      <rect x="420" y="190" width="200" height="60" rx="12" fill="rgba(218,160,72,0.15)" stroke="rgba(218,160,72,0.5)" stroke-width="1.5" class="node" data-page="org.html" data-title="Org Home" data-desc="Org-scoped view: agent roster, active tasks, workspace preview, quick-action links." data-nav="Nav: Same global nav. Breadcrumb: Dashboard > Org Name"/>
+      <text x="520" y="216" text-anchor="middle" fill="rgb(218,160,72)" font-size="14" font-weight="600">Org Home</text>
+      <text x="520" y="234" text-anchor="middle" fill="rgba(245,240,232,0.5)" font-size="11">org.html?slug=my-org</text>
+
+      <!-- Three branches from Org -->
+      <!-- Arrow: Org → Queue -->
+      <line x1="420" y1="230" x2="200" y2="310" stroke="rgba(218,160,72,0.4)" stroke-width="1.5" marker-end="url(#arrow-ex)"/>
+
+      <!-- Arrow: Org → Flows -->
+      <line x1="520" y1="250" x2="520" y2="300" stroke="rgba(218,160,72,0.4)" stroke-width="1.5" marker-end="url(#arrow-ex)"/>
+
+      <!-- Arrow: Org → Configure -->
+      <line x1="620" y1="230" x2="820" y2="310" stroke="rgba(218,160,72,0.4)" stroke-width="1.5" marker-end="url(#arrow-ex)"/>
+
+      <!-- Queue -->
+      <rect x="100" y="305" width="200" height="60" rx="12" fill="rgba(165,145,195,0.15)" stroke="rgba(165,145,195,0.4)" stroke-width="1.5" class="node" data-page="queue.html" data-title="Work Queue" data-desc="Live task stream. Filter by status. Org-scoped via ?org= param." data-nav="Nav: Overview, Get started, Configure, Queue (active), Flows"/>
+      <text x="200" y="331" text-anchor="middle" fill="rgb(165,145,195)" font-size="14" font-weight="600">Queue</text>
+      <text x="200" y="349" text-anchor="middle" fill="rgba(245,240,232,0.5)" font-size="11">queue.html?org=my-org</text>
+
+      <!-- Flows -->
+      <rect x="420" y="305" width="200" height="60" rx="12" fill="rgba(165,145,195,0.15)" stroke="rgba(165,145,195,0.4)" stroke-width="1.5" class="node" data-page="flows.html" data-title="Flow Canvas" data-desc="Build and run workflow automations. Templates, live execution, cross-tab queue integration." data-nav="Nav: Overview, Queue, Flows (active), Dashboard + workspace tools"/>
+      <text x="520" y="331" text-anchor="middle" fill="rgb(165,145,195)" font-size="14" font-weight="600">Flows</text>
+      <text x="520" y="349" text-anchor="middle" fill="rgba(245,240,232,0.5)" font-size="11">flows.html</text>
+
+      <!-- Configure -->
+      <rect x="740" y="305" width="200" height="60" rx="12" fill="rgba(165,145,195,0.15)" stroke="rgba(165,145,195,0.4)" stroke-width="1.5" class="node" data-page="configure.html" data-title="Configure" data-desc="Adjust roles, agents, autonomy levels, ethics rules for this org." data-nav="Nav: Overview, Get started, Configure (active), Queue, Flows"/>
+      <text x="840" y="331" text-anchor="middle" fill="rgb(165,145,195)" font-size="14" font-weight="600">Configure</text>
+      <text x="840" y="349" text-anchor="middle" fill="rgba(245,240,232,0.5)" font-size="11">configure.html?org=my-org</text>
+
+      <!-- Cross-links between tools -->
+      <line x1="300" y1="335" x2="420" y2="335" stroke="rgba(245,240,232,0.1)" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow-ex)"/>
+      <line x1="620" y1="335" x2="740" y2="335" stroke="rgba(245,240,232,0.1)" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow-ex)"/>
+
+      <!-- Arrow: New org -->
+      <line x1="420" y1="105" x2="200" y2="105" stroke="rgba(82,195,140,0.3)" stroke-width="1.5" stroke-dasharray="4,4" marker-end="url(#arrow-ex)"/>
+      <text x="310" y="96" text-anchor="middle" fill="rgba(245,240,232,0.3)" font-size="10">+ New org</text>
+
+      <!-- Onboard (for new org) -->
+      <rect x="100" y="80" width="160" height="50" rx="10" fill="rgba(218,160,72,0.08)" stroke="rgba(218,160,72,0.3)" stroke-width="1" class="node" data-page="onboard.html" data-title="Onboard (new org)" data-desc="Same 5-step wizard, for adding another org to your account." data-nav="Nav: Back link only"/>
+      <text x="180" y="103" text-anchor="middle" fill="rgba(218,160,72,0.7)" font-size="12" font-weight="500">Onboard</text>
+      <text x="180" y="118" text-anchor="middle" fill="rgba(245,240,232,0.35)" font-size="10">add another org</text>
+
+      <!-- Summary -->
+      <text x="550" y="430" text-anchor="middle" fill="rgba(82,195,140,0.5)" font-size="13" font-weight="600">Hub-and-spoke: Dashboard → Org → Queue / Flows / Configure</text>
+      <text x="550" y="450" text-anchor="middle" fill="rgba(245,240,232,0.3)" font-size="12">Total pages: 5 · No progress indicators · All pages cross-linked via same nav bar</text>
+
+      <rect x="100" y="475" width="860" height="50" rx="10" fill="rgba(200,105,95,0.06)" stroke="rgba(200,105,95,0.2)" stroke-width="1"/>
+      <text x="120" y="497" fill="rgba(200,105,95,0.8)" font-size="12" font-weight="600">⚠ Pain points for existing users:</text>
+      <text x="120" y="513" fill="rgba(245,240,232,0.5)" font-size="12">• Nav bar is identical across Queue/Flows/Configure — no "you are here" highlight · No org context in nav · "Get started" CTA still shows (irrelevant)</text>
+    </svg>
+  </div>
+
+  <!-- ADMIN FLOW -->
+  <div class="flow-panel" id="flow-admin">
+    <svg class="flowchart" viewBox="0 0 1100 650" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow-admin" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6" fill="rgba(120,170,210,0.6)"/>
+        </marker>
+      </defs>
+      <text x="550" y="30" text-anchor="middle" fill="rgba(120,170,210,0.8)" font-size="16" font-weight="600">Admin Flow (You)</text>
+      <text x="550" y="50" text-anchor="middle" fill="rgba(245,240,232,0.4)" font-size="12">Full access: all customer pages + admin tools + VPS dashboards + work tracker</text>
+
+      <!-- Dashboard (entry) -->
+      <rect x="420" y="75" width="200" height="60" rx="12" fill="rgba(82,195,140,0.15)" stroke="rgba(82,195,140,0.5)" stroke-width="1.5" class="node" data-page="dashboard.html?admin" data-title="Admin Dashboard" data-desc="All Orgs grid (not just yours). System services panel. CS assist backdoor (planned)." data-nav="Nav: Overview, Get started, Configure, Queue, Flows, Dashboard, ADMIN pill"/>
+      <text x="520" y="101" text-anchor="middle" fill="rgb(82,195,140)" font-size="14" font-weight="600">Admin Dashboard</text>
+      <text x="520" y="119" text-anchor="middle" fill="rgba(245,240,232,0.5)" font-size="11">All orgs + global services</text>
+
+      <!-- Customer pages (same as existing) -->
+      <rect x="80" y="190" width="160" height="50" rx="10" fill="rgba(218,160,72,0.12)" stroke="rgba(218,160,72,0.4)" stroke-width="1.5" class="node" data-page="org.html" data-title="Any Org" data-desc="Admin can access any customer's org view." data-nav="Same nav + admin pill"/>
+      <text x="160" y="213" text-anchor="middle" fill="rgb(218,160,72)" font-size="13" font-weight="600">Any Org</text>
+      <text x="160" y="228" text-anchor="middle" fill="rgba(245,240,232,0.4)" font-size="10">org.html</text>
+      <line x1="420" y1="115" x2="240" y2="200" stroke="rgba(218,160,72,0.3)" stroke-width="1.5" marker-end="url(#arrow-admin)"/>
+
+      <rect x="80" y="265" width="160" height="45" rx="10" fill="rgba(165,145,195,0.1)" stroke="rgba(165,145,195,0.3)" stroke-width="1" class="node" data-page="queue.html" data-title="Queue" data-desc="Same as customer but can see all orgs' tasks." data-nav="Same nav"/>
+      <text x="160" y="292" text-anchor="middle" fill="rgba(165,145,195,0.7)" font-size="12">Queue</text>
+      <line x1="160" y1="240" x2="160" y2="265" stroke="rgba(218,160,72,0.2)" stroke-width="1" marker-end="url(#arrow-admin)"/>
+
+      <rect x="80" y="330" width="160" height="45" rx="10" fill="rgba(165,145,195,0.1)" stroke="rgba(165,145,195,0.3)" stroke-width="1" class="node" data-page="flows.html" data-title="Flows" data-desc="Same flow canvas, full access." data-nav="Same nav"/>
+      <text x="160" y="357" text-anchor="middle" fill="rgba(165,145,195,0.7)" font-size="12">Flows</text>
+      <line x1="160" y1="310" x2="160" y2="330" stroke="rgba(218,160,72,0.2)" stroke-width="1" marker-end="url(#arrow-admin)"/>
+
+      <rect x="80" y="395" width="160" height="45" rx="10" fill="rgba(165,145,195,0.1)" stroke="rgba(165,145,195,0.3)" stroke-width="1" class="node" data-page="configure.html" data-title="Configure" data-desc="Same role builder, any org." data-nav="Same nav"/>
+      <text x="160" y="422" text-anchor="middle" fill="rgba(165,145,195,0.7)" font-size="12">Configure</text>
+      <line x1="160" y1="375" x2="160" y2="395" stroke="rgba(218,160,72,0.2)" stroke-width="1" marker-end="url(#arrow-admin)"/>
+
+      <text x="160" y="468" text-anchor="middle" fill="rgba(218,160,72,0.4)" font-size="11" font-weight="500">Customer Pages</text>
+      <rect x="65" y="180" width="190" height="295" rx="12" fill="none" stroke="rgba(218,160,72,0.15)" stroke-width="1" stroke-dasharray="4,4"/>
+
+      <!-- Admin-only tools -->
+      <rect x="360" y="190" width="160" height="50" rx="10" fill="rgba(120,170,210,0.12)" stroke="rgba(120,170,210,0.4)" stroke-width="1.5" class="node" data-page="tracker.html" data-title="Work Tracker" data-desc="Full AO deliverable inventory. 23 items, domain groups, status badges. Admin-gated." data-nav="Custom topbar. No shared nav."/>
+      <text x="440" y="213" text-anchor="middle" fill="rgb(120,170,210)" font-size="13" font-weight="600">Work Tracker</text>
+      <text x="440" y="228" text-anchor="middle" fill="rgba(245,240,232,0.4)" font-size="10">tracker.html</text>
+      <line x1="470" y1="135" x2="440" y2="190" stroke="rgba(120,170,210,0.3)" stroke-width="1.5" marker-end="url(#arrow-admin)"/>
+
+      <rect x="360" y="265" width="160" height="50" rx="10" fill="rgba(120,170,210,0.12)" stroke="rgba(120,170,210,0.4)" stroke-width="1.5" class="node" data-page="ao-sitemap.html" data-title="Sitemap Navigator" data-desc="Split-canvas page tree with live iframe preview. Audience filter tabs." data-nav="Custom topbar with filter buttons. No shared nav."/>
+      <text x="440" y="288" text-anchor="middle" fill="rgb(120,170,210)" font-size="13" font-weight="600">Sitemap Nav</text>
+      <text x="440" y="303" text-anchor="middle" fill="rgba(245,240,232,0.4)" font-size="10">ao-sitemap.html</text>
+      <line x1="440" y1="240" x2="440" y2="265" stroke="rgba(120,170,210,0.2)" stroke-width="1" marker-end="url(#arrow-admin)"/>
+
+      <rect x="360" y="340" width="160" height="50" rx="10" fill="rgba(120,170,210,0.12)" stroke="rgba(120,170,210,0.4)" stroke-width="1.5" class="node" data-page="user-flows.html" data-title="User Flows" data-desc="This page. Three-audience flowcharts." data-nav="Custom topbar with tabs. No shared nav."/>
+      <text x="440" y="363" text-anchor="middle" fill="rgb(120,170,210)" font-size="13" font-weight="600">User Flows</text>
+      <text x="440" y="378" text-anchor="middle" fill="rgba(245,240,232,0.4)" font-size="10">user-flows.html (this page)</text>
+      <line x1="440" y1="315" x2="440" y2="340" stroke="rgba(120,170,210,0.2)" stroke-width="1" marker-end="url(#arrow-admin)"/>
+
+      <text x="440" y="418" text-anchor="middle" fill="rgba(120,170,210,0.4)" font-size="11" font-weight="500">Admin Tools</text>
+      <rect x="345" y="180" width="190" height="245" rx="12" fill="none" stroke="rgba(120,170,210,0.15)" stroke-width="1" stroke-dasharray="4,4"/>
+
+      <!-- VPS dashboards -->
+      <rect x="620" y="190" width="160" height="50" rx="10" fill="rgba(110,195,175,0.12)" stroke="rgba(110,195,175,0.4)" stroke-width="1.5" class="node" data-title="Theme Studio" data-desc="VPS :18794. Live theme editor, design system, demo mode." data-nav="VPS-served. Own theme-control.js panel."/>
+      <text x="700" y="213" text-anchor="middle" fill="rgb(110,195,175)" font-size="13" font-weight="600">Theme Studio</text>
+      <text x="700" y="228" text-anchor="middle" fill="rgba(245,240,232,0.4)" font-size="10">VPS :18794</text>
+      <line x1="570" y1="135" x2="680" y2="190" stroke="rgba(110,195,175,0.3)" stroke-width="1.5" marker-end="url(#arrow-admin)"/>
+
+      <rect x="620" y="265" width="160" height="50" rx="10" fill="rgba(110,195,175,0.12)" stroke="rgba(110,195,175,0.4)" stroke-width="1.5" class="node" data-title="Theme Studio Local" data-desc="AO-specific theme configurator. 6 palettes, harmony engine, deploy workflow." data-nav="Standalone. No shared nav."/>
+      <text x="700" y="288" text-anchor="middle" fill="rgb(110,195,175)" font-size="13" font-weight="600">Theme Local</text>
+      <text x="700" y="303" text-anchor="middle" fill="rgba(245,240,232,0.4)" font-size="10">theme-studio-local.html</text>
+      <line x1="700" y1="240" x2="700" y2="265" stroke="rgba(110,195,175,0.2)" stroke-width="1" marker-end="url(#arrow-admin)"/>
+
+      <rect x="620" y="340" width="160" height="50" rx="10" fill="rgba(110,195,175,0.12)" stroke="rgba(110,195,175,0.4)" stroke-width="1.5" class="node" data-title="App Shell" data-desc="Unified sidebar + iframe shell. Embeds all tools. Keyboard shortcuts." data-nav="Own sidebar nav. No shared topbar."/>
+      <text x="700" y="363" text-anchor="middle" fill="rgb(110,195,175)" font-size="13" font-weight="600">App Shell</text>
+      <text x="700" y="378" text-anchor="middle" fill="rgba(245,240,232,0.4)" font-size="10">app.html</text>
+      <line x1="700" y1="315" x2="700" y2="340" stroke="rgba(110,195,175,0.2)" stroke-width="1" marker-end="url(#arrow-admin)"/>
+
+      <text x="700" y="418" text-anchor="middle" fill="rgba(110,195,175,0.4)" font-size="11" font-weight="500">VPS / Specialty</text>
+      <rect x="605" y="180" width="190" height="245" rx="12" fill="none" stroke="rgba(110,195,175,0.15)" stroke-width="1" stroke-dasharray="4,4"/>
+
+      <!-- Onboard/Bootup -->
+      <rect x="850" y="190" width="160" height="50" rx="10" fill="rgba(218,160,72,0.08)" stroke="rgba(218,160,72,0.2)" stroke-width="1" class="node" data-page="onboard.html" data-title="Onboard" data-desc="Admin can re-run onboard for testing. Same 5-step wizard." data-nav="Minimal nav"/>
+      <text x="930" y="213" text-anchor="middle" fill="rgba(218,160,72,0.6)" font-size="12">Onboard</text>
+      <text x="930" y="228" text-anchor="middle" fill="rgba(245,240,232,0.3)" font-size="10">testing / new orgs</text>
+      <line x1="590" y1="135" x2="870" y2="190" stroke="rgba(218,160,72,0.2)" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow-admin)"/>
+
+      <rect x="850" y="265" width="160" height="50" rx="10" fill="rgba(218,160,72,0.08)" stroke="rgba(218,160,72,0.2)" stroke-width="1" class="node" data-page="bootup.html" data-title="Bootup" data-desc="Admin can view the boot animation for testing." data-nav="No nav"/>
+      <text x="930" y="288" text-anchor="middle" fill="rgba(218,160,72,0.6)" font-size="12">Bootup</text>
+      <text x="930" y="303" text-anchor="middle" fill="rgba(245,240,232,0.3)" font-size="10">testing</text>
+      <line x1="930" y1="240" x2="930" y2="265" stroke="rgba(218,160,72,0.15)" stroke-width="1" marker-end="url(#arrow-admin)"/>
+
+      <text x="930" y="343" text-anchor="middle" fill="rgba(218,160,72,0.3)" font-size="11" font-weight="500">Setup (re-run)</text>
+      <rect x="835" y="180" width="190" height="170" rx="12" fill="none" stroke="rgba(218,160,72,0.1)" stroke-width="1" stroke-dasharray="4,4"/>
+
+      <!-- Summary -->
+      <text x="550" y="510" text-anchor="middle" fill="rgba(120,170,210,0.5)" font-size="13" font-weight="600">Sprawl: 12+ pages across 4 domains, 3 different nav systems, no unified chrome</text>
+
+      <rect x="80" y="535" width="940" height="80" rx="10" fill="rgba(200,105,95,0.06)" stroke="rgba(200,105,95,0.2)" stroke-width="1"/>
+      <text x="100" y="558" fill="rgba(200,105,95,0.8)" font-size="12" font-weight="600">⚠ Pain points for admin:</text>
+      <text x="100" y="575" fill="rgba(245,240,232,0.5)" font-size="12">• Three separate nav systems: shared AO nav, custom topbars (tracker/sitemap/flows), app shell sidebar</text>
+      <text x="100" y="590" fill="rgba(245,240,232,0.5)" font-size="12">• No way to get from admin tools back to customer pages without URL-editing · No unified "home" that links everything</text>
+      <text x="100" y="605" fill="rgba(245,240,232,0.5)" font-size="12">• Disorientation: each page looks subtly different — different topbar heights, different nav items, different hover states</text>
+    </svg>
+  </div>
+
+  <!-- ALL THREE -->
+  <div class="flow-panel" id="flow-all">
+    <svg class="flowchart" viewBox="0 0 1100 500" xmlns="http://www.w3.org/2000/svg">
+      <text x="550" y="30" text-anchor="middle" fill="var(--text)" font-size="16" font-weight="600">Comparison: What Each Audience Sees</text>
+
+      <!-- Headers -->
+      <text x="185" y="70" text-anchor="middle" fill="rgba(82,195,140,0.8)" font-size="13" font-weight="600">NEW USER</text>
+      <text x="550" y="70" text-anchor="middle" fill="rgba(218,160,72,0.8)" font-size="13" font-weight="600">EXISTING USER</text>
+      <text x="915" y="70" text-anchor="middle" fill="rgba(120,170,210,0.8)" font-size="13" font-weight="600">ADMIN</text>
+
+      <!-- Dividers -->
+      <line x1="367" y1="60" x2="367" y2="460" stroke="rgba(245,240,232,0.06)" stroke-width="1"/>
+      <line x1="733" y1="60" x2="733" y2="460" stroke="rgba(245,240,232,0.06)" stroke-width="1"/>
+
+      <!-- New user pages -->
+      <rect x="85" y="90" width="200" height="32" rx="6" fill="rgba(82,195,140,0.12)" stroke="rgba(82,195,140,0.3)" stroke-width="1"/>
+      <text x="185" y="111" text-anchor="middle" fill="rgb(82,195,140)" font-size="12" font-weight="500">Landing (index.html)</text>
+
+      <rect x="85" y="130" width="200" height="32" rx="6" fill="rgba(218,160,72,0.12)" stroke="rgba(218,160,72,0.3)" stroke-width="1"/>
+      <text x="185" y="151" text-anchor="middle" fill="rgb(218,160,72)" font-size="12" font-weight="500">Onboard (5 steps)</text>
+
+      <rect x="85" y="170" width="200" height="32" rx="6" fill="rgba(218,160,72,0.12)" stroke="rgba(218,160,72,0.3)" stroke-width="1"/>
+      <text x="185" y="191" text-anchor="middle" fill="rgb(218,160,72)" font-size="12" font-weight="500">Bootup</text>
+
+      <rect x="85" y="210" width="200" height="32" rx="6" fill="rgba(218,160,72,0.12)" stroke="rgba(218,160,72,0.3)" stroke-width="1"/>
+      <text x="185" y="231" text-anchor="middle" fill="rgb(218,160,72)" font-size="12" font-weight="500">Configure</text>
+
+      <rect x="85" y="250" width="200" height="32" rx="6" fill="rgba(218,160,72,0.12)" stroke="rgba(218,160,72,0.3)" stroke-width="1"/>
+      <text x="185" y="271" text-anchor="middle" fill="rgb(218,160,72)" font-size="12" font-weight="500">Dashboard</text>
+
+      <rect x="85" y="290" width="200" height="32" rx="6" fill="rgba(165,145,195,0.1)" stroke="rgba(165,145,195,0.2)" stroke-width="1"/>
+      <text x="185" y="311" text-anchor="middle" fill="rgba(165,145,195,0.6)" font-size="12">Queue / Flows / Org</text>
+
+      <text x="185" y="350" text-anchor="middle" fill="rgba(82,195,140,0.5)" font-size="11">6 pages · linear path</text>
+      <text x="185" y="366" text-anchor="middle" fill="rgba(245,240,232,0.3)" font-size="11">3 nav variants</text>
+
+      <!-- Existing user pages -->
+      <rect x="450" y="90" width="200" height="32" rx="6" fill="rgba(82,195,140,0.12)" stroke="rgba(82,195,140,0.3)" stroke-width="1"/>
+      <text x="550" y="111" text-anchor="middle" fill="rgb(82,195,140)" font-size="12" font-weight="500">Dashboard (entry)</text>
+
+      <rect x="450" y="130" width="200" height="32" rx="6" fill="rgba(218,160,72,0.12)" stroke="rgba(218,160,72,0.3)" stroke-width="1"/>
+      <text x="550" y="151" text-anchor="middle" fill="rgb(218,160,72)" font-size="12" font-weight="500">Org Home</text>
+
+      <rect x="450" y="170" width="200" height="32" rx="6" fill="rgba(165,145,195,0.12)" stroke="rgba(165,145,195,0.3)" stroke-width="1"/>
+      <text x="550" y="191" text-anchor="middle" fill="rgb(165,145,195)" font-size="12" font-weight="500">Queue</text>
+
+      <rect x="450" y="210" width="200" height="32" rx="6" fill="rgba(165,145,195,0.12)" stroke="rgba(165,145,195,0.3)" stroke-width="1"/>
+      <text x="550" y="231" text-anchor="middle" fill="rgb(165,145,195)" font-size="12" font-weight="500">Flows</text>
+
+      <rect x="450" y="250" width="200" height="32" rx="6" fill="rgba(165,145,195,0.12)" stroke="rgba(165,145,195,0.3)" stroke-width="1"/>
+      <text x="550" y="271" text-anchor="middle" fill="rgb(165,145,195)" font-size="12" font-weight="500">Configure</text>
+
+      <text x="550" y="310" text-anchor="middle" fill="rgba(218,160,72,0.5)" font-size="11">5 pages · hub-and-spoke</text>
+      <text x="550" y="326" text-anchor="middle" fill="rgba(245,240,232,0.3)" font-size="11">1 nav (mostly consistent)</text>
+
+      <!-- Admin pages -->
+      <rect x="815" y="90" width="200" height="32" rx="6" fill="rgba(82,195,140,0.12)" stroke="rgba(82,195,140,0.3)" stroke-width="1"/>
+      <text x="915" y="111" text-anchor="middle" fill="rgb(82,195,140)" font-size="12" font-weight="500">Admin Dashboard</text>
+
+      <rect x="815" y="130" width="200" height="32" rx="6" fill="rgba(218,160,72,0.12)" stroke="rgba(218,160,72,0.3)" stroke-width="1"/>
+      <text x="915" y="151" text-anchor="middle" fill="rgb(218,160,72)" font-size="12" font-weight="500">All Customer Pages (5)</text>
+
+      <rect x="815" y="170" width="200" height="32" rx="6" fill="rgba(120,170,210,0.12)" stroke="rgba(120,170,210,0.3)" stroke-width="1"/>
+      <text x="915" y="191" text-anchor="middle" fill="rgb(120,170,210)" font-size="12" font-weight="500">Work Tracker</text>
+
+      <rect x="815" y="210" width="200" height="32" rx="6" fill="rgba(120,170,210,0.12)" stroke="rgba(120,170,210,0.3)" stroke-width="1"/>
+      <text x="915" y="231" text-anchor="middle" fill="rgb(120,170,210)" font-size="12" font-weight="500">Sitemap Navigator</text>
+
+      <rect x="815" y="250" width="200" height="32" rx="6" fill="rgba(120,170,210,0.12)" stroke="rgba(120,170,210,0.3)" stroke-width="1"/>
+      <text x="915" y="271" text-anchor="middle" fill="rgb(120,170,210)" font-size="12" font-weight="500">User Flows</text>
+
+      <rect x="815" y="290" width="200" height="32" rx="6" fill="rgba(110,195,175,0.1)" stroke="rgba(110,195,175,0.2)" stroke-width="1"/>
+      <text x="915" y="311" text-anchor="middle" fill="rgba(110,195,175,0.7)" font-size="12">Theme Studio / App Shell</text>
+
+      <rect x="815" y="330" width="200" height="32" rx="6" fill="rgba(218,160,72,0.08)" stroke="rgba(218,160,72,0.15)" stroke-width="1"/>
+      <text x="915" y="351" text-anchor="middle" fill="rgba(218,160,72,0.5)" font-size="12">Onboard / Bootup (testing)</text>
+
+      <text x="915" y="390" text-anchor="middle" fill="rgba(120,170,210,0.5)" font-size="11">12+ pages · 4 domains</text>
+      <text x="915" y="406" text-anchor="middle" fill="rgba(245,240,232,0.3)" font-size="11">3 different nav systems</text>
+
+      <!-- The problem statement -->
+      <rect x="85" y="420" width="930" height="60" rx="10" fill="rgba(218,160,72,0.06)" stroke="rgba(218,160,72,0.2)" stroke-width="1"/>
+      <text x="550" y="445" text-anchor="middle" fill="rgb(218,160,72)" font-size="13" font-weight="600">The core problem: every page rolled its own nav. Fix = one shared chrome, contextually adapted.</text>
+      <text x="550" y="465" text-anchor="middle" fill="rgba(245,240,232,0.4)" font-size="12">Same base → add/remove items per audience + context → pages feel unified but appropriate</text>
+    </svg>
+  </div>
+</div>
+
+<!-- Navigation Findings -->
+<div class="findings">
+  <h2>Navigation Issues Found</h2>
+
+  <div class="issue">
+    <h4><span class="tag tag-fix">Fix</span> 3 different nav systems across 12 pages</h4>
+    <p>Customer pages use a sticky topbar with varying link sets. Admin tools (tracker, sitemap, user-flows) each have custom topbars. App shell has a sidebar. Onboard has a minimal back-link. This is why you feel disoriented — there's no consistent chrome.</p>
+  </div>
+
+  <div class="issue">
+    <h4><span class="tag tag-fix">Fix</span> No "you are here" indicator</h4>
+    <p>The nav links don't highlight the current page. Queue, Flows, and Configure all look the same in the nav bar. You have to read the page title to know where you are.</p>
+  </div>
+
+  <div class="issue">
+    <h4><span class="tag tag-simplify">Simplify</span> Irrelevant links persist across audiences</h4>
+    <p>"Get started" CTA shows for existing users who've already onboarded. Admin-only links show for everyone (when gated). The nav should adapt to who you are.</p>
+  </div>
+
+  <div class="issue">
+    <h4><span class="tag tag-add">Add</span> No org context in nav</h4>
+    <p>When you're inside an org's queue or flows, the nav doesn't show which org you're in. You lose context of your scope.</p>
+  </div>
+
+  <div class="issue">
+    <h4><span class="tag tag-add">Add</span> Progress indicator for new-user flow only exists on onboard</h4>
+    <p>The setup journey is Onboard → Bootup → Configure → Dashboard (4 pages), but only onboard shows progress pips. The user doesn't know they're 50% done after bootup.</p>
+  </div>
+
+  <div class="issue">
+    <h4><span class="tag tag-simplify">Simplify</span> Admin tools have no way back</h4>
+    <p>Tracker, sitemap, and user-flows pages don't link back to the dashboard or each other. You have to use the browser back button or edit the URL.</p>
+  </div>
+</div>
+
+<!-- Tooltip -->
+<div class="tip" id="tooltip"></div>
+
+<script>
+// Tab switching
+document.querySelectorAll('.tab').forEach(function(t){
+  t.addEventListener('click', function(){
+    document.querySelectorAll('.tab').forEach(function(b){b.classList.remove('active')});
+    document.querySelectorAll('.flow-panel').forEach(function(p){p.classList.remove('active')});
+    t.classList.add('active');
+    var id = 'flow-' + t.dataset.flow;
+    var panel = document.getElementById(id);
+    if(panel) panel.classList.add('active');
+  });
+});
+
+// Tooltips on nodes
+var tip = document.getElementById('tooltip');
+document.querySelectorAll('.node').forEach(function(n){
+  n.style.cursor = 'pointer';
+  n.addEventListener('mouseenter', function(e){
+    var title = n.dataset.title || '';
+    var desc = n.dataset.desc || '';
+    var nav = n.dataset.nav || '';
+    tip.innerHTML = '<div class="tip-title">' + title + '</div>' + desc +
+      (nav ? '<div class="tip-nav">Nav: ' + nav + '</div>' : '');
+    tip.classList.add('show');
+  });
+  n.addEventListener('mousemove', function(e){
+    tip.style.left = (e.clientX + 16) + 'px';
+    tip.style.top = (e.clientY - 10) + 'px';
+  });
+  n.addEventListener('mouseleave', function(){
+    tip.classList.remove('show');
+  });
+  n.addEventListener('click', function(){
+    var page = n.dataset.page;
+    if(page) window.open('/ao/' + page, '_blank');
+  });
+});
+</script>
+
+</body>
+</html>
