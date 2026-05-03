@@ -402,13 +402,11 @@ html[data-theme="light"] .panel.panel-soft {
 }
 
 /* ================================
-   AO agent network — above hero
+   AO agent network — showcase section
 ================================= */
 .ao-network {
   text-align: center;
-  padding: 36px 0 0;
-  opacity: 0;
-  animation: intro-fade 1200ms ease-out 800ms forwards;
+  padding: 8px 0 4px;
 }
 
 .ao-graph {
@@ -484,25 +482,9 @@ html[data-theme="light"] .panel.panel-soft {
   animation: intro-fade 600ms ease-out 2200ms forwards;
 }
 
-/* CTA link */
-.ao-link {
-  display: inline-block;
-  margin-top: 6px;
-  font-size: 0.82rem;
-  font-family: var(--mono);
-  color: var(--faint);
-  letter-spacing: 0.04em;
-  transition: color 0.2s var(--ease);
-  opacity: 0;
-  animation: intro-fade 600ms ease-out 2400ms forwards;
-}
-.ao-link:hover {
-  color: var(--text);
-}
-
 /* Responsive: compact on mobile */
 @media (max-width: 540px) {
-  .ao-network { padding: 20px 0 0; }
+  .ao-network { padding: 4px 0; }
   .ao-graph { width: 100%; }
 }
 
