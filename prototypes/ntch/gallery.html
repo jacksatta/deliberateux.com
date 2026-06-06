@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NTCH Prototype Gallery — Deliberate UX</title>
+  <meta name="description" content="Four interactive discovery-phase prototypes for New Thought Center of Hawaiʻi — original layout, editorial v2, layout pattern playground, and a Figma-roundtrip theme studio." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0b0d12;
+      --surface: #14171f;
+      --surface-2: #1a1e28;
+      --border: rgba(255,255,255,0.08);
+      --border-bright: rgba(255,255,255,0.18);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.62);
+      --faint: rgba(255,255,255,0.40);
+      --accent: #D4961E;
+      --accent-soft: rgba(212,150,30,0.14);
+      --terracotta: #C5614A;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      min-height: 100vh;
+      background:
+        radial-gradient(1200px 800px at 20% 0%, rgba(212,150,30,0.10), transparent 55%),
+        radial-gradient(900px 700px at 90% 10%, rgba(197,97,74,0.07), transparent 55%),
+        var(--bg);
+    }
+
+    .container { max-width: 1240px; margin: 0 auto; padding: 0 40px; }
+
+    header.site-header {
+      padding: 28px 0 20px;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 10;
+      background: rgba(11,13,18,0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .site-header .inner { display: flex; justify-content: space-between; align-items: center; }
+    .brand { font-size: 14px; font-weight: 700; letter-spacing: -0.005em; color: var(--text); text-decoration: none; }
+    .brand span { color: var(--muted); font-weight: 500; }
+    .back-link { font-size: 13px; color: var(--muted); text-decoration: none; transition: color 200ms var(--ease); }
+    .back-link:hover { color: var(--text); }
+
+    .hero { padding: 80px 0 32px; max-width: 760px; }
+    .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); margin-bottom: 18px; }
+    .hero h1 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 400;
+      line-height: 1.06;
+      letter-spacing: -0.005em;
+      margin-bottom: 20px;
+    }
+    .hero h1 em { color: var(--accent); font-style: italic; font-weight: 400; }
+    .hero .sub { font-size: 17px; color: var(--muted); line-height: 1.65; }
+
+    .meta-strip {
+      display: flex; flex-wrap: wrap; gap: 32px;
+      padding: 24px 0 8px;
+      border-top: 1px solid var(--border);
+      margin-top: 36px;
+    }
+    .meta-strip .item { display: flex; flex-direction: column; gap: 4px; }
+    .meta-strip .item .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--faint); font-weight: 600; }
+    .meta-strip .item .value { font-size: 14px; color: var(--text); }
+
+    section.gallery { padding: 56px 0 80px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 28px;
+    }
+    @media (max-width: 880px) { .grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+      transition: transform 320ms var(--ease), border-color 320ms var(--ease), box-shadow 320ms var(--ease);
+      text-decoration: none; color: inherit;
+      display: flex; flex-direction: column;
+      position: relative;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-bright);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+    }
+    .card-preview {
+      height: 220px;
+      position: relative;
+      overflow: hidden;
+      background: var(--surface-2);
+    }
+    .card-content { padding: 26px 28px 28px; flex: 1; display: flex; flex-direction: column; }
+    .card-tag { font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+    .card-title { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 26px; font-weight: 500; color: var(--text); margin-bottom: 10px; line-height: 1.15; letter-spacing: -0.005em; }
+    .card-desc { font-size: 14px; color: var(--muted); line-height: 1.6; flex: 1; margin-bottom: 22px; }
+    .card-cta {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 600; color: var(--text);
+      letter-spacing: 0.01em;
+    }
+    .card-cta .arrow { transition: transform 280ms var(--ease); display: inline-block; }
+    .card:hover .card-cta .arrow { transform: translateX(4px); }
+
+    /* Per-card preview hero swatches */
+    .preview-v1 {
+      background: linear-gradient(135deg, #1B4F5E 0%, #2D6A7A 100%);
+    }
+    .preview-v2 {
+      background: linear-gradient(135deg, #1E3A52 0%, #2F6680 100%);
+    }
+    .preview-layouts {
+      background: linear-gradient(135deg, #7B3A2A 0%, #C8963E 100%);
+    }
+    .preview-theme {
+      background: linear-gradient(135deg, #2A4A3E 0%, #B5694D 100%);
+    }
+    .preview-glyph {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 84px; font-weight: 300; font-style: italic;
+      color: rgba(255,255,255,0.18);
+      letter-spacing: -0.02em;
+    }
+    .preview-label {
+      position: absolute; bottom: 18px; left: 22px;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 12px; border-radius: 999px;
+      background: rgba(0,0,0,0.30);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: rgba(255,255,255,0.92);
+    }
+    .preview-label::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+    .preview-label.theme::before { background: #6EE7B7; }
+
+    /* Highlight ribbon for theme studio (the "Figma roundtrip" star) */
+    .card.featured { border-color: rgba(212,150,30,0.32); }
+    .card.featured::before {
+      content: "Figma roundtrip";
+      position: absolute; top: 14px; right: 14px;
+      padding: 5px 10px;
+      background: var(--accent);
+      color: #14171f;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.10em; text-transform: uppercase;
+      border-radius: 999px;
+      z-index: 2;
+    }
+
+    footer.site-footer {
+      padding: 36px 0 48px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 16px;
+      font-size: 13px; color: var(--faint);
+    }
+    .site-footer a { color: var(--muted); text-decoration: none; }
+    .site-footer a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container inner">
+    <a href="/" class="brand">Deliberate UX <span>· Prototypes</span></a>
+    <a href="/portfolio/" class="back-link">← Back to portfolio</a>
+  </div>
+</header>
+
+<main>
+  <section class="container">
+    <div class="hero">
+      <div class="eyebrow">NTCH · Kona, Hawaiʻi · 2026</div>
+      <h1>Four prototypes for one <em>discovery conversation</em>.</h1>
+      <p class="sub">Before committing to a WordPress build for New Thought Center of Hawaiʻi, we built four working HTML prototypes — clickable, themeable, embedded with their own design exploration so the board could feel the decisions, not just see slides.</p>
+    </div>
+
+    <div class="meta-strip container" style="padding-left:0;padding-right:0">
+      <div class="item"><span class="label">Role</span><span class="value">Lead Designer + Prototype Engineer</span></div>
+      <div class="item"><span class="label">Stack</span><span class="value">HTML, CSS, vanilla JS, Figma (html.to.design)</span></div>
+      <div class="item"><span class="label">Status</span><span class="value">Discovery handoff → WordPress build pending</span></div>
+      <div class="item"><span class="label">Productized as</span><span class="value"><a href="https://beta.clickgather.events" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">ClickGather →</a></span></div>
+    </div>
+  </section>
+
+  <section class="gallery container">
+    <div class="grid">
+
+      <a class="card" href="v1.html">
+        <div class="card-preview preview-v1">
+          <div class="preview-glyph">v1</div>
+          <span class="preview-label">Foundation</span>
+        </div>
+        <div class="card-content">
+          <div class="card-tag">Original Layout</div>
+          <h3 class="card-title">Where Spirit Meets Life · v1</h3>
+          <p class="card-desc">The first end-to-end homepage prototype — full nav, hero, mission, events, speakers, livestream, get-involved, footer. The complete site-map made tangible.</p>
+          <span class="card-cta">Open prototype <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="card" href="index.html">
+        <div class="card-preview preview-v2">
+          <div class="preview-glyph">v2</div>
+          <span class="preview-label">Editorial</span>
+        </div>
+        <div class="card-content">
+          <div class="card-tag">Editorial Direction</div>
+          <h3 class="card-title">Editorial · v2</h3>
+          <p class="card-desc">Cinematic direction: full-viewport hero, asymmetric speaker grid, pull-quote moments, minimal footer. Same content, more weight. Theme switcher built in.</p>
+          <span class="card-cta">Open prototype <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="card" href="layouts.html">
+        <div class="card-preview preview-layouts">
+          <div class="preview-glyph">·</div>
+          <span class="preview-label">Patterns</span>
+        </div>
+        <div class="card-content">
+          <div class="card-tag">Layout Playground</div>
+          <h3 class="card-title">Layout Patterns</h3>
+          <p class="card-desc">A reference page of every layout pattern in the system — hero variants, grid configurations, card and quote treatments, padding scale, background patterns. The design vocabulary, in one place.</p>
+          <span class="card-cta">Open prototype <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="card featured" href="theme-studio.html">
+        <div class="card-preview preview-theme">
+          <div class="preview-glyph">★</div>
+          <span class="preview-label theme">Token Studio</span>
+        </div>
+        <div class="card-content">
+          <div class="card-tag">Theme Studio · Figma Roundtrip</div>
+          <h3 class="card-title">NTCH Theme Studio</h3>
+          <p class="card-desc">Full component page driven by a live theme-control panel. Tune palette, type, and spacing tokens in the browser, export the CSS <code style="font-size:12px;color:var(--accent);background:var(--accent-soft);padding:1px 6px;border-radius:4px">:root</code> block, paste into Figma Variables or your codebase. The bidirectional design loop, built in HTML.</p>
+          <span class="card-cta">Open prototype <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+</main>
+
+<footer class="container site-footer">
+  <span>Built by Jack Satta · Deliberate UX · 2026</span>
+  <span><a href="/portfolio/">View full portfolio →</a></span>
+</footer>
+
+</body>
+</html>

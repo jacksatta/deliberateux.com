@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NTCH — Layout Styles</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+
+    /* ── TOKENS (match index.html) ─────────────────────────────── */
+    :root {
+      --color-primary:   #2A4A3E;
+      --color-secondary: #B5694D;
+      --color-accent:    #C8963E;
+      --color-text:      #1C1C1C;
+      --color-bg:        #FAF7F2;
+      --color-surface:   #EEE8DE;
+      --color-muted:     #6B6B6B;
+      --color-white:     #FFFFFF;
+      --font-heading:    'Cormorant Garamond', Georgia, serif;
+      --font-body:       'Inter', system-ui, sans-serif;
+      --spacing-unit:    8px;
+      --radius:          4px;
+      --radius-lg:       12px;
+      --max-width:       1200px;
+      --max-width-text:  680px;
+      --ease:            cubic-bezier(0.4, 0, 0.2, 1);
+      --dur:             0.22s;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-body); font-size: 17px; line-height: 1.65; color: var(--color-text); background: var(--color-bg); }
+    img  { max-width: 100%; display: block; }
+    a    { color: inherit; text-decoration: none; }
+
+    /* ── PLAYGROUND META BAR ───────────────────────────────────── */
+    .playground-bar {
+      background: #0f0f0f;
+      color: rgba(255,255,255,0.5);
+      font-family: var(--font-body);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      padding: 8px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .playground-bar strong { color: #C8963E; }
+    .playground-bar nav    { display: flex; gap: 20px; }
+    .playground-bar nav a  { color: rgba(255,255,255,0.4); transition: color 0.2s; }
+    .playground-bar nav a:hover { color: rgba(255,255,255,0.8); }
+
+    /* ── SECTION LABEL (shows which pattern is being demonstrated) */
+    .pattern-label {
+      background: rgba(200, 150, 62, 0.12);
+      border-top: 2px solid var(--color-accent);
+      padding: 10px 24px;
+      font-family: var(--font-body);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .pattern-label span { color: var(--color-muted); font-weight: 400; letter-spacing: 0; text-transform: none; font-size: 11px; }
+
+    /* ── SHARED TYPOGRAPHY ─────────────────────────────────────── */
+    .t-label    { font-family: var(--font-body); font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-accent); }
+    .t-display  { font-family: var(--font-heading); font-size: clamp(3rem, 6vw, 5.5rem); font-weight: 300; line-height: 1.08; letter-spacing: -0.01em; }
+    .t-display em { font-style: italic; color: var(--color-secondary); }
+    .t-heading  { font-family: var(--font-heading); font-size: clamp(1.8rem, 3vw, 2.8rem); font-weight: 400; line-height: 1.2; }
+    .t-heading em { font-style: italic; }
+    .t-body-lg  { font-size: 1.05rem; line-height: 1.7; color: var(--color-muted); }
+
+    /* ── SHARED LAYOUT ─────────────────────────────────────────── */
+    .container   { max-width: var(--max-width); margin: 0 auto; padding: 0 calc(var(--spacing-unit) * 3); }
+    .container--text { max-width: var(--max-width-text); margin: 0 auto; padding: 0 calc(var(--spacing-unit) * 3); }
+
+    /* ── SECTION BACKGROUNDS ───────────────────────────────────── */
+    /* bg-default   → --color-bg  (#FAF7F2 warm white) */
+    /* bg-surface   → --color-surface (#EEE8DE tinted) */
+    /* bg-green     → --color-primary dark green */
+    /* bg-dark      → #16302a near-black green */
+    /* bg-image     → full-bleed photo + overlay */
+    .bg-default  { background: var(--color-bg); }
+    .bg-surface  { background: var(--color-surface); }
+    .bg-green    { background: var(--color-primary); color: var(--color-bg); }
+    .bg-dark     { background: #16302a; color: var(--color-bg); }
+    .bg-white    { background: var(--color-white); }
+
+    /* ── SECTION PADDING SCALES ────────────────────────────────── */
+    /* sm  → 64px  (tight — for strips, banners) */
+    /* md  → 96px  (standard — most sections) */
+    /* lg  → 128px (generous — hero, pull quotes) */
+    /* xl  → 160px (hero-only) */
+    .pad-sm  { padding: calc(var(--spacing-unit) * 8)  0; }
+    .pad-md  { padding: calc(var(--spacing-unit) * 12) 0; }
+    .pad-lg  { padding: calc(var(--spacing-unit) * 16) 0; }
+    .pad-xl  { padding: calc(var(--spacing-unit) * 20) 0; }
+
+    /* ── DIVIDERS ──────────────────────────────────────────────── */
+    .divider          { border: none; border-top: 1px solid var(--color-surface); }
+    .divider--strong  { border-top-color: rgba(42,74,62,0.2); }
+    .divider--white   { border-top-color: rgba(250,247,242,0.15); }
+
+    /* ── GRID SYSTEMS ──────────────────────────────────────────── */
+    /* col-2       → 2 equal columns */
+    /* col-3       → 3 equal columns */
+    /* col-4       → 4 equal columns */
+    /* col-1-2     → 1/3 · 2/3 */
+    /* col-2-1     → 2/3 · 1/3 */
+    /* col-1-1     → 50/50 */
+    .grid        { display: grid; gap: calc(var(--spacing-unit) * 3); }
+    .col-2       { grid-template-columns: repeat(2, 1fr); }
+    .col-3       { grid-template-columns: repeat(3, 1fr); }
+    .col-4       { grid-template-columns: repeat(4, 1fr); }
+    .col-1-2     { grid-template-columns: 1fr 2fr; }
+    .col-2-1     { grid-template-columns: 2fr 1fr; }
+    .col-1-1     { grid-template-columns: 1fr 1fr; }
+    .gap-sm      { gap: calc(var(--spacing-unit) * 2); }
+    .gap-md      { gap: calc(var(--spacing-unit) * 3); }
+    .gap-lg      { gap: calc(var(--spacing-unit) * 6); }
+    .gap-xl      { gap: calc(var(--spacing-unit) * 10); }
+    .align-center { align-items: center; }
+    .align-start  { align-items: start; }
+
+    /* ── FLEX HELPERS ──────────────────────────────────────────── */
+    .flex         { display: flex; }
+    .flex-between { display: flex; align-items: center; justify-content: space-between; }
+    .flex-center  { display: flex; align-items: center; justify-content: center; }
+    .flex-col     { display: flex; flex-direction: column; }
+    .gap-inline   { gap: calc(var(--spacing-unit) * 2); }
+
+    /* ── CONTENT ALIGNMENT ─────────────────────────────────────── */
+    .text-left   { text-align: left; }
+    .text-center { text-align: center; }
+    .text-right  { text-align: right; }
+
+    /* ── STACK (vertical rhythm within a section) ──────────────── */
+    .stack > * + * { margin-top: calc(var(--spacing-unit) * 2.5); }
+    .stack-sm > * + * { margin-top: calc(var(--spacing-unit) * 1.5); }
+    .stack-lg > * + * { margin-top: calc(var(--spacing-unit) * 4); }
+
+    /* ── SECTION HEADER PATTERN ────────────────────────────────── */
+    /* Used above grids: label + heading on left, action on right */
+    .section-header { margin-bottom: calc(var(--spacing-unit) * 6); }
+
+    /* ── BUTTONS ───────────────────────────────────────────────── */
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; font-family: var(--font-body); font-size: 0.85rem; font-weight: 500; letter-spacing: 0.04em; border-radius: var(--radius); transition: all var(--dur) var(--ease); cursor: pointer; border: none; }
+    .btn--primary  { background: var(--color-accent); color: var(--color-white); }
+    .btn--primary:hover { background: #b8832e; }
+    .btn--outline  { background: transparent; color: var(--color-bg); border: 1.5px solid rgba(255,255,255,0.5); }
+    .btn--outline:hover { border-color: var(--color-bg); background: rgba(255,255,255,0.08); }
+    .btn--ghost    { background: transparent; color: var(--color-primary); border: 1.5px solid var(--color-primary); }
+    .btn--ghost:hover { background: var(--color-primary); color: var(--color-bg); }
+    .btn--text     { background: none; color: var(--color-accent); padding-left: 0; padding-right: 0; font-weight: 500; }
+    .btn--text::after { content: ' →'; }
+    .btn--text:hover  { color: var(--color-secondary); }
+    .btn--text-white  { background: none; color: rgba(250,247,242,0.7); padding-left: 0; padding-right: 0; font-weight: 500; }
+    .btn--text-white::after { content: ' →'; }
+    .btn--text-white:hover  { color: var(--color-bg); }
+
+    /* ── IMAGE PLACEHOLDERS ────────────────────────────────────── */
+    .img-placeholder {
+      background: linear-gradient(135deg, var(--color-surface) 0%, #d9d0c4 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-muted);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .img-full-bleed {
+      width: 100%;
+      aspect-ratio: 16/9;
+    }
+    .img-portrait {
+      width: 100%;
+      aspect-ratio: 3/4;
+      border-radius: var(--radius-lg);
+    }
+    .img-square {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: var(--radius-lg);
+    }
+    .img-wide {
+      width: 100%;
+      aspect-ratio: 2/1;
+      border-radius: var(--radius-lg);
+    }
+
+    /* ── CARD SHELL ────────────────────────────────────────────── */
+    .card {
+      background: var(--color-white);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid rgba(42,74,62,0.08);
+    }
+    .card__body { padding: calc(var(--spacing-unit) * 3); }
+    .card--surface { background: var(--color-surface); border-color: transparent; }
+
+    /* ── QUOTE STYLES ──────────────────────────────────────────── */
+    .quote-pull {
+      font-family: var(--font-heading);
+      font-size: clamp(1.8rem, 3.5vw, 3rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.35;
+    }
+    .quote-inline {
+      font-family: var(--font-heading);
+      font-size: clamp(1.4rem, 2.5vw, 2rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.4;
+      color: var(--color-primary);
+      border-left: 2px solid var(--color-accent);
+      padding-left: calc(var(--spacing-unit) * 3);
+    }
+
+    /* ── HERO OVERLAY ──────────────────────────────────────────── */
+    .hero-shell {
+      position: relative;
+      overflow: hidden;
+      color: var(--color-bg);
+      background: var(--color-primary);
+    }
+    .hero-shell__bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0.35;
+    }
+    .hero-shell__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(165deg, rgba(22,48,42,0.85) 0%, rgba(22,48,42,0.7) 50%, rgba(22,48,42,0.9) 100%);
+    }
+    .hero-shell__content { position: relative; }
+
+  </style>
+</head>
+<body>
+
+  <div class="playground-bar">
+    <strong>NTCH — Layout Styles</strong>
+    <nav>
+      <a href="#backgrounds">Backgrounds</a>
+      <a href="#padding">Padding</a>
+      <a href="#grids">Grids</a>
+      <a href="#heroes">Heroes</a>
+      <a href="#quotes">Quotes</a>
+      <a href="#cards">Cards</a>
+    </nav>
+    <a href="index.html">← Homepage</a>
+  </div>
+
+
+  <!-- ============================================================
+       SECTION BACKGROUNDS
+       ============================================================ -->
+  <div class="pattern-label" id="backgrounds">
+    Section backgrounds
+    <span>bg-default · bg-surface · bg-white · bg-green · bg-dark</span>
+  </div>
+
+  <div class="bg-default pad-sm">
+    <div class="container">
+      <p class="t-label">bg-default</p>
+      <p style="color:var(--color-muted);margin-top:4px;font-size:0.85rem;">#FAF7F2 — warm white. Primary section background.</p>
+    </div>
+  </div>
+
+  <div class="bg-surface pad-sm">
+    <div class="container">
+      <p class="t-label">bg-surface</p>
+      <p style="color:var(--color-muted);margin-top:4px;font-size:0.85rem;">#EEE8DE — tinted cream. Alternating sections, event grids.</p>
+    </div>
+  </div>
+
+  <div class="bg-white pad-sm">
+    <div class="container">
+      <p class="t-label">bg-white</p>
+      <p style="color:var(--color-muted);margin-top:4px;font-size:0.85rem;">#FFFFFF — pure white. Cards and elevated surfaces.</p>
+    </div>
+  </div>
+
+  <div class="bg-green pad-sm">
+    <div class="container">
+      <p class="t-label" style="color:rgba(250,247,242,0.55)">bg-green</p>
+      <p style="color:rgba(250,247,242,0.65);margin-top:4px;font-size:0.85rem;">#2A4A3E — primary green. Pull quotes, CTA bands.</p>
+    </div>
+  </div>
+
+  <div class="bg-dark pad-sm">
+    <div class="container">
+      <p class="t-label" style="color:rgba(200,150,62,0.7)">bg-dark</p>
+      <p style="color:rgba(250,247,242,0.5);margin-top:4px;font-size:0.85rem;">#16302A — near-black green. Footer only.</p>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       PADDING SCALE
+       ============================================================ -->
+  <div class="pattern-label" id="padding">
+    Padding scale
+    <span>pad-sm (64px) · pad-md (96px) · pad-lg (128px) · pad-xl (160px)</span>
+  </div>
+
+  <div style="background:var(--color-surface)">
+    <div class="container" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(42,74,62,0.1)">
+      <div class="pad-sm bg-default flex-center" style="display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px">
+        <p class="t-label">pad-sm</p>
+        <p style="font-size:0.75rem;color:var(--color-muted)">64px top + bottom</p>
+        <p style="font-size:0.7rem;color:var(--color-muted)">Strips · banners</p>
+      </div>
+      <div class="pad-md bg-default flex-center" style="display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px">
+        <p class="t-label">pad-md</p>
+        <p style="font-size:0.75rem;color:var(--color-muted)">96px top + bottom</p>
+        <p style="font-size:0.7rem;color:var(--color-muted)">Standard sections</p>
+      </div>
+      <div class="pad-lg bg-default flex-center" style="display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px">
+        <p class="t-label">pad-lg</p>
+        <p style="font-size:0.75rem;color:var(--color-muted)">128px top + bottom</p>
+        <p style="font-size:0.7rem;color:var(--color-muted)">Pull quotes · features</p>
+      </div>
+      <div class="pad-xl bg-default flex-center" style="display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px">
+        <p class="t-label">pad-xl</p>
+        <p style="font-size:0.75rem;color:var(--color-muted)">160px top + bottom</p>
+        <p style="font-size:0.7rem;color:var(--color-muted)">Hero only</p>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       GRID SYSTEMS
+       ============================================================ -->
+  <div class="pattern-label" id="grids">
+    Grid layouts
+    <span>col-2 · col-3 · col-4 · col-1-2 · col-2-1 · col-1-1</span>
+  </div>
+
+  <!-- col-1-2: sidebar + main (mission, about) -->
+  <div class="bg-default pad-md">
+    <div class="container">
+      <p class="t-label section-header">col-1-2 — 1/3 · 2/3 <span style="color:var(--color-muted);font-weight:400;text-transform:none;letter-spacing:0;margin-left:12px;">Mission, About, sidebar + body</span></p>
+      <div class="grid col-1-2 gap-xl align-center">
+        <div class="img-placeholder img-portrait">Image</div>
+        <div class="stack">
+          <p class="t-label">Section label</p>
+          <h2 class="t-heading">Heading goes <em>here</em></h2>
+          <p class="t-body-lg">Body copy that supports the heading. Muted, comfortable reading size, generous line height for a spiritual/wellness feel.</p>
+          <a class="btn btn--text" href="#">Call to action</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- col-2-1: main + sidebar (reversed) -->
+  <div class="bg-default pad-md">
+    <div class="container">
+      <p class="t-label section-header">col-2-1 — 2/3 · 1/3 <span style="color:var(--color-muted);font-weight:400;text-transform:none;letter-spacing:0;margin-left:12px;">Text-heavy with supporting image</span></p>
+      <div class="grid col-2-1 gap-xl align-center">
+        <div class="stack">
+          <p class="t-label">Section label</p>
+          <h2 class="t-heading">Heading goes <em>here</em></h2>
+          <p class="t-body-lg">Body copy that supports the heading. Muted, comfortable reading size, generous line height for a spiritual/wellness feel.</p>
+          <a class="btn btn--ghost" href="#">Secondary action</a>
+        </div>
+        <div class="img-placeholder img-portrait">Image</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- col-1-1: 50/50 -->
+  <div class="bg-surface pad-md">
+    <div class="container">
+      <p class="t-label section-header">col-1-1 — 50 · 50 <span style="color:var(--color-muted);font-weight:400;text-transform:none;letter-spacing:0;margin-left:12px;">Split — equal weight each side</span></p>
+      <div class="grid col-1-1 gap-lg align-center">
+        <div class="img-placeholder img-wide">Image</div>
+        <div class="stack">
+          <p class="t-label">Section label</p>
+          <h2 class="t-heading">Equal split <em>layout</em></h2>
+          <p class="t-body-lg">Good for pairing an image or graphic with a block of text at equal visual weight.</p>
+          <a class="btn btn--primary" href="#">Primary action</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- col-3: cards -->
+  <div class="bg-default pad-md">
+    <div class="container">
+      <p class="t-label section-header">col-3 — Three column <span style="color:var(--color-muted);font-weight:400;text-transform:none;letter-spacing:0;margin-left:12px;">Events, features, services</span></p>
+      <div class="grid col-3 gap-md">
+        <div class="card"><div class="img-placeholder" style="aspect-ratio:3/2">Image</div><div class="card__body stack-sm"><p class="t-label">Label</p><h3 style="font-family:var(--font-heading);font-size:1.35rem;font-weight:400">Card title here</h3><p style="font-size:0.875rem;color:var(--color-muted)">Supporting description text goes here.</p><a class="btn btn--text" href="#">Action</a></div></div>
+        <div class="card"><div class="img-placeholder" style="aspect-ratio:3/2">Image</div><div class="card__body stack-sm"><p class="t-label">Label</p><h3 style="font-family:var(--font-heading);font-size:1.35rem;font-weight:400">Card title here</h3><p style="font-size:0.875rem;color:var(--color-muted)">Supporting description text goes here.</p><a class="btn btn--text" href="#">Action</a></div></div>
+        <div class="card"><div class="img-placeholder" style="aspect-ratio:3/2">Image</div><div class="card__body stack-sm"><p class="t-label">Label</p><h3 style="font-family:var(--font-heading);font-size:1.35rem;font-weight:400">Card title here</h3><p style="font-size:0.875rem;color:var(--color-muted)">Supporting description text goes here.</p><a class="btn btn--text" href="#">Action</a></div></div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- col-4: speaker grid -->
+  <div class="bg-default pad-md">
+    <div class="container">
+      <p class="t-label section-header">col-4 — Four column <span style="color:var(--color-muted);font-weight:400;text-transform:none;letter-spacing:0;margin-left:12px;">Speakers, team, directory previews</span></p>
+      <div class="grid col-4 gap-md">
+        <div class="stack-sm text-center"><div class="img-placeholder img-square">Photo</div><p style="font-family:var(--font-heading);font-size:1.1rem">Name Here</p><p style="font-size:0.78rem;color:var(--color-muted)">Role · Specialty</p></div>
+        <div class="stack-sm text-center"><div class="img-placeholder img-square">Photo</div><p style="font-family:var(--font-heading);font-size:1.1rem">Name Here</p><p style="font-size:0.78rem;color:var(--color-muted)">Role · Specialty</p></div>
+        <div class="stack-sm text-center"><div class="img-placeholder img-square">Photo</div><p style="font-family:var(--font-heading);font-size:1.1rem">Name Here</p><p style="font-size:0.78rem;color:var(--color-muted)">Role · Specialty</p></div>
+        <div class="stack-sm text-center"><div class="img-placeholder img-square">Photo</div><p style="font-family:var(--font-heading);font-size:1.1rem">Name Here</p><p style="font-size:0.78rem;color:var(--color-muted)">Role · Specialty</p></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       HERO PATTERNS
+       ============================================================ -->
+  <div class="pattern-label" id="heroes">
+    Hero layouts
+    <span>Full-bleed overlay · Split · Centered</span>
+  </div>
+
+  <!-- Full-bleed with overlay -->
+  <div class="hero-shell pad-xl">
+    <div class="hero-shell__bg" style="background-image:url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1920&q=80')"></div>
+    <div class="hero-shell__overlay"></div>
+    <div class="hero-shell__content container">
+      <div style="max-width:720px" class="stack-lg">
+        <p class="t-label" style="color:var(--color-accent)">Full-bleed overlay hero</p>
+        <h1 class="t-display">A living community<br>for <em>conscious</em><br>transformation</h1>
+        <p style="font-size:1.1rem;color:rgba(250,247,242,0.72);max-width:500px;line-height:1.7">Subtitle text — short, evocative. Sets tone without overselling.</p>
+        <div class="flex gap-inline">
+          <a class="btn btn--primary" href="#">Primary action</a>
+          <a class="btn btn--outline" href="#">Secondary</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Split hero: text left, image right -->
+  <div class="bg-default pad-xl" style="padding-bottom:0">
+    <div class="container">
+      <p class="t-label section-header" style="margin-bottom:32px">Split hero — text left · image right</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;min-height:520px">
+      <div class="pad-lg" style="padding-right:64px;display:flex;align-items:center;max-width:680px;margin-left:auto">
+        <div class="stack-lg">
+          <p class="t-label">Split hero</p>
+          <h1 class="t-display">Heading<br><em>in two lines</em></h1>
+          <p class="t-body-lg">Subtitle sits here — one or two lines maximum.</p>
+          <a class="btn btn--primary" href="#">Primary action</a>
+        </div>
+      </div>
+      <div class="img-placeholder" style="min-height:520px">Full-height image</div>
+    </div>
+  </div>
+
+  <!-- Centered hero -->
+  <div class="bg-surface pad-xl text-center">
+    <div class="container--text">
+      <p class="t-label section-header" style="margin-bottom:24px">Centered hero — inner pages, archives</p>
+      <div class="stack-lg">
+        <p class="t-label">Page category</p>
+        <h1 class="t-display">Page <em>title</em></h1>
+        <p class="t-body-lg" style="margin:0 auto">A short description of what this page is about. One to two sentences.</p>
+        <div class="flex-center gap-inline">
+          <a class="btn btn--ghost" href="#">Action</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       QUOTE PATTERNS
+       ============================================================ -->
+  <div class="pattern-label" id="quotes">
+    Quote layouts
+    <span>Pull quote (full-width) · Inline quote · Centered</span>
+  </div>
+
+  <!-- Full-width pull quote on green -->
+  <div class="bg-green pad-lg text-center">
+    <div class="container--text">
+      <p class="quote-pull" style="color:var(--color-bg);margin-bottom:24px">
+        "There is a Power for Good in the Universe, and you can use it."
+      </p>
+      <p style="font-size:0.8rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(250,247,242,0.4)">— Ernest Holmes</p>
+    </div>
+  </div>
+
+  <!-- Inline quote beside body text -->
+  <div class="bg-default pad-md">
+    <div class="container">
+      <p class="t-label section-header">Inline quote — col-1-2 with blockquote</p>
+      <div class="grid col-1-2 gap-xl align-center">
+        <blockquote class="quote-inline">
+          "The infinite intelligence within us is always moving toward healing."
+        </blockquote>
+        <div class="stack">
+          <p class="t-body-lg">Body copy that sits beside the quote. Gives context, tells the story, invites further reading.</p>
+          <a class="btn btn--text" href="#">Learn more</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       CARD PATTERNS
+       ============================================================ -->
+  <div class="pattern-label" id="cards">
+    Card patterns
+    <span>Event card · Speaker card · Feature block · Stat strip</span>
+  </div>
+
+  <!-- Feature blocks (get involved style) -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(42,74,62,0.1)">
+    <div class="involve-block bg-default" style="padding:calc(var(--spacing-unit)*6) calc(var(--spacing-unit)*5)">
+      <div style="width:40px;height:40px;border-radius:50%;background:var(--color-surface);display:flex;align-items:center;justify-content:center;margin-bottom:24px;font-size:1.2rem">⬡</div>
+      <h3 style="font-family:var(--font-heading);font-size:1.4rem;font-weight:400;color:var(--color-primary);margin-bottom:12px">Feature block</h3>
+      <p style="font-size:0.9rem;color:var(--color-muted);line-height:1.65;margin-bottom:24px">Short description of the feature or offering. Two to three lines max.</p>
+      <a class="btn btn--text" href="#">Action link</a>
+    </div>
+    <div class="involve-block bg-default" style="padding:calc(var(--spacing-unit)*6) calc(var(--spacing-unit)*5)">
+      <div style="width:40px;height:40px;border-radius:50%;background:var(--color-surface);display:flex;align-items:center;justify-content:center;margin-bottom:24px;font-size:1.2rem">⬡</div>
+      <h3 style="font-family:var(--font-heading);font-size:1.4rem;font-weight:400;color:var(--color-primary);margin-bottom:12px">Feature block</h3>
+      <p style="font-size:0.9rem;color:var(--color-muted);line-height:1.65;margin-bottom:24px">Short description of the feature or offering. Two to three lines max.</p>
+      <a class="btn btn--text" href="#">Action link</a>
+    </div>
+    <div class="involve-block bg-default" style="padding:calc(var(--spacing-unit)*6) calc(var(--spacing-unit)*5)">
+      <div style="width:40px;height:40px;border-radius:50%;background:var(--color-surface);display:flex;align-items:center;justify-content:center;margin-bottom:24px;font-size:1.2rem">⬡</div>
+      <h3 style="font-family:var(--font-heading);font-size:1.4rem;font-weight:400;color:var(--color-primary);margin-bottom:12px">Feature block</h3>
+      <p style="font-size:0.9rem;color:var(--color-muted);line-height:1.65;margin-bottom:24px">Short description of the feature or offering. Two to three lines max.</p>
+      <a class="btn btn--text" href="#">Action link</a>
+    </div>
+  </div>
+
+  <!-- Stat / number strip -->
+  <div class="bg-green pad-md">
+    <div class="container">
+      <p class="t-label section-header" style="color:rgba(250,247,242,0.45);margin-bottom:40px">Stat strip — on bg-green</p>
+      <div class="grid col-4 gap-lg text-center">
+        <div><p style="font-family:var(--font-heading);font-size:3rem;font-weight:300;color:var(--color-bg);line-height:1">30+</p><p style="font-size:0.78rem;color:rgba(250,247,242,0.5);letter-spacing:0.06em;text-transform:uppercase;margin-top:8px">Years serving Hawai'i</p></div>
+        <div><p style="font-family:var(--font-heading);font-size:3rem;font-weight:300;color:var(--color-bg);line-height:1">200+</p><p style="font-size:0.78rem;color:rgba(250,247,242,0.5);letter-spacing:0.06em;text-transform:uppercase;margin-top:8px">Community members</p></div>
+        <div><p style="font-family:var(--font-heading);font-size:3rem;font-weight:300;color:var(--color-bg);line-height:1">50+</p><p style="font-size:0.78rem;color:rgba(250,247,242,0.5);letter-spacing:0.06em;text-transform:uppercase;margin-top:8px">Events each year</p></div>
+        <div><p style="font-family:var(--font-heading);font-size:3rem;font-weight:300;color:var(--color-bg);line-height:1">Free</p><p style="font-size:0.78rem;color:rgba(250,247,242,0.5);letter-spacing:0.06em;text-transform:uppercase;margin-top:8px">Sunday services</p></div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
