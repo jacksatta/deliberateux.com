@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NTCH — Design Playground v2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+
+    /* ============================================================
+       TOKENS — same palette as v1 (copy to ntch-child/style.css)
+       ============================================================ */
+
+    /* ── PALI: deep coastal navy · coral · sunrise gold ── */
+    :root {
+      --color-primary:    #1E3A52;
+      --color-secondary:  #C5614A;
+      --color-accent:     #D4961E;
+      --color-text:       #111824;
+      --color-bg:         #F5F7FA;
+      --color-surface:    #E2EAF0;
+      --color-muted:      #5A6E8A;
+      --color-white:      #FFFFFF;
+      --color-footer:     #0D1A28;
+
+      --font-heading:     'Cormorant Garamond', Georgia, serif;
+      --font-body:        'Inter', system-ui, sans-serif;
+
+      --spacing-unit:     8px;
+      --radius:           4px;
+      --radius-lg:        12px;
+      --max-width:        1200px;
+      --max-width-text:   680px;
+      --ease:             cubic-bezier(0.4, 0, 0.2, 1);
+      --dur:              0.22s;
+    }
+
+    [data-theme="ocean"] {
+      --color-primary:    #1B4F5E;
+      --color-secondary:  #D4735E;
+      --color-accent:     #4BA8C5;
+      --color-text:       #0F2A33;
+      --color-bg:         #F4FAFB;
+      --color-surface:    #D9EEF4;
+      --color-muted:      #5A7F8A;
+      --color-footer:     #0E2F3A;
+    }
+
+    [data-theme="warm"] {
+      --color-primary:    #7B3A2A;
+      --color-secondary:  #C8963E;
+      --color-accent:     #E8B86D;
+      --color-text:       #2A1810;
+      --color-bg:         #FDF6EE;
+      --color-surface:    #F0E0CC;
+      --color-muted:      #8A6050;
+      --color-footer:     #4A1E12;
+    }
+
+    [data-theme="twilight"] {
+      --color-primary:    #2D2052;
+      --color-secondary:  #8B6BA8;
+      --color-accent:     #C8963E;
+      --color-text:       #1A1130;
+      --color-bg:         #F8F6FD;
+      --color-surface:    #EAE5F5;
+      --color-muted:      #6B5E8A;
+      --color-footer:     #18102E;
+    }
+
+    [data-theme="minimal"] {
+      --color-primary:    #1A1A1A;
+      --color-secondary:  #444444;
+      --color-accent:     #C8963E;
+      --color-text:       #111111;
+      --color-bg:         #FFFFFF;
+      --color-surface:    #F2F2F2;
+      --color-muted:      #777777;
+      --color-footer:     #0A0A0A;
+    }
+
+    /* ============================================================
+       RESET & BASE
+       ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      font-size: 17px;
+      line-height: 1.65;
+      color: var(--color-text);
+      background: var(--color-bg);
+    }
+
+    img { max-width: 100%; display: block; }
+    a   { color: inherit; text-decoration: none; }
+    ul  { list-style: none; }
+
+    /* ============================================================
+       NAV — transparent, ultra-minimal
+       ============================================================ */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 48px;
+      mix-blend-mode: normal;
+    }
+
+    .nav::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .nav__wordmark {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      color: white;
+      position: relative;
+    }
+
+    .nav__links {
+      display: flex;
+      gap: 36px;
+      position: relative;
+    }
+
+    .nav__links a {
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.85);
+      transition: color var(--dur) var(--ease);
+    }
+
+    .nav__links a:hover { color: white; }
+
+    .nav__actions {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav__cta {
+      position: relative;
+      padding: 10px 20px;
+      border-radius: 100px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: background var(--dur) var(--ease);
+    }
+
+    .nav__cta--join {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.4);
+      color: white;
+      backdrop-filter: blur(8px);
+    }
+    .nav__cta--join:hover { background: rgba(255,255,255,0.28); }
+
+    .nav__cta--members {
+      background: rgba(255,255,255,0.9);
+      border: 1px solid transparent;
+      color: var(--color-primary);
+    }
+    .nav__cta--members:hover { background: white; }
+
+    /* ============================================================
+       HERO — full-viewport, image-first
+       ============================================================ */
+    .hero {
+      position: relative;
+      height: 100vh;
+      min-height: 680px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+    }
+
+    .hero__bg {
+      position: absolute;
+      inset: 0;
+      background:
+        url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1800&q=80') center/cover no-repeat;
+    }
+
+    .hero__bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.15) 50%, transparent 100%);
+    }
+
+    .hero__content {
+      position: relative;
+      padding: 0 48px 80px;
+      max-width: 900px;
+    }
+
+    .hero__eyebrow {
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-bottom: 20px;
+    }
+
+    .hero__headline {
+      font-family: var(--font-heading);
+      font-size: clamp(3.5rem, 7vw, 7rem);
+      font-weight: 300;
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      color: white;
+      margin-bottom: 32px;
+    }
+
+    .hero__headline em {
+      font-style: italic;
+      color: rgba(255,255,255,0.75);
+    }
+
+    .hero__sub {
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.75);
+      max-width: 480px;
+      margin-bottom: 40px;
+    }
+
+    .hero__actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-hero-primary {
+      padding: 14px 36px;
+      background: var(--color-accent);
+      color: #111;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: 100px;
+      transition: opacity var(--dur) var(--ease);
+    }
+
+    .btn-hero-primary:hover { opacity: 0.85; }
+
+    .btn-hero-ghost {
+      padding: 14px 36px;
+      border: 1px solid rgba(255,255,255,0.5);
+      color: white;
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: 100px;
+      transition: border-color var(--dur) var(--ease);
+    }
+
+    .btn-hero-ghost:hover { border-color: white; }
+
+    .hero__scroll-cue {
+      position: absolute;
+      bottom: 40px;
+      right: 48px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: rgba(255,255,255,0.5);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .hero__scroll-line {
+      width: 40px;
+      height: 1px;
+      background: rgba(255,255,255,0.3);
+    }
+
+    /* ============================================================
+       MISSION — typographic centrepiece
+       ============================================================ */
+    .mission {
+      padding: 140px 48px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .mission__label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-bottom: 48px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .mission__label::before {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 1px;
+      background: var(--color-accent);
+    }
+
+    .mission__statement {
+      font-family: var(--font-heading);
+      font-size: clamp(2.4rem, 4.5vw, 4.5rem);
+      font-weight: 300;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      color: var(--color-primary);
+      max-width: 880px;
+    }
+
+    .mission__statement em {
+      font-style: italic;
+      color: var(--color-secondary);
+    }
+
+    .mission__body {
+      margin-top: 48px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      max-width: 880px;
+    }
+
+    .mission__body p {
+      font-size: 1rem;
+      line-height: 1.75;
+      color: var(--color-muted);
+    }
+
+    .mission__link {
+      margin-top: 48px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-primary);
+      border-bottom: 1px solid var(--color-primary);
+      padding-bottom: 4px;
+      transition: opacity var(--dur) var(--ease);
+    }
+
+    .mission__link:hover { opacity: 0.6; }
+
+    /* ============================================================
+       EVENTS — editorial list, big numbers
+       ============================================================ */
+    .events {
+      background: var(--color-primary);
+      padding: 120px 48px;
+    }
+
+    .events__inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .events__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 80px;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+      padding-bottom: 32px;
+    }
+
+    .events__header-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+    }
+
+    .events__header-heading {
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 3.5vw, 3.5rem);
+      font-weight: 300;
+      color: white;
+      margin-top: 8px;
+    }
+
+    .events__all-link {
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color var(--dur) var(--ease);
+      white-space: nowrap;
+    }
+
+    .events__all-link:hover { color: white; }
+
+    .events__list { display: flex; flex-direction: column; }
+
+    .event-row {
+      display: grid;
+      grid-template-columns: 100px 1fr auto;
+      gap: 40px;
+      align-items: center;
+      padding: 36px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      cursor: pointer;
+      transition: background var(--dur) var(--ease);
+    }
+
+    .event-row:hover { background: rgba(255,255,255,0.03); margin: 0 -48px; padding-left: 48px; padding-right: 48px; }
+
+    .event-row__date {
+      text-align: center;
+    }
+
+    .event-row__day {
+      font-family: var(--font-heading);
+      font-size: 3rem;
+      font-weight: 300;
+      line-height: 1;
+      color: white;
+    }
+
+    .event-row__month {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-top: 4px;
+    }
+
+    .event-row__info {}
+
+    .event-row__tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 8px;
+    }
+
+    .event-row__title {
+      font-family: var(--font-heading);
+      font-size: clamp(1.3rem, 2vw, 1.8rem);
+      font-weight: 400;
+      color: white;
+      line-height: 1.2;
+    }
+
+    .event-row__meta {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.45);
+      margin-top: 6px;
+    }
+
+    .event-row__arrow {
+      width: 40px;
+      height: 40px;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.5);
+      font-size: 1rem;
+      transition: all var(--dur) var(--ease);
+      flex-shrink: 0;
+    }
+
+    .event-row:hover .event-row__arrow {
+      border-color: rgba(255,255,255,0.6);
+      color: white;
+    }
+
+    /* ============================================================
+       PULL QUOTE — full bleed typographic
+       ============================================================ */
+    .pullquote {
+      padding: 120px 48px;
+      background: var(--color-surface);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pullquote::before {
+      content: '\201C';
+      position: absolute;
+      top: -60px;
+      left: 20px;
+      font-family: var(--font-heading);
+      font-size: 40rem;
+      line-height: 1;
+      color: var(--color-primary);
+      opacity: 0.04;
+      pointer-events: none;
+      font-weight: 300;
+    }
+
+    .pullquote__inner {
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .pullquote__text {
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 4vw, 4rem);
+      font-weight: 300;
+      line-height: 1.2;
+      color: var(--color-primary);
+      font-style: italic;
+    }
+
+    .pullquote__attribution {
+      margin-top: 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .pullquote__line {
+      width: 40px;
+      height: 1px;
+      background: var(--color-accent);
+    }
+
+    .pullquote__source {
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+    }
+
+    /* ============================================================
+       SPEAKERS — asymmetric portrait grid
+       ============================================================ */
+    .speakers {
+      padding: 140px 48px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .speakers__header {
+      margin-bottom: 80px;
+    }
+
+    .speakers__label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-bottom: 16px;
+    }
+
+    .speakers__heading {
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 3.5vw, 3.5rem);
+      font-weight: 300;
+      color: var(--color-primary);
+      max-width: 600px;
+      line-height: 1.15;
+    }
+
+    .speakers__heading em { font-style: italic; }
+
+    .speakers__grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+
+    .speaker-card {}
+
+    .speaker-card--featured { }
+
+    .speaker-card__photo-wrap {
+      position: relative;
+      overflow: hidden;
+      background: var(--color-surface);
+    }
+
+    .speaker-card--featured .speaker-card__photo-wrap {
+      aspect-ratio: 3/4;
+    }
+
+    .speaker-card:not(.speaker-card--featured) .speaker-card__photo-wrap {
+      aspect-ratio: 3/4;
+    }
+
+    .speaker-card__photo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: sepia(25%) contrast(1.05);
+      transition: transform 0.6s var(--ease);
+    }
+
+    .speaker-card:hover .speaker-card__photo-wrap img {
+      transform: scale(1.04);
+    }
+
+    .speaker-card__info {
+      margin-top: 20px;
+    }
+
+    .speaker-card__name {
+      font-family: var(--font-heading);
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: var(--color-primary);
+      line-height: 1.2;
+    }
+
+    .speaker-card--featured .speaker-card__name {
+      font-size: 1.8rem;
+    }
+
+    .speaker-card__title {
+      font-size: 0.8rem;
+      color: var(--color-muted);
+      margin-top: 4px;
+    }
+
+    .speaker-card__topic {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--color-accent);
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    .speaker-card--featured .speaker-card__bio {
+      font-size: 0.9rem;
+      color: var(--color-muted);
+      margin-top: 12px;
+      line-height: 1.65;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .speakers__secondary {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+
+    .speakers__footer {
+      margin-top: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--color-surface);
+      padding-top: 32px;
+    }
+
+    .speakers__footer-text {
+      font-size: 0.9rem;
+      color: var(--color-muted);
+    }
+
+    .speakers__link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-primary);
+      border-bottom: 1px solid var(--color-primary);
+      padding-bottom: 4px;
+    }
+
+    /* ============================================================
+       GET INVOLVED — three editorial columns, no chrome
+       ============================================================ */
+    .get-involved {
+      background: var(--color-bg);
+      border-top: 1px solid var(--color-surface);
+      padding: 140px 48px;
+    }
+
+    .get-involved__inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .get-involved__label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-bottom: 16px;
+    }
+
+    .get-involved__heading {
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 3.5vw, 3.5rem);
+      font-weight: 300;
+      color: var(--color-primary);
+      max-width: 620px;
+      line-height: 1.15;
+      margin-bottom: 80px;
+    }
+
+    .get-involved__heading em { font-style: italic; }
+
+    .get-involved__cols {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+    }
+
+    .involve-col {
+      padding: 40px 40px 40px 0;
+      border-right: 1px solid var(--color-surface);
+    }
+
+    .involve-col:last-child {
+      padding-right: 0;
+      border-right: none;
+    }
+
+    .involve-col:not(:first-child) {
+      padding-left: 40px;
+    }
+
+    .involve-col__num {
+      font-family: var(--font-heading);
+      font-size: 4rem;
+      font-weight: 300;
+      color: var(--color-surface);
+      line-height: 1;
+      margin-bottom: 24px;
+    }
+
+    .involve-col__title {
+      font-family: var(--font-heading);
+      font-size: 1.6rem;
+      font-weight: 400;
+      color: var(--color-primary);
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+
+    .involve-col__body {
+      font-size: 0.9rem;
+      line-height: 1.75;
+      color: var(--color-muted);
+      margin-bottom: 28px;
+    }
+
+    .involve-col__link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-primary);
+      border-bottom: 1px solid currentColor;
+      padding-bottom: 3px;
+      transition: opacity var(--dur) var(--ease);
+    }
+
+    .involve-col__link:hover { opacity: 0.6; }
+
+    /* ============================================================
+       LIVESTREAM BANNER — immersive strip
+       ============================================================ */
+    .livestream {
+      position: relative;
+      padding: 80px 48px;
+      overflow: hidden;
+      background: var(--color-primary);
+    }
+
+    .livestream__bg {
+      position: absolute;
+      inset: 0;
+      background:
+        url('https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=1400&q=80') center/cover no-repeat;
+      opacity: 0.12;
+    }
+
+    .livestream__inner {
+      position: relative;
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 48px;
+      flex-wrap: wrap;
+    }
+
+    .livestream__left {}
+
+    .livestream__eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-bottom: 12px;
+    }
+
+    .livestream__dot {
+      width: 8px;
+      height: 8px;
+      background: var(--color-accent);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .livestream__title {
+      font-family: var(--font-heading);
+      font-size: clamp(1.6rem, 3vw, 2.8rem);
+      font-weight: 300;
+      color: white;
+      line-height: 1.15;
+    }
+
+    .livestream__meta {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .btn-livestream {
+      padding: 14px 36px;
+      background: var(--color-accent);
+      color: #111;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: 100px;
+      white-space: nowrap;
+      transition: opacity var(--dur) var(--ease);
+      flex-shrink: 0;
+    }
+
+    .btn-livestream:hover { opacity: 0.85; }
+
+    /* ============================================================
+       FOOTER — minimal
+       ============================================================ */
+    .site-footer {
+      background: var(--color-footer);
+      color: rgba(255,255,255,0.5);
+      padding: 80px 48px 48px;
+    }
+
+    .footer__inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .footer__top {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 48px;
+      padding-bottom: 64px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .footer__brand-name {
+      font-family: var(--font-heading);
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 12px;
+      letter-spacing: 0.04em;
+    }
+
+    .footer__brand-tagline {
+      font-size: 0.85rem;
+      line-height: 1.65;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .footer__col-head {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 20px;
+    }
+
+    .footer__col-links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .footer__col-links a {
+      font-size: 0.88rem;
+      color: rgba(255,255,255,0.4);
+      transition: color var(--dur) var(--ease);
+    }
+
+    .footer__col-links a:hover { color: rgba(255,255,255,0.8); }
+
+    .footer__bottom {
+      padding-top: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer__copy {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.25);
+    }
+
+    .footer__legal {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer__legal a {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.25);
+      transition: color var(--dur) var(--ease);
+    }
+
+    .footer__legal a:hover { color: rgba(255,255,255,0.5); }
+
+    /* ============================================================
+       PLAYGROUND BAR — same as v1
+       ============================================================ */
+    .playground-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(10px);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 9999;
+    }
+
+    .playground-bar__label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      margin-right: 4px;
+    }
+
+    .theme-btn {
+      padding: 5px 14px;
+      border-radius: 100px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: transparent;
+      color: rgba(255,255,255,0.55);
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .theme-btn:hover, .theme-btn.active {
+      background: rgba(255,255,255,0.12);
+      color: white;
+      border-color: rgba(255,255,255,0.4);
+    }
+
+    .pg-sep {
+      flex: 1;
+    }
+
+    .pg-version {
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.2);
+      font-weight: 500;
+      letter-spacing: 0.08em;
+    }
+
+    /* ============================================================
+       PHOTO PLACEHOLDER UTIL
+       ============================================================ */
+    .photo-placeholder {
+      width: 100%;
+      height: 100%;
+      background: var(--color-surface);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 320px;
+    }
+
+    .photo-placeholder__initials {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      color: var(--color-white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      opacity: 0.7;
+    }
+
+    .photo-placeholder__label {
+      font-size: 0.68rem;
+      color: var(--color-muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- ====================================================
+     NAV
+     ==================================================== -->
+<nav class="nav">
+  <a href="#" class="nav__wordmark">New Thought Center of Hawaiʻi</a>
+  <ul class="nav__links">
+    <li><a href="#">About</a></li>
+    <li><a href="#">Events</a></li>
+    <li><a href="#">Speakers</a></li>
+    <li><a href="#">Community</a></li>
+    <li><a href="#">Visit</a></li>
+  </ul>
+  <div class="nav__actions">
+    <a href="#" class="nav__cta nav__cta--join">Join Us</a>
+    <a href="#" class="nav__cta nav__cta--members">Members</a>
+  </div>
+</nav>
+
+<!-- ====================================================
+     HERO
+     ==================================================== -->
+<section class="hero">
+  <div class="hero__bg"></div>
+  <div class="hero__content">
+    <p class="hero__eyebrow">Kona, Hawaiʻi</p>
+    <h1 class="hero__headline">Where Spirit<br><em>Meets Life</em></h1>
+    <p class="hero__sub">A welcoming community grounded in New Thought philosophy — celebrating the connection between spiritual practice and everyday living.</p>
+    <div class="hero__actions">
+      <a href="#" class="btn-hero-primary">Upcoming Events</a>
+      <a href="#" class="btn-hero-ghost">Our Story</a>
+    </div>
+  </div>
+  <div class="hero__scroll-cue">
+    <span class="hero__scroll-line"></span>
+    Scroll to explore
+  </div>
+</section>
+
+<!-- ====================================================
+     MISSION
+     ==================================================== -->
+<section class="mission">
+  <p class="mission__label">Our Mission</p>
+  <h2 class="mission__statement">We believe in the <em>transformative power</em> of spiritual community — that when we gather with intention, lives change.</h2>
+  <div class="mission__body">
+    <p>For over four decades, the New Thought Center of Hawaiʻi has offered a space where seekers of all backgrounds find connection, healing, and a deeper understanding of themselves and the universe.</p>
+    <p>Rooted in New Thought principles, we offer Sunday services, workshops, speaker events, and a vibrant community directory connecting practitioners across the islands.</p>
+  </div>
+  <a href="#" class="mission__link">Learn our philosophy →</a>
+</section>
+
+<!-- ====================================================
+     EVENTS
+     ==================================================== -->
+<section class="events">
+  <div class="events__inner">
+    <div class="events__header">
+      <div>
+        <p class="events__header-label">Upcoming</p>
+        <h2 class="events__header-heading">Events &amp; Programs</h2>
+      </div>
+      <a href="#" class="events__all-link">View all events →</a>
+    </div>
+
+    <ul class="events__list">
+      <li class="event-row">
+        <div class="event-row__date">
+          <div class="event-row__day">6</div>
+          <div class="event-row__month">Apr</div>
+        </div>
+        <div class="event-row__info">
+          <p class="event-row__tag">Sunday Service</p>
+          <h3 class="event-row__title">The Aloha Principle — Living in Harmony</h3>
+          <p class="event-row__meta">10:00 AM · In person + livestream</p>
+        </div>
+        <div class="event-row__arrow">→</div>
+      </li>
+
+      <li class="event-row">
+        <div class="event-row__date">
+          <div class="event-row__day">12</div>
+          <div class="event-row__month">Apr</div>
+        </div>
+        <div class="event-row__info">
+          <p class="event-row__tag">Workshop</p>
+          <h3 class="event-row__title">Conscious Creation: A Weekend Intensive</h3>
+          <p class="event-row__meta">Fri–Sun · Manoa Valley · 3 sessions</p>
+        </div>
+        <div class="event-row__arrow">→</div>
+      </li>
+
+      <li class="event-row">
+        <div class="event-row__date">
+          <div class="event-row__day">19</div>
+          <div class="event-row__month">Apr</div>
+        </div>
+        <div class="event-row__info">
+          <p class="event-row__tag">Wellness Fair</p>
+          <h3 class="event-row__title">Spring Gathering — Practitioners &amp; Community</h3>
+          <p class="event-row__meta">11:00 AM – 4:00 PM · Outdoor grounds</p>
+        </div>
+        <div class="event-row__arrow">→</div>
+      </li>
+
+      <li class="event-row">
+        <div class="event-row__date">
+          <div class="event-row__day">27</div>
+          <div class="event-row__month">Apr</div>
+        </div>
+        <div class="event-row__info">
+          <p class="event-row__tag">Speaker Series</p>
+          <h3 class="event-row__title">Dr. Nāhoa Kealoha — Quantum Consciousness &amp; Kānaka Thought</h3>
+          <p class="event-row__meta">7:00 PM · Kaimukī Community Hall</p>
+        </div>
+        <div class="event-row__arrow">→</div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================================================
+     PULL QUOTE
+     ==================================================== -->
+<section class="pullquote">
+  <div class="pullquote__inner">
+    <p class="pullquote__text">"Change your thinking, change your life — the universe responds to consciousness, not circumstance."</p>
+    <div class="pullquote__attribution">
+      <span class="pullquote__line"></span>
+      <span class="pullquote__source">Ernest Holmes · The Science of Mind</span>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================
+     SPEAKERS
+     ==================================================== -->
+<section class="speakers">
+  <div class="speakers__header">
+    <p class="speakers__label">Speaker Archive</p>
+    <h2 class="speakers__heading">Voices that <em>inspire</em> and challenge</h2>
+  </div>
+
+  <div class="speakers__grid">
+    <!-- Featured speaker -->
+    <div class="speaker-card speaker-card--featured">
+      <div class="speaker-card__photo-wrap">
+        <img
+          src="https://www.newthoughtcenterofhawaii.com/SurajHolzwarth3.png"
+          alt="Suraj Holzwarth"
+          onerror="this.parentElement.innerHTML='<div class=\'photo-placeholder\'><div class=\'photo-placeholder__initials\'>SH</div><span class=\'photo-placeholder__label\'>Photo needed</span></div>'"
+        />
+      </div>
+      <div class="speaker-card__info">
+        <h3 class="speaker-card__name">Suraj Holzwarth</h3>
+        <p class="speaker-card__title">Practitioner · Author</p>
+        <p class="speaker-card__topic">"Abundance Consciousness"</p>
+        <p class="speaker-card__bio">A longtime presence in the New Thought community, Suraj has drawn audiences with his grounded approach to prosperity principles and conscious living.</p>
+      </div>
+    </div>
+
+    <!-- Secondary speakers — real photos from live site archive -->
+    <div class="speakers__secondary">
+      <div class="speaker-card">
+        <div class="speaker-card__photo-wrap">
+          <img
+            src="https://www.newthoughtcenterofhawaii.com/susan_lithuania.jpg"
+            alt="Susan Gregg"
+            onerror="this.parentElement.innerHTML='<div class=\'photo-placeholder\'><div class=\'photo-placeholder__initials\'>SG</div><span class=\'photo-placeholder__label\'>Photo needed</span></div>'"
+          />
+        </div>
+        <div class="speaker-card__info">
+          <h3 class="speaker-card__name">Susan Gregg</h3>
+          <p class="speaker-card__title">Author · Spiritual Teacher</p>
+          <p class="speaker-card__topic">New Thought · Shamanic Wisdom</p>
+        </div>
+      </div>
+
+      <div class="speaker-card">
+        <div class="speaker-card__photo-wrap">
+          <img
+            src="https://www.newthoughtcenterofhawaii.com/alan-small.png"
+            alt="Alan Cohen"
+            onerror="this.parentElement.innerHTML='<div class=\'photo-placeholder\'><div class=\'photo-placeholder__initials\'>AC</div><span class=\'photo-placeholder__label\'>Photo needed</span></div>'"
+          />
+        </div>
+        <div class="speaker-card__info">
+          <h3 class="speaker-card__name">Alan Cohen</h3>
+          <p class="speaker-card__title">Author · Speaker</p>
+          <p class="speaker-card__topic">Conscious Living · Inspiration</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Third column -->
+    <div class="speakers__secondary">
+      <div class="speaker-card">
+        <div class="speaker-card__photo-wrap">
+          <img
+            src="https://www.newthoughtcenterofhawaii.com/Charley_Thweatt.png"
+            alt="Charley Thweatt"
+            onerror="this.parentElement.innerHTML='<div class=\'photo-placeholder\'><div class=\'photo-placeholder__initials\'>CT</div><span class=\'photo-placeholder__label\'>Photo needed</span></div>'"
+          />
+        </div>
+        <div class="speaker-card__info">
+          <h3 class="speaker-card__name">Charley Thweatt</h3>
+          <p class="speaker-card__title">Musician · Spiritual Artist</p>
+          <p class="speaker-card__topic">Sacred Music · New Thought</p>
+        </div>
+      </div>
+
+      <div class="speaker-card">
+        <div class="speaker-card__photo-wrap">
+          <img
+            src="https://www.newthoughtcenterofhawaii.com/Hank_Wesselman1.jpg"
+            alt="Hank Wesselman"
+            onerror="this.parentElement.innerHTML='<div class=\'photo-placeholder\'><div class=\'photo-placeholder__initials\'>HW</div><span class=\'photo-placeholder__label\'>Photo needed</span></div>'"
+          />
+        </div>
+        <div class="speaker-card__info">
+          <h3 class="speaker-card__name">Hank Wesselman</h3>
+          <p class="speaker-card__title">Anthropologist · Author</p>
+          <p class="speaker-card__topic">Shamanic Studies · Ancient Wisdom</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="speakers__footer">
+    <p class="speakers__footer-text">Featuring over 60 speakers in our archive</p>
+    <a href="#" class="speakers__link">Browse all speakers →</a>
+  </div>
+</section>
+
+<!-- ====================================================
+     LIVESTREAM STRIP
+     ==================================================== -->
+<section class="livestream">
+  <div class="livestream__bg"></div>
+  <div class="livestream__inner">
+    <div class="livestream__left">
+      <div class="livestream__eyebrow">
+        <span class="livestream__dot"></span>
+        Live Every Sunday
+      </div>
+      <h2 class="livestream__title">Join our Sunday Service<br>from anywhere in the world</h2>
+      <p class="livestream__meta">10:00 AM HST · YouTube Live · No registration required</p>
+    </div>
+    <a href="#" class="btn-livestream">Watch Live →</a>
+  </div>
+</section>
+
+<!-- ====================================================
+     GET INVOLVED
+     ==================================================== -->
+<section class="get-involved">
+  <div class="get-involved__inner">
+    <p class="get-involved__label">Get Involved</p>
+    <h2 class="get-involved__heading">There's a place for <em>everyone</em> in this community</h2>
+
+    <div class="get-involved__cols">
+      <div class="involve-col">
+        <div class="involve-col__num">01</div>
+        <h3 class="involve-col__title">Become a Member</h3>
+        <p class="involve-col__body">Join our growing community of practitioners and seekers. Members access exclusive events, our community directory, and deeper program offerings.</p>
+        <a href="#" class="involve-col__link">Learn more →</a>
+      </div>
+
+      <div class="involve-col">
+        <div class="involve-col__num">02</div>
+        <h3 class="involve-col__title">Volunteer</h3>
+        <p class="involve-col__body">From event support to teaching assistants, our center runs on the generosity of dedicated volunteers who share our mission.</p>
+        <a href="#" class="involve-col__link">Find a role →</a>
+      </div>
+
+      <div class="involve-col">
+        <div class="involve-col__num">03</div>
+        <h3 class="involve-col__title">Make a Gift</h3>
+        <p class="involve-col__body">Your support helps us offer free and reduced-cost programs, maintain our facilities, and expand our reach across the Hawaiian Islands.</p>
+        <a href="#" class="involve-col__link">Donate →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================
+     FOOTER
+     ==================================================== -->
+<footer class="site-footer">
+  <div class="footer__inner">
+    <div class="footer__top">
+      <div>
+        <p class="footer__brand-name">New Thought Center<br>of Hawaiʻi</p>
+        <p class="footer__brand-tagline">A spiritual community rooted in New Thought principles — celebrating the connection between spirit, mind, and life.</p>
+      </div>
+      <div>
+        <p class="footer__col-head">Visit</p>
+        <div class="footer__col-links">
+          <a href="#">Plan your visit</a>
+          <a href="#">Hours &amp; location</a>
+          <a href="#">Parking info</a>
+          <a href="#">Livestream</a>
+        </div>
+      </div>
+      <div>
+        <p class="footer__col-head">Community</p>
+        <div class="footer__col-links">
+          <a href="#">Member directory</a>
+          <a href="#">Volunteer</a>
+          <a href="#">Newsletter</a>
+          <a href="#">Donate</a>
+        </div>
+      </div>
+      <div>
+        <p class="footer__col-head">Connect</p>
+        <div class="footer__col-links">
+          <a href="#">Facebook</a>
+          <a href="#">YouTube</a>
+          <a href="#">Instagram</a>
+          <a href="#">Contact us</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <p class="footer__copy">© 2026 New Thought Center of Hawaiʻi. All rights reserved.</p>
+      <div class="footer__legal">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ====================================================
+     PLAYGROUND BAR
+     ==================================================== -->
+<div class="playground-bar">
+  <span class="playground-bar__label">Theme</span>
+  <button class="theme-btn active" data-theme="">Grounded</button>
+  <button class="theme-btn" data-theme="ocean">Ocean</button>
+  <button class="theme-btn" data-theme="warm">Warm</button>
+  <button class="theme-btn" data-theme="twilight">Twilight</button>
+  <button class="theme-btn" data-theme="minimal">Minimal</button>
+  <span class="pg-sep"></span>
+  <span class="pg-version">v2 — Editorial</span>
+</div>
+
+<script>
+  (function () {
+    const root = document.documentElement;
+    const buttons = document.querySelectorAll('.theme-btn');
+
+    // Apply from URL param
+    const param = new URLSearchParams(location.search).get('theme');
+    if (param) {
+      root.dataset.theme = param;
+      buttons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.theme === param);
+      });
+    }
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        root.dataset.theme = btn.dataset.theme;
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const url = new URL(location.href);
+        if (btn.dataset.theme) {
+          url.searchParams.set('theme', btn.dataset.theme);
+        } else {
+          url.searchParams.delete('theme');
+        }
+        history.replaceState(null, '', url.toString());
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" width="1600" height="1000">
+  <defs>
+    <linearGradient id="ntch-sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A52"/>
+      <stop offset="55%" stop-color="#264E69"/>
+      <stop offset="100%" stop-color="#2F6680"/>
+    </linearGradient>
+    <radialGradient id="ntch-sun" cx="78%" cy="20%" r="40%">
+      <stop offset="0%" stop-color="rgba(212,150,30,0.55)"/>
+      <stop offset="60%" stop-color="rgba(212,150,30,0.10)"/>
+      <stop offset="100%" stop-color="rgba(212,150,30,0)"/>
+    </radialGradient>
+    <linearGradient id="ntch-card" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F5F7FA"/>
+    </linearGradient>
+    <filter id="ntch-shadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="22"/>
+      <feOffset dy="16"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.18"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- light page bg -->
+  <rect width="1600" height="1000" fill="#F5F7FA"/>
+
+  <!-- hero band (deep navy, sky) -->
+  <rect x="0" y="0" width="1600" height="560" fill="url(#ntch-sky)"/>
+  <rect x="0" y="0" width="1600" height="560" fill="url(#ntch-sun)"/>
+
+  <!-- distant horizon ridges -->
+  <path d="M 0 470 Q 200 430 400 450 T 800 440 T 1200 455 T 1600 445 L 1600 560 L 0 560 Z" fill="rgba(13,26,40,0.55)"/>
+  <path d="M 0 500 Q 240 470 480 488 T 960 482 T 1440 492 L 1600 488 L 1600 560 L 0 560 Z" fill="rgba(13,26,40,0.85)"/>
+
+  <!-- top nav -->
+  <g transform="translate(0,0)">
+    <text x="80" y="60" font-family="Georgia, serif" font-size="20" font-weight="600" fill="#FFFFFF" letter-spacing="0.01em">New Thought Center of Hawai'i</text>
+    <g transform="translate(820,46)" font-family="Inter, system-ui, sans-serif" font-size="14" fill="rgba(255,255,255,0.78)">
+      <text x="0" y="14">About</text>
+      <text x="80" y="14">Events</text>
+      <text x="170" y="14">Speakers</text>
+      <text x="270" y="14">Community</text>
+      <text x="385" y="14">Visit</text>
+      <rect x="450" y="-8" width="120" height="36" rx="18" fill="#C5614A"/>
+      <text x="510" y="15" fill="#FFFFFF" font-weight="600" text-anchor="middle">Join Us</text>
+      <rect x="580" y="-8" width="120" height="36" rx="18" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="1.5"/>
+      <text x="640" y="15" fill="#FFFFFF" font-weight="500" text-anchor="middle">Members</text>
+    </g>
+  </g>
+
+  <!-- hero copy -->
+  <g transform="translate(80,160)" fill="#FFFFFF">
+    <text font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#D4961E" letter-spacing="0.24em">KONA, HAWAI'I</text>
+    <text x="0" y="80" font-family="Cormorant Garamond, Georgia, serif" font-size="96" font-weight="300" fill="#FFFFFF">Where Spirit</text>
+    <text x="0" y="178" font-family="Cormorant Garamond, Georgia, serif" font-size="96" font-weight="300" font-style="italic" fill="#D4961E">Meets Life.</text>
+    <text x="0" y="234" font-family="Inter, system-ui, sans-serif" font-size="17" fill="rgba(255,255,255,0.78)">A welcoming community grounded in New Thought philosophy —</text>
+    <text x="0" y="258" font-family="Inter, system-ui, sans-serif" font-size="17" fill="rgba(255,255,255,0.78)">celebrating the connection between spiritual practice and everyday living.</text>
+
+    <!-- CTAs -->
+    <rect x="0" y="298" width="200" height="52" rx="26" fill="#C5614A"/>
+    <text x="100" y="331" font-family="Inter, system-ui, sans-serif" font-size="15" font-weight="600" fill="#FFFFFF" text-anchor="middle">Upcoming Events</text>
+    <rect x="220" y="298" width="160" height="52" rx="26" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="1.5"/>
+    <text x="300" y="331" font-family="Inter, system-ui, sans-serif" font-size="15" font-weight="500" fill="#FFFFFF" text-anchor="middle">Our Story</text>
+  </g>
+
+  <!-- floating mission tile bottom-right -->
+  <g transform="translate(1020,360)" filter="url(#ntch-shadow)">
+    <rect x="0" y="0" width="500" height="220" rx="20" fill="url(#ntch-card)" stroke="rgba(30,58,82,0.10)"/>
+    <text x="36" y="50" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="700" fill="#5A6E8A" letter-spacing="0.22em">OUR MISSION</text>
+    <text x="36" y="98" font-family="Cormorant Garamond, Georgia, serif" font-size="26" fill="#1E3A52">We believe in the</text>
+    <text x="36" y="130" font-family="Cormorant Garamond, Georgia, serif" font-size="26" font-style="italic" fill="#C5614A">transformative power</text>
+    <text x="36" y="160" font-family="Cormorant Garamond, Georgia, serif" font-size="26" fill="#1E3A52">of spiritual community.</text>
+    <line x1="36" y1="184" x2="80" y2="184" stroke="#D4961E" stroke-width="2"/>
+  </g>
+
+  <!-- Events strip header -->
+  <g transform="translate(80,620)">
+    <text font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700" fill="#1E3A52" letter-spacing="0.22em">EVENTS &amp; PROGRAMS</text>
+    <text x="0" y="44" font-family="Cormorant Garamond, Georgia, serif" font-size="44" font-weight="300" fill="#111824">Gather, learn,</text>
+    <text x="296" y="44" font-family="Cormorant Garamond, Georgia, serif" font-size="44" font-weight="300" font-style="italic" fill="#C5614A">grow.</text>
+    <text x="1300" y="36" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="600" fill="#1E3A52">View all events  →</text>
+  </g>
+
+  <!-- 3 event cards -->
+  <g transform="translate(80,696)">
+    <!-- card 1 -->
+    <g>
+      <rect x="0" y="0" width="468" height="240" rx="16" fill="#FFFFFF" stroke="rgba(30,58,82,0.08)"/>
+      <rect x="0" y="0" width="468" height="96" rx="16" fill="#E2EAF0"/>
+      <rect x="0" y="80" width="468" height="16" fill="#E2EAF0"/>
+      <!-- abstract church/mountain in image area -->
+      <circle cx="380" cy="40" r="14" fill="#D4961E" opacity="0.5"/>
+      <path d="M 0 96 L 80 56 L 140 78 L 220 40 L 290 70 L 360 50 L 468 64 L 468 96 Z" fill="rgba(30,58,82,0.45)"/>
+
+      <rect x="24" y="118" width="62" height="26" rx="13" fill="#1E3A52"/>
+      <text x="55" y="136" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="700" fill="#FFFFFF" text-anchor="middle">JUN 7</text>
+      <text x="100" y="135" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="500" fill="#5A6E8A" letter-spacing="0.08em">SUNDAY SERVICE</text>
+
+      <text x="24" y="174" font-family="Cormorant Garamond, Georgia, serif" font-size="24" fill="#111824">Living from</text>
+      <text x="24" y="202" font-family="Cormorant Garamond, Georgia, serif" font-size="24" font-style="italic" fill="#C5614A">a higher consciousness</text>
+      <text x="24" y="228" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#5A6E8A">Rev. Annalisa Castaldi · 10 AM · Sanctuary</text>
+    </g>
+
+    <!-- card 2 -->
+    <g transform="translate(488,0)">
+      <rect x="0" y="0" width="468" height="240" rx="16" fill="#FFFFFF" stroke="rgba(30,58,82,0.08)"/>
+      <rect x="0" y="0" width="468" height="96" rx="16" fill="#D9EEF4"/>
+      <rect x="0" y="80" width="468" height="16" fill="#D9EEF4"/>
+      <!-- abstract sound waves -->
+      <g stroke="#1B4F5E" stroke-width="2" fill="none" opacity="0.5">
+        <circle cx="234" cy="48" r="18"/>
+        <circle cx="234" cy="48" r="32"/>
+        <circle cx="234" cy="48" r="46"/>
+      </g>
+
+      <rect x="24" y="118" width="74" height="26" rx="13" fill="#1B4F5E"/>
+      <text x="61" y="136" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="700" fill="#FFFFFF" text-anchor="middle">JUN 14</text>
+      <text x="112" y="135" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="500" fill="#5A6E8A" letter-spacing="0.08em">MEDITATION CIRCLE</text>
+
+      <text x="24" y="174" font-family="Cormorant Garamond, Georgia, serif" font-size="24" fill="#111824">An hour of</text>
+      <text x="24" y="202" font-family="Cormorant Garamond, Georgia, serif" font-size="24" font-style="italic" fill="#C5614A">stillness and silence</text>
+      <text x="24" y="228" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#5A6E8A">Sangha Hall · 7 PM · All welcome</text>
+    </g>
+
+    <!-- card 3 -->
+    <g transform="translate(976,0)">
+      <rect x="0" y="0" width="464" height="240" rx="16" fill="#FFFFFF" stroke="rgba(30,58,82,0.08)"/>
+      <rect x="0" y="0" width="464" height="96" rx="16" fill="#F0E2D5"/>
+      <rect x="0" y="80" width="464" height="16" fill="#F0E2D5"/>
+      <!-- abstract ocean waves -->
+      <path d="M 0 60 Q 60 50 120 60 T 240 60 T 360 60 T 464 60" stroke="#C5614A" stroke-width="2.5" fill="none" opacity="0.6"/>
+      <path d="M 0 72 Q 60 62 120 72 T 240 72 T 360 72 T 464 72" stroke="#C5614A" stroke-width="2" fill="none" opacity="0.4"/>
+      <path d="M 0 84 Q 60 74 120 84 T 240 84 T 360 84 T 464 84" stroke="#C5614A" stroke-width="1.5" fill="none" opacity="0.3"/>
+
+      <rect x="24" y="118" width="62" height="26" rx="13" fill="#C5614A"/>
+      <text x="55" y="136" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="700" fill="#FFFFFF" text-anchor="middle">JUL 4</text>
+      <text x="100" y="135" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="500" fill="#5A6E8A" letter-spacing="0.08em">COMMUNITY SHARE</text>
+
+      <text x="24" y="174" font-family="Cormorant Garamond, Georgia, serif" font-size="24" fill="#111824">Storytelling under</text>
+      <text x="24" y="202" font-family="Cormorant Garamond, Georgia, serif" font-size="24" font-style="italic" fill="#C5614A">the banyan tree</text>
+      <text x="24" y="228" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#5A6E8A">Front lawn · 6:30 PM · Bring a chair</text>
+    </g>
+  </g>
+
+  <!-- footer wordmark -->
+  <g transform="translate(80,968)">
+    <text font-family="Cormorant Garamond, Georgia, serif" font-size="18" font-weight="600" fill="#1E3A52">NTCH —</text>
+    <text x="80" y="0" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#5A6E8A">Website prototype · WordPress build pending discovery</text>
+  </g>
+</svg>
