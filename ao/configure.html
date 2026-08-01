@@ -15,6 +15,7 @@
   <meta name="description" content="Build your own AO agency. Choose roles, assign humans or agents, scale up or down. Every configuration includes built-in ethics guidance." />
   <link rel="icon" href="/assets/favicon.svg" />
   <link rel="stylesheet" href="ao-theme.css">
+  <script src="ao-user.js"></script>
   <script src="ao-nav.js"></script>
   <style>
     /* ── Page-specific overrides ──────────────────────────── */
@@ -588,10 +589,11 @@
   </div>
 
   <script>
-    // ── Admin gate ─────────────────────────────────────────
+    // ── Admin gate (delegated to AOUser) ───────────────────
     function isAdmin() {
-      return new URLSearchParams(window.location.search).has('admin') ||
-             localStorage.getItem('ao_admin') === '1';
+      return window.AOUser ? AOUser.isAdmin() :
+        (new URLSearchParams(window.location.search).has('admin') ||
+         localStorage.getItem('ao_admin') === '1');
     }
 
     // ── Role definitions ──────────────────────────────────
@@ -844,7 +846,8 @@
       const orgType = params.get('type');
       // Load saved org from localStorage, or fall back to URL type param
       if (orgSlug) {
-        const orgs = JSON.parse(localStorage.getItem('ao_orgs') || '[]');
+        const orgs = window.AOUser ? AOUser.getJSON('orgs', []) :
+          JSON.parse(localStorage.getItem('ao_orgs') || '[]');
         const saved = orgs.find(o => o.slug === orgSlug);
         if (saved) {
           state.roles = [...saved.roles];
@@ -869,27 +872,42 @@
 
       render();
 
-      // Admin mode
-      if (isAdmin()) {
-        localStorage.setItem('ao_admin', '1');
-        document.getElementById('admin-pill').classList.add('visible');
-        const banner = document.getElementById('admin-banner');
-        banner.classList.add('visible');
-        document.getElementById('admin-org-name').textContent = orgSlug || 'Untitled org';
-        // Swap CTA for admin
-        const ctaHeading = document.querySelector('.cfg-cta h3');
-        const ctaBody = document.querySelector('.cfg-cta p');
-        const ctaPrimary = document.getElementById('cta-primary-btn');
+      // Unified Launch CTA — if we have an org slug, configure the CTA to launch it.
+      // Non-admin users get the same Launch treatment admin users do (REQUEST §3).
+      // PLG soft-gate: if the user isn't signed in yet, the Launch button routes through
+      // /ao/account.html?next=... which shows Clerk sign-up, then bounces back to org.html
+      // carrying the same slug. Admin users skip the gate entirely.
+      if (orgSlug) {
         var displayName = orgSlug.replace(/-/g, ' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+        var ctaHeading = document.querySelector('.cfg-cta h3');
+        var ctaBody = document.querySelector('.cfg-cta p');
+        var ctaPrimary = document.getElementById('cta-primary-btn');
         if (ctaHeading) ctaHeading.textContent = 'Configuration ready.';
         if (ctaBody) ctaBody.textContent = 'Save this config to lock it in, then launch your org to see agents, tasks, and links.';
         if (ctaPrimary) {
           ctaPrimary.textContent = 'Launch ' + displayName + ' →';
-          ctaPrimary.href = '/ao/flows.html?slug=' + encodeURIComponent(orgSlug);
+          var orgUrl = '/ao/org.html?slug=' + encodeURIComponent(orgSlug);
+          var signedIn = window.AOUser && AOUser.getUser && AOUser.getUser().signedIn;
+          var isAdminNow = window.AOUser ? AOUser.isAdmin() : false;
+          if (!signedIn && !isAdminNow) {
+            ctaPrimary.href = '/ao/account.html?next=' + encodeURIComponent(orgUrl);
+          } else {
+            ctaPrimary.href = orgUrl;
+          }
         }
+      }
+
+      // Admin mode adds the banner + admin-pill + admin-run-btn on top of the CTA.
+      if (isAdmin()) {
+        // AOUser.isAdmin() already persists the flag when ?admin is in URL.
+        document.getElementById('admin-pill').classList.add('visible');
+        var banner = document.getElementById('admin-banner');
+        banner.classList.add('visible');
+        document.getElementById('admin-org-name').textContent = orgSlug || 'Untitled org';
         var runBtn = document.getElementById('admin-run-btn');
-        if (runBtn) {
-          runBtn.textContent = 'Launch ' + displayName + ' →';
+        if (runBtn && orgSlug) {
+          var adminDisplayName = orgSlug.replace(/-/g, ' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+          runBtn.textContent = 'Launch ' + adminDisplayName + ' →';
           runBtn.href = '/ao/org.html?slug=' + encodeURIComponent(orgSlug);
         }
       }
@@ -899,7 +917,8 @@
     function saveConfig() {
       const params = new URLSearchParams(window.location.search);
       const orgSlug = params.get('org') || ('org-' + Date.now());
-      const orgs = JSON.parse(localStorage.getItem('ao_orgs') || '[]');
+      const orgs = window.AOUser ? AOUser.getJSON('orgs', []) :
+        JSON.parse(localStorage.getItem('ao_orgs') || '[]');
       const idx = orgs.findIndex(o => o.slug === orgSlug);
       const entry = {
         slug: orgSlug,
@@ -911,7 +930,8 @@
         status: 'active'
       };
       if (idx > -1) orgs[idx] = entry; else orgs.push(entry);
-      localStorage.setItem('ao_orgs', JSON.stringify(orgs));
+      if (window.AOUser) AOUser.setJSON('orgs', orgs);
+      else localStorage.setItem('ao_orgs', JSON.stringify(orgs));
       const btn = document.querySelector('.admin-save-btn');
       const orig = btn.textContent;
       btn.textContent = 'Saved ✓';

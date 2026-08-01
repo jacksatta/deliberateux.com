@@ -169,8 +169,28 @@ var FLOWS = {
 
 // ── Engine ──
 function AOFlowEngine(){
-  this.executions = JSON.parse(localStorage.getItem('ao_flow_executions') || '[]');
+  this.executions = (typeof window !== 'undefined' && window.AOUser)
+    ? window.AOUser.getJSON('flow_executions', [])
+    : JSON.parse(localStorage.getItem('ao_flow_executions') || '[]');
 }
+
+// Internal storage helpers — route through AOUser when available so every
+// piece of flow state is per-user namespaced.
+AOFlowEngine._aoGet = function(suffix, fallback){
+  if (typeof window !== 'undefined' && window.AOUser) {
+    var v = window.AOUser.getJSON(suffix, null);
+    return v === null ? fallback : v;
+  }
+  try { return JSON.parse(localStorage.getItem('ao_' + suffix)) || fallback; }
+  catch(e){ return fallback; }
+};
+AOFlowEngine._aoSet = function(suffix, value){
+  if (typeof window !== 'undefined' && window.AOUser) {
+    window.AOUser.setItem(suffix, typeof value === 'string' ? value : safeStringify(value));
+    return;
+  }
+  localStorage.setItem('ao_' + suffix, typeof value === 'string' ? value : safeStringify(value));
+};
 
 AOFlowEngine.prototype.run = function(flowId, inputData){
   var flow = FLOWS[flowId];
@@ -373,8 +393,8 @@ AOFlowEngine.prototype._persist = function(execution){
   });
   // Keep last 50
   if(this.executions.length > 50) this.executions = this.executions.slice(-50);
-  localStorage.setItem('ao_flow_executions', safeStringify(this.executions));
-  localStorage.setItem('ao_last_execution', safeStringify(execution));
+  AOFlowEngine._aoSet('flow_executions', this.executions);
+  AOFlowEngine._aoSet('last_execution', execution);
 };
 
 AOFlowEngine.prototype._broadcastResult = function(execution){
@@ -399,11 +419,11 @@ AOFlowEngine.prototype._broadcastResult = function(execution){
   };
   BC.postMessage({type:'flow_complete', execution: execution.id, task: task, log: execution.log});
 
-  // Also persist to localStorage for queue.html to pick up
-  var pending = JSON.parse(localStorage.getItem('ao_flow_tasks') || '[]');
+  // Also persist to per-user namespace for queue.html to pick up
+  var pending = AOFlowEngine._aoGet('flow_tasks', []);
   pending.push(task);
   if(pending.length > 100) pending = pending.slice(-100);
-  localStorage.setItem('ao_flow_tasks', JSON.stringify(pending));
+  AOFlowEngine._aoSet('flow_tasks', pending);
 };
 
 AOFlowEngine.prototype.getExecutions = function(){
@@ -411,7 +431,7 @@ AOFlowEngine.prototype.getExecutions = function(){
 };
 
 AOFlowEngine.prototype.getLastExecution = function(){
-  return JSON.parse(localStorage.getItem('ao_last_execution') || 'null');
+  return AOFlowEngine._aoGet('last_execution', null);
 };
 
 // ── Sample leads for testing ──

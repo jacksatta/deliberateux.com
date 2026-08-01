@@ -13,8 +13,24 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>AO — Autonomous Operations</title>
   <meta name="description" content="The agent operating system for one-person companies. Seven AI agents, one protocol, real products shipping." />
+  <link rel="canonical" href="https://deliberateux.com/ao/" />
   <link rel="icon" href="/assets/favicon.svg" />
+
+  <!-- Open Graph / share previews -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://deliberateux.com/ao/" />
+  <meta property="og:title" content="AO — Autonomous Operations" />
+  <meta property="og:description" content="The operating system for one-person companies. Seven specialist AI agents on a shared protocol — you make the decisions, the agents do the rest." />
+  <meta property="og:image" content="https://deliberateux.com/ao/og.svg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content="Deliberate UX" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="AO — Autonomous Operations" />
+  <meta name="twitter:description" content="A virtual agency that actually runs. Seven AI agents, one protocol, real products shipping." />
+  <meta name="twitter:image" content="https://deliberateux.com/ao/og.svg" />
   <link rel="stylesheet" href="ao-theme.css">
+  <script src="ao-user.js"></script>
   <script src="ao-nav.js"></script>
   <style>
     /* ── Page overrides ─────────────────────────────────────── */
@@ -41,6 +57,7 @@
     img { max-width: 100%; display: block; }
     a { color: var(--text); text-decoration: none; }
     ::selection { background: rgba(var(--amber),0.25); }
+    /* .sr-only and .skip-link now live in ao-theme.css (shared) */
     .container { width: min(var(--max), calc(100% - 64px)); margin: 0 auto; }
 
     /* ── Hero ──────────────────────────────────────────────── */
@@ -132,6 +149,18 @@
       border-color: rgba(var(--amber),0.4);
       transform: translateY(-1px);
     }
+    .btn-tertiary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      padding: 13px 12px;
+      font-size: 0.92rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .btn-tertiary:hover { color: var(--text); }
 
     /* ── Section divider CTA (inline links between sections) ── */
     .section-cta {
@@ -726,6 +755,7 @@
   </style>
 </head>
 <body>
+  <a class="skip-link" href="#architecture">Skip to content</a>
   <div class="container">
 
     <!-- Hero -->
@@ -747,8 +777,9 @@
         </div>
       </div>
       <div class="hero-ctas">
-        <a href="/ao/onboard.html" class="btn-primary">Get started</a>
-        <a href="#request-access" class="btn-secondary">Request beta access</a>
+        <a href="/ao/tour.html" class="btn-primary">Take the tour</a>
+        <a href="/ao/onboard.html" class="btn-secondary">Get started free</a>
+        <a href="/ao/pricing.html" class="btn-tertiary">See pricing &rarr;</a>
       </div>
     </section>
 
@@ -963,15 +994,19 @@
       <h2>Request beta access</h2>
       <p class="banner-sub">Interested in running AO for your team or one-person company? Drop your details and we'll be in touch.</p>
 
-      <form id="ao-contact-form" class="ao-beta-form">
+      <form id="ao-contact-form" class="ao-beta-form" aria-labelledby="request-access" novalidate>
         <div class="form-row">
           <div class="form-row-inline">
-            <input type="text" name="name" placeholder="Name" required />
-            <input type="email" name="email" placeholder="Email" required />
+            <label class="sr-only" for="cf-name">Name</label>
+            <input id="cf-name" type="text" name="name" placeholder="Name" autocomplete="name" required aria-required="true" />
+            <label class="sr-only" for="cf-email">Email</label>
+            <input id="cf-email" type="email" name="email" placeholder="Email" autocomplete="email" required aria-required="true" />
           </div>
           <div class="form-row-inline">
-            <input type="text" name="company" placeholder="Company (optional)" />
-            <select name="type">
+            <label class="sr-only" for="cf-company">Company (optional)</label>
+            <input id="cf-company" type="text" name="company" placeholder="Company (optional)" autocomplete="organization" />
+            <label class="sr-only" for="cf-type">Inquiry type</label>
+            <select id="cf-type" name="type" aria-label="Inquiry type">
               <option value="demo">Request a demo</option>
               <option value="client">Potential client</option>
               <option value="partner">Partnership inquiry</option>
@@ -979,10 +1014,11 @@
               <option value="general">General inquiry</option>
             </select>
           </div>
-          <textarea name="message" placeholder="Tell us about your use case..." rows="3"></textarea>
+          <label class="sr-only" for="cf-message">Message</label>
+          <textarea id="cf-message" name="message" placeholder="Tell us about your use case..." rows="3" aria-label="Message — tell us about your use case"></textarea>
           <button type="submit" id="ao-submit-btn" class="submit-btn">Send request</button>
         </div>
-        <p id="ao-form-status"></p>
+        <p id="ao-form-status" role="status" aria-live="polite"></p>
       </form>
     </section>
 
@@ -1255,17 +1291,40 @@
   <!-- Contact form submission -->
   <script>
     (function () {
-      var CRM_URL = 'https://openclaw-vps.tailc8723d.ts.net:18800/api/inbound';
+      // Primary: AO worker — same-site path, public route, persists to Supabase
+      // leads table, scores the lead, returns { ok, id }. When the worker isn't
+      // reachable yet (pre-deploy) we fall through to a pre-filled mailto so
+      // messages still land in Jack's inbox.
+      var LEADS_URL = '/ao/api/leads';
+      // Product-specific inbox so AO mail doesn't pollute Jack's personal alias
+      // and so the address can fan out to a support team later without changing
+      // the form. Cloudflare Email Routing forwards ao@deliberateux.com →
+      // jacksatta@gmail.com (or wherever) — set up in CF dashboard.
+      var FALLBACK_EMAIL = 'ao@deliberateux.com';
       var form = document.getElementById('ao-contact-form');
       var status = document.getElementById('ao-form-status');
       var btn = document.getElementById('ao-submit-btn');
       if (!form) return;
 
+      function buildMailto(data) {
+        var subject = '[AO ' + data.type + '] ' + (data.name || 'New inquiry');
+        var lines = [
+          'From: ' + (data.name || '—') + ' <' + (data.email || '—') + '>',
+          'Company: ' + (data.company || '—'),
+          'Type: ' + data.type,
+          '',
+          (data.message || '(no message)')
+        ];
+        return 'mailto:' + FALLBACK_EMAIL +
+          '?subject=' + encodeURIComponent(subject) +
+          '&body=' + encodeURIComponent(lines.join('\n'));
+      }
+
       form.addEventListener('submit', function (e) {
         e.preventDefault();
         btn.disabled = true;
         btn.textContent = 'Sending...';
-        status.textContent = '';
+        status.innerHTML = '';
 
         var data = {
           name: form.name.value.trim(),
@@ -1276,22 +1335,37 @@
           source: 'ao-beta-form'
         };
 
-        fetch(CRM_URL, {
+        // 4-second timeout so the fallback fires fast when CRM is unreachable.
+        var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+        var timeoutId = setTimeout(function () { if (controller) controller.abort(); }, 4000);
+
+        fetch(LEADS_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
+          body: JSON.stringify(data),
+          signal: controller ? controller.signal : undefined
         })
-          .then(function (r) { return r.json(); })
-          .then(function () {
+          .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('http ' + r.status)); })
+          .then(function (resp) {
             status.style.color = 'rgb(var(--amber))';
-            status.textContent = 'Thanks! We\'ll be in touch soon.';
+            status.textContent = (resp && resp.message) || 'Thanks! We\'ll be in touch soon.';
             form.reset();
+            try { gtag('event', 'ao_contact_submit', { delivery: 'worker', type: data.type, lead_id: (resp && resp.id) || null }); } catch (_) {}
           })
           .catch(function () {
-            status.style.color = 'var(--muted)';
-            status.textContent = 'Noted — we\'ll follow up at ' + data.email + '.';
+            // Worker unreachable (not deployed yet, or transient) — open mail
+            // client with a pre-filled draft so the message still reaches Jack.
+            var href = buildMailto(data);
+            status.style.color = 'rgb(var(--amber))';
+            status.innerHTML =
+              'Opening your email client to deliver this — if nothing happens, ' +
+              'send to <a href="mailto:' + FALLBACK_EMAIL + '" style="color:rgb(var(--amber));text-decoration:underline">' +
+              FALLBACK_EMAIL + '</a>.';
+            try { gtag('event', 'ao_contact_submit', { delivery: 'mailto', type: data.type }); } catch (_) {}
+            window.location.href = href;
           })
           .finally(function () {
+            clearTimeout(timeoutId);
             btn.disabled = false;
             btn.textContent = 'Send request';
           });

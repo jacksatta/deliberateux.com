@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <radialGradient id="amberGlow" cx="22%" cy="0%" r="60%">
+      <stop offset="0%" stop-color="#f5a623" stop-opacity="0.25"/>
+      <stop offset="60%" stop-color="#f5a623" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="blueGlow" cx="92%" cy="6%" r="55%">
+      <stop offset="0%" stop-color="#60a5fa" stop-opacity="0.18"/>
+      <stop offset="60%" stop-color="#60a5fa" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="pinkGlow" cx="72%" cy="100%" r="55%">
+      <stop offset="0%" stop-color="#f0abfc" stop-opacity="0.12"/>
+      <stop offset="60%" stop-color="#f0abfc" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1410"/>
+      <stop offset="100%" stop-color="#0f0e0c"/>
+    </linearGradient>
+    <linearGradient id="headlineGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f5a623"/>
+      <stop offset="55%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#60a5fa"/>
+    </linearGradient>
+    <filter id="dotGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+  </defs>
+
+  <!-- background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#amberGlow)"/>
+  <rect width="1200" height="630" fill="url(#blueGlow)"/>
+  <rect width="1200" height="630" fill="url(#pinkGlow)"/>
+
+  <!-- top bar: brand -->
+  <g transform="translate(80,72)" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+    <circle cx="9" cy="9" r="14" fill="#f5a623" filter="url(#dotGlow)" opacity="0.55"/>
+    <circle cx="9" cy="9" r="6" fill="#f5a623"/>
+    <text x="32" y="15" font-size="20" font-weight="700" fill="#f5ecd8" letter-spacing="0.5">AO</text>
+    <text x="60" y="15" font-size="20" fill="#8a7e6f">— Autonomous Operations</text>
+  </g>
+
+  <!-- headline -->
+  <g font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+    <text x="80" y="230" font-size="76" font-weight="700" fill="#f5ecd8" letter-spacing="-2">The operating system</text>
+    <text x="80" y="320" font-size="76" font-weight="700" fill="url(#headlineGrad)" letter-spacing="-2">for one-person companies.</text>
+    <text x="80" y="395" font-size="26" fill="#a89e8e" font-weight="400">Seven specialist AI agents · one shared protocol · run by you.</text>
+  </g>
+
+  <!-- agent row -->
+  <g transform="translate(80,470)" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+    <g>
+      <circle cx="0" cy="0" r="26" fill="rgba(168,139,250,0.18)" stroke="#a78bfa" stroke-width="1.5"/>
+      <text x="0" y="5" text-anchor="middle" font-size="13" font-weight="700" fill="#a78bfa">EA</text>
+    </g>
+    <g transform="translate(72,0)">
+      <circle cx="0" cy="0" r="26" fill="rgba(96,165,250,0.18)" stroke="#60a5fa" stroke-width="1.5"/>
+      <text x="0" y="5" text-anchor="middle" font-size="13" font-weight="700" fill="#60a5fa">Dev</text>
+    </g>
+    <g transform="translate(144,0)">
+      <circle cx="0" cy="0" r="26" fill="rgba(245,166,35,0.18)" stroke="#f5a623" stroke-width="1.5"/>
+      <text x="0" y="5" text-anchor="middle" font-size="13" font-weight="700" fill="#f5a623">Mkt</text>
+    </g>
+    <g transform="translate(216,0)">
+      <circle cx="0" cy="0" r="26" fill="rgba(74,222,128,0.18)" stroke="#4ade80" stroke-width="1.5"/>
+      <text x="0" y="5" text-anchor="middle" font-size="13" font-weight="700" fill="#4ade80">UXR</text>
+    </g>
+    <g transform="translate(288,0)">
+      <circle cx="0" cy="0" r="26" fill="rgba(244,114,182,0.18)" stroke="#f472b6" stroke-width="1.5"/>
+      <text x="0" y="5" text-anchor="middle" font-size="13" font-weight="700" fill="#f472b6">QA</text>
+    </g>
+    <g transform="translate(360,0)">
+      <circle cx="0" cy="0" r="26" fill="rgba(251,191,36,0.18)" stroke="#fbbf24" stroke-width="1.5"/>
+      <text x="0" y="5" text-anchor="middle" font-size="13" font-weight="700" fill="#fbbf24">Biz</text>
+    </g>
+    <g transform="translate(432,0)">
+      <circle cx="0" cy="0" r="26" fill="rgba(52,211,153,0.18)" stroke="#34d399" stroke-width="1.5"/>
+      <text x="0" y="5" text-anchor="middle" font-size="13" font-weight="700" fill="#34d399">CS</text>
+    </g>
+    <text x="490" y="6" font-size="18" fill="#8a7e6f">+ you, the human in the loop</text>
+  </g>
+
+  <!-- bottom bar -->
+  <g transform="translate(80,560)" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+    <text x="0" y="0" font-size="17" fill="#a89e8e">deliberateux.com / ao</text>
+    <text x="1040" y="0" font-size="17" fill="#a89e8e" text-anchor="end">Take the tour →</text>
+  </g>
+</svg>

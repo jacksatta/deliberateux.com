@@ -7,6 +7,7 @@
   <link rel="icon" href="/assets/favicon.svg" />
   <link rel="stylesheet" href="ao-theme.css">
   <script>/* theme persistence */ (function(){var t=localStorage.getItem('ao_theme');if(t)document.documentElement.dataset.theme=t})()</script>
+  <script src="ao-user.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; }
@@ -179,16 +180,18 @@
   </div>
 
   <script>
-    // ── Admin gate ────────────────────────────────────────
+    // ── Admin gate (delegated to AOUser) ─────────────────
     function isAdmin() {
-      return new URLSearchParams(window.location.search).has('admin') ||
-             localStorage.getItem('ao_admin') === '1';
+      return window.AOUser ? AOUser.isAdmin() :
+        (new URLSearchParams(window.location.search).has('admin') ||
+         localStorage.getItem('ao_admin') === '1');
     }
 
-    // ── Read org from URL + localStorage ─────────────────
+    // ── Read org from URL + per-user namespace ───────────
     var params = new URLSearchParams(window.location.search);
     var slug = params.get('org') || '';
-    var orgs = JSON.parse(localStorage.getItem('ao_orgs') || '[]');
+    var orgs = window.AOUser ? AOUser.getJSON('orgs', []) :
+      JSON.parse(localStorage.getItem('ao_orgs') || '[]');
     var org = null;
     for (var i = 0; i < orgs.length; i++) {
       if (orgs[i].slug === slug) { org = orgs[i]; break; }
@@ -299,7 +302,8 @@
           var defaultOps = {};
           roles.forEach(function(r){ defaultOps[r] = 'agent'; });
           org.operators = defaultOps;
-          localStorage.setItem('ao_orgs', JSON.stringify(orgs));
+          if (window.AOUser) AOUser.setJSON('orgs', orgs);
+          else localStorage.setItem('ao_orgs', JSON.stringify(orgs));
         }
         return;
       }

@@ -69,13 +69,14 @@ svg.flowchart text{font-family:'Inter','SF Pro Text',system-ui,sans-serif}
 
 <script>
 (function(){
-  var isAdmin = new URLSearchParams(window.location.search).has('admin') ||
-                localStorage.getItem('ao_admin') === '1';
+  var isAdmin = window.AOUser ? AOUser.isAdmin() :
+    (new URLSearchParams(window.location.search).has('admin') ||
+     localStorage.getItem('ao_admin') === '1');
   if(!isAdmin){
     document.body.innerHTML = '<div class="gate"><div style="text-align:center"><h2>AO User Flows</h2><p>Admin access required.</p></div></div>';
     throw new Error('admin gate');
   }
-  localStorage.setItem('ao_admin','1');
+  // AOUser.isAdmin() already persists the flag when ?admin is in URL.
 })();
 </script>
 
@@ -550,6 +551,7 @@ document.querySelectorAll('.node').forEach(function(n){
   });
 });
 </script>
-
+<script src="ao-user.js"></script>
+<script src="ao-nav.js"></script>
 </body>
 </html>

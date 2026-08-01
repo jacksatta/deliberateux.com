@@ -414,7 +414,7 @@ function DeployModal({theme,oldTheme,subs,onClose,activeTheme}){
   const[copied,setCopied]=useState(false);
   const[showBefore,setShowBefore]=useState(false);
   const[deployError,setDeployError]=useState(null);
-  const[patInput,setPatInput]=useState(()=>localStorage.getItem('ao_gh_pat')||"");
+  const[patInput,setPatInput]=useState(()=>(window.AOUser?AOUser.getItem('gh_pat'):localStorage.getItem('ao_gh_pat'))||"");
   const[showPat,setShowPat]=useState(false);
   const deployAbort=useRef(null);
 
@@ -429,7 +429,8 @@ function DeployModal({theme,oldTheme,subs,onClose,activeTheme}){
   async function realDeploy(){
     const pat=patInput.trim();
     if(!pat){setShowPat(true);return;}
-    localStorage.setItem('ao_gh_pat',pat);
+    if(window.AOUser) AOUser.setItem('gh_pat',pat);
+    else localStorage.setItem('ao_gh_pat',pat);
 
     /* Persist theme in localStorage immediately */
     localStorage.setItem('ao_theme', activeTheme);
@@ -619,7 +620,7 @@ function DeployModal({theme,oldTheme,subs,onClose,activeTheme}){
           <div style={{fontSize:10,color:"rgba(245,240,232,0.4)",marginBottom:6}}>GitHub Personal Access Token <span style={{color:"rgba(245,240,232,0.2)"}}>(stored locally, never sent anywhere else)</span></div>
           <div style={{display:"flex",gap:6}}>
             <input type="password" value={patInput} onChange={e=>setPatInput(e.target.value)} placeholder="ghp_xxxxxxxxxxxx" style={{flex:1,padding:"7px 12px",borderRadius:7,border:"1px solid rgba(245,240,232,0.1)",background:"rgba(0,0,0,0.3)",color:"rgba(245,240,232,0.8)",fontSize:12,fontFamily:"monospace",outline:"none"}}/>
-            <button onClick={()=>{if(patInput.trim()){localStorage.setItem('ao_gh_pat',patInput.trim());setShowPat(false)}}} style={{padding:"7px 12px",borderRadius:7,fontSize:11,fontWeight:600,cursor:"pointer",background:"rgba(82,195,140,0.1)",border:"1px solid rgba(82,195,140,0.25)",color:"rgb(82,195,140)"}}>Save</button>
+            <button onClick={()=>{if(patInput.trim()){if(window.AOUser){AOUser.setItem('gh_pat',patInput.trim())}else{localStorage.setItem('ao_gh_pat',patInput.trim())}setShowPat(false)}}} style={{padding:"7px 12px",borderRadius:7,fontSize:11,fontWeight:600,cursor:"pointer",background:"rgba(82,195,140,0.1)",border:"1px solid rgba(82,195,140,0.25)",color:"rgb(82,195,140)"}}>Save</button>
           </div>
         </div>}
 
@@ -886,5 +887,7 @@ function App(){
 
 ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
+<script src="ao-user.js"></script>
+<script src="ao-nav.js"></script>
 </body>
 </html>

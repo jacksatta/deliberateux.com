@@ -7,6 +7,8 @@
   <meta name="description" content="AO admin dashboard. Manage organizations, monitor agents, run ops." />
   <link rel="icon" href="/assets/favicon.svg" />
   <link rel="stylesheet" href="ao-theme.css">
+  <script src="ao-user.js"></script>
+  <script src="ao-seed.js"></script>
   <script src="ao-nav.js"></script>
   <style>
     :root {
@@ -312,8 +314,8 @@
 
     <div class="dash-header">
       <div>
-        <h1>Organizations</h1>
-        <p>Manage and run your AO-powered orgs.</p>
+        <h1>Your organizations</h1>
+        <p>Each org runs its own seven-agent agency. Click in to brief them, watch them work, and keep them moving.</p>
       </div>
       <a href="/ao/onboard.html" class="btn-new-org">+ New org</a>
     </div>
@@ -366,15 +368,21 @@
   </div>
 
   <script>
-    // ── Admin gate ────────────────────────────────────────
+    // ── Admin gate (delegated to AOUser) ─────────────────
     function isAdmin() {
-      return new URLSearchParams(window.location.search).has('admin') ||
-             localStorage.getItem('ao_admin') === '1';
+      return window.AOUser ? AOUser.isAdmin() :
+        (new URLSearchParams(window.location.search).has('admin') ||
+         localStorage.getItem('ao_admin') === '1');
     }
-    localStorage.setItem('ao_admin', '1');
 
-    // ── Load orgs ─────────────────────────────────────────
-    var orgs = JSON.parse(localStorage.getItem('ao_orgs') || '[]');
+    // ── Seed demo orgs once for fresh visitors (no-op if user already has orgs)
+    if (window.AOSeed && typeof window.AOSeed.seedOrgsIfEmpty === 'function') {
+      try { window.AOSeed.seedOrgsIfEmpty(); } catch (e) {}
+    }
+
+    // ── Load orgs (per-user sandbox) ──────────────────────
+    var orgs = window.AOUser ? AOUser.getJSON('orgs', []) :
+      JSON.parse(localStorage.getItem('ao_orgs') || '[]');
 
     // ── Stats ─────────────────────────────────────────────
     var totalAgents = 0, totalHumans = 0, activeCount = 0;
@@ -443,11 +451,12 @@
         var card = document.createElement('div');
         card.className = 'org-card';
         card.style.animationDelay = (i * 50) + 'ms';
+        var demoPill = org.demo ? '<span style="display:inline-block;margin-left:8px;font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;padding:2px 7px;border-radius:4px;background:rgba(168,139,250,0.16);color:rgb(168,139,250);border:1px solid rgba(168,139,250,0.3);vertical-align:middle">Demo</span>' : '';
         card.innerHTML =
           '<a href="' + orgUrl + '" style="text-decoration:none;color:inherit">' +
             '<div class="org-card-top">' +
               '<div>' +
-                '<div class="org-name">' + escHtml(org.name || org.slug) + '</div>' +
+                '<div class="org-name">' + escHtml(org.name || org.slug) + demoPill + '</div>' +
                 '<div class="org-type">' + escHtml(typeLabel) + '</div>' +
               '</div>' +
               '<span class="org-status ' + statusClass + '">' + statusLabel + '</span>' +

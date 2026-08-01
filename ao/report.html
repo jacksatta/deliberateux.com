@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daily Report — AO</title>
+<link rel="icon" href="/assets/favicon.svg">
+<link rel="stylesheet" href="ao-theme.css">
+<script>(function(){var t=localStorage.getItem('ao_theme');if(t)document.documentElement.dataset.theme=t})()</script>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font,system-ui,-apple-system,sans-serif);color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;min-height:100vh}
+  .wrap{width:min(1100px,calc(100% - 48px));margin:0 auto;padding:28px 0 80px}
+
+  /* Head */
+  .rh{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin:8px 0 24px;flex-wrap:wrap}
+  .rh h1{font-size:1.9rem;font-weight:700;letter-spacing:-.01em;color:var(--text)}
+  .rh-sub{font-size:0.86rem;color:var(--muted);margin-top:4px}
+  .rh-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .btn{font:inherit;font-size:0.78rem;font-weight:600;padding:8px 14px;border-radius:8px;border:1px solid var(--border2);background:var(--panel);color:var(--text);cursor:pointer;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;gap:7px}
+  .btn:hover{border-color:rgba(var(--amber),0.4);background:var(--panel2)}
+  .btn.primary{background:rgba(var(--amber),0.14);border-color:rgba(var(--amber),0.35);color:rgb(var(--amber))}
+  .btn.primary:hover{background:rgba(var(--amber),0.22)}
+  .btn .ic{font-size:0.9rem;line-height:1}
+
+  /* Tabs */
+  .tabs{display:flex;gap:4px;margin-bottom:22px;border-bottom:1px solid var(--hairline);padding-bottom:0}
+  .tab{font-size:0.82rem;font-weight:600;padding:10px 16px;color:var(--muted);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all .15s;font-family:inherit}
+  .tab:hover{color:var(--text)}
+  .tab.active{color:var(--text);border-bottom-color:rgb(var(--amber))}
+  .tab .count{font-size:0.68rem;color:var(--ghost);margin-left:6px;font-weight:500}
+
+  /* KPIs */
+  .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:26px}
+  .kpi{background:var(--panel);border:1px solid var(--hairline);border-radius:12px;padding:16px 18px}
+  .kpi-label{font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px}
+  .kpi-value{font-size:1.8rem;font-weight:700;color:var(--text);line-height:1;letter-spacing:-0.01em}
+  .kpi-delta{font-size:0.7rem;color:var(--ghost);margin-top:6px}
+  .kpi-delta.up{color:rgb(var(--green))}
+  .kpi-delta.down{color:rgb(var(--red))}
+
+  /* Section */
+  .sec{background:var(--panel);border:1px solid var(--hairline);border-radius:12px;padding:18px 20px;margin-bottom:16px}
+  .sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:12px}
+  .sec-h h2{font-size:0.94rem;font-weight:700;color:var(--text)}
+  .sec-h .sec-sub{font-size:0.72rem;color:var(--muted);font-weight:500}
+  .sec-empty{padding:24px 0;text-align:center;color:var(--ghost);font-size:0.82rem}
+
+  /* Exec rows */
+  .exec{display:grid;grid-template-columns:auto 1fr auto auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid var(--hairline);cursor:pointer;transition:background .12s}
+  .exec:hover{background:rgba(var(--amber),0.04);margin:0 -8px;padding-left:8px;padding-right:8px;border-radius:6px}
+  .exec:last-child{border-bottom:none}
+  .exec-dot{width:8px;height:8px;border-radius:50%;background:rgb(var(--green))}
+  .exec-dot.failed{background:rgb(var(--red))}
+  .exec-main{min-width:0}
+  .exec-title{font-size:0.84rem;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .exec-sub{font-size:0.68rem;color:var(--muted);margin-top:2px}
+  .exec-stats{font-size:0.7rem;color:var(--muted);text-align:right;white-space:nowrap}
+  .exec-stats b{color:var(--text);font-weight:600}
+  .exec-time{font-size:0.68rem;color:var(--ghost);font-family:ui-monospace,"SF Mono",monospace;white-space:nowrap}
+  .tier-pill{display:inline-block;font-size:0.6rem;font-weight:700;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:0.04em;margin-left:6px;vertical-align:middle}
+  .tier-pill.enterprise{background:rgba(var(--amber),0.16);color:rgb(var(--amber))}
+  .tier-pill.growth{background:rgba(var(--green),0.16);color:rgb(var(--green))}
+  .tier-pill.starter{background:rgba(var(--blue),0.16);color:rgb(var(--blue))}
+  .tier-pill.unq{background:rgba(var(--text),0.06);color:var(--muted)}
+
+  /* Queue mini */
+  .qline{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:0.78rem;border-bottom:1px solid var(--hairline)}
+  .qline:last-child{border-bottom:none}
+  .qline .qag{font-size:0.6rem;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(var(--blue),0.14);color:rgb(var(--blue));text-transform:uppercase}
+  .qline .qt{color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .qline .qs{font-size:0.62rem;padding:2px 7px;border-radius:4px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em}
+  .qs.done{background:rgba(var(--green),0.12);color:rgb(var(--green))}
+  .qs.active,.qs.progress{background:rgba(var(--amber),0.12);color:rgb(var(--amber))}
+  .qs.blocked,.qs.diagnosing,.qs.healing{background:rgba(var(--red),0.12);color:rgb(var(--red))}
+
+  /* Archive */
+  .arc-item{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--hairline);cursor:pointer;gap:12px;transition:background .12s}
+  .arc-item:hover{background:rgba(var(--amber),0.04);margin:0 -8px;padding-left:8px;padding-right:8px;border-radius:6px}
+  .arc-item:last-child{border-bottom:none}
+  .arc-date{font-weight:600;font-size:0.84rem;color:var(--text);font-family:ui-monospace,"SF Mono",monospace}
+  .arc-date .arc-day{color:var(--muted);font-weight:400;margin-left:6px}
+  .arc-sum{font-size:0.72rem;color:var(--muted)}
+  .arc-chev{color:var(--ghost);font-size:0.9rem}
+
+  /* Drawer */
+  .drawer{position:fixed;top:0;right:0;bottom:0;width:min(520px,100%);background:var(--surface3);border-left:1px solid var(--border);overflow-y:auto;transform:translateX(100%);transition:transform .2s ease-out;z-index:400;padding:22px 24px}
+  .drawer.v{transform:translateX(0)}
+  .drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .drawer-close{background:none;border:1px solid var(--border2);color:var(--muted);font-size:1rem;cursor:pointer;border-radius:6px;padding:5px 10px;line-height:1;font-family:inherit}
+  .drawer-close:hover{color:var(--text);border-color:rgba(var(--amber),0.4)}
+  .drawer h3{font-size:1.05rem;font-weight:700;color:var(--text);margin-bottom:2px}
+  .drawer .drawer-meta{font-size:0.74rem;color:var(--muted);margin-bottom:16px;font-family:ui-monospace,"SF Mono",monospace}
+  .log-line{padding:8px 10px;border-left:2px solid var(--border2);margin-bottom:4px;font-size:0.76rem;background:var(--panel)}
+  .log-line .ln-t{font-family:ui-monospace,"SF Mono",monospace;color:var(--ghost);font-size:0.68rem;margin-right:6px}
+  .log-line .ln-n{color:rgb(var(--amber));font-weight:600;margin-right:6px}
+  .log-line .ln-m{color:var(--text)}
+  .log-line pre{font-family:ui-monospace,"SF Mono",monospace;font-size:0.68rem;color:var(--muted);margin-top:4px;white-space:pre-wrap;word-break:break-all;max-height:120px;overflow-y:auto}
+  .drawer-scrim{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:399;opacity:0;pointer-events:none;transition:opacity .2s}
+  .drawer-scrim.v{opacity:1;pointer-events:auto}
+
+  /* Toast */
+  .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(40px);background:var(--surface3);border:1px solid rgba(var(--green),0.4);color:rgb(var(--green));padding:10px 18px;border-radius:10px;font-size:0.82rem;font-weight:600;z-index:500;opacity:0;transition:all .2s;box-shadow:0 8px 24px rgba(0,0,0,0.4)}
+  .toast.v{transform:translateX(-50%) translateY(0);opacity:1}
+
+  /* Banner */
+  .banner{padding:10px 14px;border-radius:8px;font-size:0.78rem;background:rgba(var(--yellow),0.08);border:1px solid rgba(var(--yellow),0.22);color:var(--text);margin-bottom:18px;display:flex;gap:10px;align-items:flex-start}
+  .banner .bi{color:rgb(var(--yellow));font-weight:700;flex-shrink:0}
+
+  /* Print — makes the emailable version look clean if Jack hits Cmd-P */
+  @media print{
+    .rh-actions,.tabs,.drawer,.drawer-scrim,.banner{display:none!important}
+    body{background:#fff!important;color:#111!important}
+    .sec,.kpi,.wrap{background:#fff!important;border-color:#e2e2e2!important;color:#111!important}
+    .kpi-value,.exec-title,.arc-date,.rh h1{color:#111!important}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="rh">
+    <div>
+      <h1 id="r-title">Daily brief</h1>
+      <div class="rh-sub" id="r-sub">Loading…</div>
+    </div>
+    <div class="rh-actions">
+      <input type="date" id="r-date" class="btn" style="padding:7px 10px;color-scheme:dark">
+      <button class="btn" id="r-permalink" title="Copy a link to this exact day"><span class="ic">🔗</span>Permalink</button>
+      <button class="btn" id="r-copy-html" title="Copy the full report as email-ready HTML"><span class="ic">✉</span>Copy as email HTML</button>
+      <button class="btn primary" id="r-mail" title="Open mail composer with today's report"><span class="ic">✈</span>Mail report</button>
+    </div>
+  </div>
+
+  <div class="tabs" id="r-tabs">
+    <button class="tab active" data-range="today">Today <span class="count" id="c-today"></span></button>
+    <button class="tab" data-range="yesterday">Yesterday</button>
+    <button class="tab" data-range="week">Last 7 days <span class="count" id="c-week"></span></button>
+    <button class="tab" data-range="archive">Archive <span class="count" id="c-arc"></span></button>
+  </div>
+
+  <div id="r-banner-host"></div>
+
+  <!-- ─── KPI row ─── -->
+  <div class="kpi-row" id="kpi-row">
+    <div class="kpi"><div class="kpi-label">Flows run</div><div class="kpi-value" id="k-exec">0</div><div class="kpi-delta" id="k-exec-d">—</div></div>
+    <div class="kpi"><div class="kpi-label">Leads qualified</div><div class="kpi-value" id="k-leads">0</div><div class="kpi-delta" id="k-leads-d">—</div></div>
+    <div class="kpi"><div class="kpi-label">Enterprise tier</div><div class="kpi-value" id="k-ent">0</div><div class="kpi-delta" id="k-ent-d">—</div></div>
+    <div class="kpi"><div class="kpi-label">Auto-heals</div><div class="kpi-value" id="k-heal">0</div><div class="kpi-delta" id="k-heal-d">—</div></div>
+  </div>
+
+  <!-- ─── Flow executions ─── -->
+  <div class="sec">
+    <div class="sec-h">
+      <h2>Flow activity</h2>
+      <div class="sec-sub" id="e-sub">Every flow run, newest first</div>
+    </div>
+    <div id="e-body"><div class="sec-empty">Nothing yet for this day.</div></div>
+  </div>
+
+  <!-- ─── Work queue snapshot ─── -->
+  <div class="sec">
+    <div class="sec-h">
+      <h2>Work queue snapshot</h2>
+      <div class="sec-sub" id="q-sub">—</div>
+    </div>
+    <div id="q-body"><div class="sec-empty">Queue state was not captured for this day.</div></div>
+  </div>
+
+  <!-- ─── Archive ─── -->
+  <div class="sec" id="arc-sec" style="display:none">
+    <div class="sec-h">
+      <h2>Archive</h2>
+      <div class="sec-sub">Every snapshot, dated. Click to load.</div>
+    </div>
+    <div id="arc-body"></div>
+  </div>
+
+</div>
+
+<!-- Drawer for exec detail -->
+<div class="drawer-scrim" id="d-scrim" onclick="closeDrawer()"></div>
+<div class="drawer" id="d">
+  <div class="drawer-head">
+    <div>
+      <h3 id="d-title">Execution</h3>
+      <div class="drawer-meta" id="d-meta"></div>
+    </div>
+    <button class="drawer-close" onclick="closeDrawer()">Close ✕</button>
+  </div>
+  <div id="d-body"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="ao-user.js"></script>
+<script src="ao-nav.js"></script>
+<script>
+(function(){
+'use strict';
+
+// ── Storage keys ──
+var K_EXEC   = 'ao_flow_executions';    // written by flow-engine.js
+var K_TASKS  = 'ao_flow_tasks';         // written by flow-engine.js
+var K_ARC    = 'ao_report_archive';     // this page writes it
+var K_QUEUE  = 'ao_queue_snapshot';     // queue.html can write it; best-effort
+
+// ── Helpers ──
+function pad(n){ return n<10?'0'+n:''+n; }
+function ymd(d){ d=d||new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function dayLabel(s){
+  var today = ymd(); var y = new Date(); y.setDate(y.getDate()-1); var yd = ymd(y);
+  if (s===today) return 'today';
+  if (s===yd) return 'yesterday';
+  var d = new Date(s+'T00:00:00');
+  return d.toLocaleDateString(undefined,{weekday:'long'});
+}
+function readJSON(k, fb){ try{ return JSON.parse(localStorage.getItem(k)||JSON.stringify(fb)); }catch(e){ return fb; } }
+function writeJSON(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtTime(ms){ var d=new Date(ms); return pad(d.getHours())+':'+pad(d.getMinutes()); }
+function startOfDay(s){ return new Date(s+'T00:00:00').getTime(); }
+function endOfDay(s){ return new Date(s+'T23:59:59.999').getTime(); }
+
+// ── Snapshot the current state under today's key ──
+// This is the "archiver." Every visit updates today; previous days are frozen.
+function snapshotToday(){
+  var today = ymd();
+  var arc = readJSON(K_ARC, {});
+  var execs = readJSON(K_EXEC, []);
+  var tasks = readJSON(K_TASKS, []);
+  var queue = readJSON(K_QUEUE, null);  // optional; queue.html may write this
+
+  var todayExecs = execs.filter(function(e){
+    return e.startTime >= startOfDay(today) && e.startTime <= endOfDay(today);
+  });
+  var todayTasks = tasks.filter(function(t){
+    return t.born >= startOfDay(today) && t.born <= endOfDay(today);
+  });
+
+  arc[today] = {
+    date: today,
+    updated: Date.now(),
+    execs: todayExecs,
+    tasks: todayTasks,
+    queueSnapshot: queue
+  };
+  // Keep last 60 days
+  var keys = Object.keys(arc).sort();
+  while (keys.length > 60) { delete arc[keys.shift()]; }
+  writeJSON(K_ARC, arc);
+}
+
+// ── State ──
+var currentDate = null;
+var currentRange = 'today';
+var reportView = null;  // the currently rendered {execs, tasks, queueSnapshot, kpis, deltas}
+
+function buildView(range, dateOverride){
+  var arc = readJSON(K_ARC, {});
+  var today = ymd();
+  var keys = Object.keys(arc).sort();
+
+  function kpisFor(execs, tasks){
+    var leads=0, ent=0, heal=0;
+    execs.forEach(function(e){
+      var cs = (e.result && e.result.n2) || {};
+      if (cs.qualified) leads++;
+      if (cs.tier==='enterprise') ent++;
+    });
+    tasks.forEach(function(t){ if (t.healReason || t.healed) heal++; });
+    return { exec: execs.length, leads: leads, ent: ent, heal: heal };
+  }
+
+  function bucketFor(dateKey){
+    var b = arc[dateKey] || { date: dateKey, execs: [], tasks: [], queueSnapshot: null };
+    return b;
+  }
+
+  if (range === 'today') {
+    var t = bucketFor(today);
+    var y = new Date(); y.setDate(y.getDate()-1);
+    var yBucket = bucketFor(ymd(y));
+    var tK = kpisFor(t.execs, t.tasks), yK = kpisFor(yBucket.execs, yBucket.tasks);
+    return { title:'Today', date:today, span:'today', execs:t.execs, tasks:t.tasks, queueSnapshot:t.queueSnapshot, kpis:tK, deltas:yK };
+  }
+  if (range === 'yesterday') {
+    var y = new Date(); y.setDate(y.getDate()-1); var yK = ymd(y);
+    var b = bucketFor(yK);
+    var d2 = new Date(); d2.setDate(d2.getDate()-2);
+    var pb = bucketFor(ymd(d2));
+    return { title:'Yesterday', date:yK, span:'yesterday', execs:b.execs, tasks:b.tasks, queueSnapshot:b.queueSnapshot, kpis:kpisFor(b.execs,b.tasks), deltas:kpisFor(pb.execs,pb.tasks) };
+  }
+  if (range === 'week') {
+    // Aggregate last 7 days
+    var agg = { execs:[], tasks:[], queueSnapshot:null };
+    for (var i=0;i<7;i++){
+      var d = new Date(); d.setDate(d.getDate()-i);
+      var b = bucketFor(ymd(d));
+      agg.execs = agg.execs.concat(b.execs);
+      agg.tasks = agg.tasks.concat(b.tasks);
+    }
+    return { title:'Last 7 days', date:'', span:'week', execs:agg.execs, tasks:agg.tasks, queueSnapshot:null, kpis:kpisFor(agg.execs,agg.tasks), deltas:null };
+  }
+  if (range === 'date') {
+    var b = bucketFor(dateOverride);
+    var prev = new Date(dateOverride+'T00:00:00'); prev.setDate(prev.getDate()-1);
+    var pb = bucketFor(ymd(prev));
+    return { title:dateOverride, date:dateOverride, span:'date', execs:b.execs, tasks:b.tasks, queueSnapshot:b.queueSnapshot, kpis:kpisFor(b.execs,b.tasks), deltas:kpisFor(pb.execs,pb.tasks) };
+  }
+  // archive — no body content; we render the list separately
+  return { title:'Archive', span:'archive', execs:[], tasks:[], kpis:{exec:0,leads:0,ent:0,heal:0}, deltas:null };
+}
+
+function deltaLine(curr, prev, key, inverse){
+  if (prev == null) return '—';
+  var c = curr[key]||0, p = prev[key]||0;
+  if (p === 0 && c === 0) return '—';
+  if (p === 0) return '+' + c + ' vs prior';
+  var d = c - p;
+  var sign = d>0?'+':'';
+  var cls = d>0 ? (inverse?'down':'up') : d<0 ? (inverse?'up':'down') : '';
+  return '<span class="'+cls+'">'+sign+d+' vs prior</span>';
+}
+
+function renderExecs(execs){
+  var body = document.getElementById('e-body');
+  if (!execs.length){ body.innerHTML = '<div class="sec-empty">No flow runs for this period.</div>'; return; }
+  var rows = execs.slice().sort(function(a,b){ return b.startTime - a.startTime; }).map(function(e, idx){
+    var cs = (e.result && e.result.n2) || {};
+    var lead = e.input || {};
+    var tier = cs.tier || 'unq';
+    var tierCls = ['enterprise','growth','starter'].indexOf(tier) >= 0 ? tier : 'unq';
+    var ok = e.status === 'completed';
+    return '<div class="exec" data-idx="'+idx+'">' +
+      '<div class="exec-dot '+(ok?'':'failed')+'"></div>' +
+      '<div class="exec-main">' +
+        '<div class="exec-title">'+esc(e.flowName || 'Flow')+': '+esc(lead.name||'(no name)')+' <span class="exec-sub">'+esc(lead.company||'')+'</span>' +
+          (cs.tier? '<span class="tier-pill '+tierCls+'">'+esc(cs.tier)+'</span>':'') +
+        '</div>' +
+        '<div class="exec-sub">'+esc(lead.email||'—')+' · '+esc(e.id)+'</div>' +
+      '</div>' +
+      '<div class="exec-stats">'+
+        (cs.score!=null?'<b>'+cs.score+'</b> score · ':'')+
+        (e.duration!=null?Math.round(e.duration)+'ms':'—')+
+      '</div>' +
+      '<div class="exec-time">'+fmtTime(e.startTime)+'</div>' +
+      '</div>';
+  }).join('');
+  body.innerHTML = rows;
+  // Attach click handlers
+  body.querySelectorAll('.exec').forEach(function(row){
+    row.addEventListener('click', function(){ openDrawer(execs, parseInt(row.dataset.idx)); });
+  });
+}
+
+function renderQueue(snap, tasks){
+  var body = document.getElementById('q-body');
+  // If we have a captured snapshot, use it. Otherwise fall back to today's task stream.
+  var items = (snap && snap.items) || tasks || [];
+  if (!items.length){ body.innerHTML = '<div class="sec-empty">No queue items to show.</div>'; return; }
+  var sub = document.getElementById('q-sub');
+  var done = items.filter(function(t){return t.status==='done'}).length;
+  var blocked = items.filter(function(t){return t.status==='blocked'||t.status==='diagnosing'||t.status==='healing'}).length;
+  sub.textContent = items.length + ' items · ' + done + ' done · ' + blocked + ' blocked';
+  var rows = items.slice(0,20).map(function(t){
+    return '<div class="qline">' +
+      '<span class="qag">'+esc(t.agent||'?')+'</span>' +
+      '<span class="qt">'+esc(t.task||'')+'</span>' +
+      '<span class="qs '+esc(t.status||'')+'">'+esc(t.status||'')+'</span>' +
+      '</div>';
+  }).join('');
+  body.innerHTML = rows;
+}
+
+function renderKpis(kpis, deltas){
+  document.getElementById('k-exec').textContent = kpis.exec;
+  document.getElementById('k-leads').textContent = kpis.leads;
+  document.getElementById('k-ent').textContent = kpis.ent;
+  document.getElementById('k-heal').textContent = kpis.heal;
+  document.getElementById('k-exec-d').innerHTML  = deltas ? deltaLine(kpis,deltas,'exec')  : '—';
+  document.getElementById('k-leads-d').innerHTML = deltas ? deltaLine(kpis,deltas,'leads') : '—';
+  document.getElementById('k-ent-d').innerHTML   = deltas ? deltaLine(kpis,deltas,'ent')   : '—';
+  document.getElementById('k-heal-d').innerHTML  = deltas ? deltaLine(kpis,deltas,'heal', true) : '—';
+}
+
+function renderArchive(){
+  var sec = document.getElementById('arc-sec');
+  var body = document.getElementById('arc-body');
+  var arc = readJSON(K_ARC, {});
+  var keys = Object.keys(arc).sort().reverse();
+  if (!keys.length){ body.innerHTML = '<div class="sec-empty">No archived days yet. The first snapshot is today.</div>'; sec.style.display='block'; return; }
+  var rows = keys.map(function(k){
+    var b = arc[k], tier = (b.execs||[]).reduce(function(s,e){ return s + (((e.result&&e.result.n2&&e.result.n2.tier)==='enterprise')?1:0); }, 0);
+    return '<div class="arc-item" data-date="'+esc(k)+'">' +
+      '<div class="arc-date">'+esc(k)+' <span class="arc-day">· '+esc(dayLabel(k))+'</span></div>' +
+      '<div class="arc-sum">'+(b.execs||[]).length+' flows · '+(b.tasks||[]).length+' tasks · '+tier+' enterprise</div>' +
+      '<div class="arc-chev">→</div>' +
+      '</div>';
+  }).join('');
+  body.innerHTML = rows;
+  body.querySelectorAll('.arc-item').forEach(function(r){
+    r.addEventListener('click', function(){
+      var d = r.dataset.date;
+      setRange('date', d);
+      var u = new URL(location.href); u.searchParams.set('date', d); history.replaceState(null,'',u);
+    });
+  });
+  sec.style.display = 'block';
+}
+
+function hideArchive(){ document.getElementById('arc-sec').style.display = 'none'; }
+
+// ── Render ──
+function renderAll(view){
+  reportView = view;
+  var titleEl = document.getElementById('r-title');
+  var subEl = document.getElementById('r-sub');
+  if (view.span==='today'){ titleEl.textContent = 'Today · '+view.date; subEl.textContent = new Date().toLocaleString(undefined,{weekday:'long',month:'long',day:'numeric',year:'numeric'}); }
+  else if (view.span==='yesterday'){ titleEl.textContent = 'Yesterday · '+view.date; subEl.textContent = 'Frozen snapshot'; }
+  else if (view.span==='week'){ titleEl.textContent = 'Last 7 days'; subEl.textContent = 'Aggregated activity'; }
+  else if (view.span==='date'){ titleEl.textContent = view.date; subEl.textContent = dayLabel(view.date)+' · frozen snapshot'; }
+  else { titleEl.textContent = 'Archive'; subEl.textContent = 'Every snapshot, dated'; }
+
+  renderKpis(view.kpis, view.deltas);
+  renderExecs(view.execs||[]);
+  renderQueue(view.queueSnapshot, view.tasks||[]);
+
+  // Counts in tabs
+  var arc = readJSON(K_ARC, {});
+  var todayB = arc[ymd()] || {execs:[], tasks:[]};
+  document.getElementById('c-today').textContent = (todayB.execs||[]).length ? '· '+(todayB.execs||[]).length : '';
+  var wk = 0; for (var i=0;i<7;i++){ var d=new Date(); d.setDate(d.getDate()-i); wk += ((arc[ymd(d)]||{execs:[]}).execs||[]).length; }
+  document.getElementById('c-week').textContent = wk ? '· '+wk : '';
+  document.getElementById('c-arc').textContent = Object.keys(arc).length ? '· '+Object.keys(arc).length : '';
+
+  // Archive visibility
+  if (view.span==='archive') renderArchive(); else hideArchive();
+
+  // Empty-state banner
+  var host = document.getElementById('r-banner-host');
+  if (!view.execs.length && !view.tasks.length && view.span!=='archive'){
+    host.innerHTML = '<div class="banner"><div class="bi">⚠</div><div>No flow activity captured for this period. Run a flow from <a href="/ao/flows.html" style="color:rgb(var(--amber))">the Flows page</a> — executions are persisted to localStorage and will appear here automatically. If you expected historical data, check the Archive tab.</div></div>';
+  } else { host.innerHTML = ''; }
+}
+
+function setRange(range, dateOverride){
+  currentRange = range;
+  currentDate = dateOverride || null;
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.toggle('active', t.dataset.range === range); });
+  renderAll(buildView(range, dateOverride));
+}
+
+// ── Drawer ──
+function openDrawer(execs, idx){
+  var e = execs[idx]; if (!e) return;
+  var cs = (e.result && e.result.n2) || {};
+  document.getElementById('d-title').textContent = (e.flowName||'Flow') + ' · ' + ((e.input&&e.input.name)||'(no name)');
+  document.getElementById('d-meta').textContent = e.id + ' · ' + new Date(e.startTime).toLocaleString() + ' · ' + (e.duration||'—') + 'ms';
+  var body = document.getElementById('d-body');
+  var summary = '<div class="sec" style="margin:0 0 14px">' +
+    '<div class="sec-h"><h2>Outcome</h2></div>' +
+    '<div style="font-size:0.82rem;line-height:1.6;color:var(--text)">' +
+      (cs.score!=null?'Score: <b>'+cs.score+'</b><br>':'') +
+      (cs.tier?'Tier: <b>'+esc(cs.tier)+'</b><br>':'') +
+      (cs.qualified!=null?'Qualified: <b>'+(cs.qualified?'yes':'no')+'</b><br>':'') +
+      (cs.sentiment?'Sentiment: <b>'+esc(cs.sentiment)+'</b><br>':'') +
+      (cs.notes?'<div style="color:var(--muted);margin-top:6px;font-size:0.74rem">'+esc(cs.notes)+'</div>':'') +
+    '</div></div>';
+  var inputBox = '<div class="sec" style="margin:0 0 14px"><div class="sec-h"><h2>Input</h2></div>' +
+    '<pre style="font-family:ui-monospace,&quot;SF Mono&quot;,monospace;font-size:0.72rem;color:var(--muted);white-space:pre-wrap;word-break:break-all">'+esc(JSON.stringify(e.input||{}, null, 2))+'</pre></div>';
+  var outputBox = '<div class="sec" style="margin:0"><div class="sec-h"><h2>Node outputs</h2></div>';
+  Object.keys(e.result||{}).forEach(function(k){
+    outputBox += '<div class="log-line"><span class="ln-n">'+esc(k)+'</span>' +
+      '<pre>'+esc(JSON.stringify(e.result[k], null, 2))+'</pre></div>';
+  });
+  outputBox += '</div>';
+  body.innerHTML = summary + inputBox + outputBox;
+  document.getElementById('d').classList.add('v');
+  document.getElementById('d-scrim').classList.add('v');
+}
+function closeDrawer(){
+  document.getElementById('d').classList.remove('v');
+  document.getElementById('d-scrim').classList.remove('v');
+}
+window.closeDrawer = closeDrawer;
+
+// ── Toast ──
+function toast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('v');
+  setTimeout(function(){ t.classList.remove('v'); }, 1900);
+}
+
+// ── Email HTML export ──
+// Builds a self-contained, style-inlined version of the current view.
+// Works in Gmail, Apple Mail, Outlook; includes a hosted permalink so the archive URL lives in the inbox.
+function buildEmailHTML(view){
+  var origin = location.origin + location.pathname;
+  var permalink = origin + (view.date ? '?date='+view.date : '');
+  var title = (view.span==='today' ? 'AO Daily Report · ' : 'AO Report · ') + (view.date || view.title);
+  var when = new Date().toLocaleString();
+
+  function tile(label, value, delta){
+    return '<td style="padding:12px 14px;background:#1a1816;border:1px solid #2a2722;border-radius:10px;vertical-align:top;width:25%">' +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#a39a8a">'+label+'</div>' +
+      '<div style="font-size:24px;font-weight:700;color:#f5f0e8;margin-top:4px;line-height:1">'+value+'</div>' +
+      '<div style="font-size:10px;color:#a39a8a;margin-top:6px">'+(delta||'—')+'</div>' +
+      '</td>';
+  }
+
+  var kpis = view.kpis;
+  var d = view.deltas;
+  function dl(key, inv){ if(!d) return '—'; var c=kpis[key]||0,p=d[key]||0; if(!p&&!c)return '—'; if(!p)return '+'+c; var diff=c-p; return (diff>0?'+':'')+diff+' vs prior'; }
+
+  var execRows = (view.execs||[]).slice().sort(function(a,b){return b.startTime-a.startTime}).map(function(e){
+    var cs = (e.result&&e.result.n2)||{}, lead=e.input||{};
+    return '<tr>' +
+      '<td style="padding:8px 10px;border-bottom:1px solid #2a2722;font-size:13px;color:#f5f0e8">'+esc(lead.name||'—')+' <span style="color:#a39a8a;font-size:11px">· '+esc(lead.company||'')+'</span></td>' +
+      '<td style="padding:8px 10px;border-bottom:1px solid #2a2722;font-size:12px;color:#a39a8a">'+esc(cs.tier||'—')+'</td>' +
+      '<td style="padding:8px 10px;border-bottom:1px solid #2a2722;font-size:12px;color:#f5f0e8;text-align:right">'+(cs.score!=null?cs.score:'—')+'</td>' +
+      '<td style="padding:8px 10px;border-bottom:1px solid #2a2722;font-size:11px;color:#a39a8a;text-align:right;font-family:ui-monospace,monospace">'+fmtTime(e.startTime)+'</td>' +
+      '</tr>';
+  }).join('') || '<tr><td colspan="4" style="padding:14px 10px;text-align:center;color:#a39a8a;font-size:12px">No flow activity.</td></tr>';
+
+  return '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+esc(title)+'</title></head>' +
+    '<body style="margin:0;padding:24px;background:#121110;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#f5f0e8">' +
+    '<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto">' +
+    '<tr><td style="padding-bottom:18px">' +
+      '<div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#daa048">AO · Daily report</div>' +
+      '<div style="font-size:22px;font-weight:700;color:#f5f0e8;margin-top:4px">'+esc(title)+'</div>' +
+      '<div style="font-size:12px;color:#a39a8a;margin-top:2px">Generated '+esc(when)+'</div>' +
+    '</td></tr>' +
+    '<tr><td style="padding-bottom:16px"><table role="presentation" width="100%" cellpadding="0" cellspacing="6"><tr>' +
+      tile('Flows run', kpis.exec, dl('exec')) +
+      tile('Leads qualified', kpis.leads, dl('leads')) +
+      tile('Enterprise tier', kpis.ent, dl('ent')) +
+      tile('Auto-heals', kpis.heal, dl('heal', true)) +
+    '</tr></table></td></tr>' +
+    '<tr><td style="padding-bottom:16px;background:#1a1816;border:1px solid #2a2722;border-radius:10px;padding:14px 16px">' +
+      '<div style="font-size:13px;font-weight:700;color:#f5f0e8;margin-bottom:10px">Flow activity</div>' +
+      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">' + execRows + '</table>' +
+    '</td></tr>' +
+    '<tr><td style="padding:18px 0 8px;border-top:1px solid #2a2722;margin-top:18px">' +
+      '<div style="font-size:12px;color:#a39a8a">View this report on the web:</div>' +
+      '<a href="'+esc(permalink)+'" style="color:#daa048;font-size:13px;font-weight:600;text-decoration:none;word-break:break-all">'+esc(permalink)+'</a>' +
+    '</td></tr>' +
+    '<tr><td style="padding-top:8px"><div style="font-size:11px;color:#6a6660">AO · deliberateux.com · interactive version in the inbox means archives are searchable from day one</div></td></tr>' +
+    '</table></body></html>';
+}
+
+function buildEmailPlain(view){
+  var out = [];
+  out.push('AO · Daily Report — ' + (view.date || view.title));
+  out.push('');
+  out.push('Flows run: ' + view.kpis.exec);
+  out.push('Leads qualified: ' + view.kpis.leads);
+  out.push('Enterprise tier: ' + view.kpis.ent);
+  out.push('Auto-heals: ' + view.kpis.heal);
+  out.push('');
+  if ((view.execs||[]).length){
+    out.push('Activity:');
+    view.execs.slice().sort(function(a,b){return b.startTime-a.startTime}).forEach(function(e){
+      var cs = (e.result&&e.result.n2)||{}, lead=e.input||{};
+      out.push('· ' + (lead.name||'—') + ' (' + (lead.company||'—') + ') — ' + (cs.tier||'?') + ' · score ' + (cs.score||'?'));
+    });
+  }
+  out.push('');
+  var origin = location.origin + location.pathname;
+  var permalink = origin + (view.date ? '?date='+view.date : '');
+  out.push('Web version: ' + permalink);
+  return out.join('\n');
+}
+
+// ── Copy HTML ──
+async function copyEmailHtml(){
+  if (!reportView) return;
+  var html = buildEmailHTML(reportView);
+  var text = buildEmailPlain(reportView);
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      var blobHtml = new Blob([html], {type:'text/html'});
+      var blobText = new Blob([text], {type:'text/plain'});
+      await navigator.clipboard.write([ new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText }) ]);
+      toast('Email HTML copied — paste into your mail client');
+      return;
+    }
+  } catch(e){}
+  // Fallback: plain copy of raw HTML source
+  try {
+    await navigator.clipboard.writeText(html);
+    toast('HTML copied (plain) — paste into a raw-HTML email editor');
+  } catch(e){
+    toast('Copy failed — browser blocked clipboard');
+  }
+}
+
+// ── Mail composer (mailto) ──
+function mailReport(){
+  if (!reportView) return;
+  var subject = 'AO Daily Report · ' + (reportView.date || reportView.title);
+  var body = buildEmailPlain(reportView);
+  var href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  // Warn if body is near the mailto limit (~2000 chars is safe)
+  location.href = href;
+}
+
+// ── Permalink ──
+async function copyPermalink(){
+  var view = reportView || {};
+  var origin = location.origin + location.pathname;
+  var link = origin + (view.date ? '?date='+view.date : '');
+  try {
+    await navigator.clipboard.writeText(link);
+    toast('Permalink copied');
+  } catch(e){
+    prompt('Copy this permalink:', link);
+  }
+}
+
+// ── Wire up ──
+document.getElementById('r-tabs').addEventListener('click', function(e){
+  var t = e.target.closest('.tab'); if (!t) return;
+  var r = t.dataset.range;
+  setRange(r);
+  var u = new URL(location.href); u.searchParams.delete('date'); u.searchParams.set('range', r); history.replaceState(null,'',u);
+});
+document.getElementById('r-date').addEventListener('change', function(e){
+  var v = e.target.value; if (!v) return;
+  setRange('date', v);
+  var u = new URL(location.href); u.searchParams.set('date', v); history.replaceState(null,'',u);
+});
+document.getElementById('r-copy-html').addEventListener('click', copyEmailHtml);
+document.getElementById('r-mail').addEventListener('click', mailReport);
+document.getElementById('r-permalink').addEventListener('click', copyPermalink);
+document.addEventListener('keydown', function(e){ if (e.key==='Escape') closeDrawer(); });
+
+// ── Init ──
+snapshotToday();
+document.getElementById('r-date').value = ymd();
+var urlDate = new URLSearchParams(location.search).get('date');
+var urlRange = new URLSearchParams(location.search).get('range');
+if (urlDate){ setRange('date', urlDate); document.getElementById('r-date').value = urlDate; }
+else if (urlRange){ setRange(urlRange); }
+else { setRange('today'); }
+
+})();
+</script>
+</body>
+</html>

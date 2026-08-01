@@ -1,0 +1,883 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-9MSXWF3TX3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-9MSXWF3TX3');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pricing — AO</title>
+  <meta name="description" content="AO plans — Free, Pro, and Team. Start free, upgrade when you need multi-org or integrations." />
+  <link rel="canonical" href="https://deliberateux.com/ao/pricing.html" />
+  <link rel="icon" href="/assets/favicon.svg" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://deliberateux.com/ao/pricing.html" />
+  <meta property="og:title" content="AO Pricing — Free, Pro, Team" />
+  <meta property="og:description" content="Start free. Upgrade when your agency outgrows the sandbox. Pro $29/mo · Team $49/seat/mo." />
+  <meta property="og:image" content="https://deliberateux.com/ao/og.svg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content="Deliberate UX" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="AO Pricing — Free, Pro, Team" />
+  <meta name="twitter:description" content="Start free. Upgrade when your agency outgrows the sandbox." />
+  <meta name="twitter:image" content="https://deliberateux.com/ao/og.svg" />
+  <link rel="stylesheet" href="ao-theme.css">
+  <script src="ao-user.js"></script>
+  <script src="ao-nav.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--bg);
+      background-image:
+        radial-gradient(900px 640px at 50% 8%, rgba(var(--amber), 0.08), transparent 60%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      -webkit-font-smoothing: antialiased;
+      min-height: 100%;
+    }
+
+    .price-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 72px 28px 80px;
+    }
+
+    .price-hero {
+      text-align: center;
+      max-width: 640px;
+      margin: 0 auto 40px;
+    }
+    .price-hero h1 {
+      font-size: clamp(30px, 4vw, 46px);
+      line-height: 1.12;
+      letter-spacing: -0.01em;
+      margin: 0 0 14px;
+      font-weight: 600;
+    }
+    .price-hero p {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    /* Billing toggle */
+    .billing-toggle {
+      display: inline-flex;
+      padding: 4px;
+      border-radius: 999px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      margin: 28px auto 0;
+      gap: 4px;
+    }
+    .billing-toggle button {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 8px 18px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 160ms ease, color 160ms ease;
+      position: relative;
+    }
+    .billing-toggle button:hover { color: var(--text); }
+    .billing-toggle button[aria-pressed="true"] {
+      background: rgba(var(--amber), 0.92);
+      color: #1a1200;
+    }
+    .save-chip {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(var(--green), 0.18);
+      color: rgb(var(--green));
+      margin-left: 6px;
+      letter-spacing: 0.03em;
+      vertical-align: middle;
+    }
+    .billing-toggle button[aria-pressed="true"] .save-chip {
+      background: rgba(26,18,0,0.14);
+      color: #1a1200;
+    }
+
+    /* Card grid */
+    .price-grid {
+      margin-top: 48px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      align-items: stretch;
+    }
+    @media (max-width: 940px) {
+      .price-grid { grid-template-columns: 1fr; }
+    }
+
+    .price-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px 26px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      position: relative;
+      box-shadow: var(--shadow-soft);
+    }
+    .price-card.featured {
+      border-color: rgba(var(--amber), 0.45);
+      box-shadow:
+        0 0 0 1px rgba(var(--amber), 0.25),
+        0 20px 60px rgba(0,0,0,0.4);
+    }
+    .price-card.featured::before {
+      content: "Recommended";
+      position: absolute;
+      top: -11px;
+      left: 24px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(var(--amber), 0.92);
+      color: #1a1200;
+    }
+
+    .tier {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .tier-name {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin: 0;
+    }
+    .tier-tag {
+      font-size: 11px;
+      color: var(--muted);
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+    }
+
+    .price-figure {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .price-amount {
+      font-size: 40px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .price-unit {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .price-note {
+      font-size: 12px;
+      color: var(--faint);
+      margin: 6px 0 0;
+      min-height: 1.4em;
+    }
+    .price-note.visible { color: var(--muted); }
+
+    .tier-hook {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    .btn {
+      appearance: none;
+      border: 0;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      font: inherit;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: filter 120ms ease, background 120ms ease, color 120ms ease, border-color 120ms ease;
+      text-align: center;
+    }
+    .btn-primary {
+      background: rgba(var(--amber), 0.92);
+      color: #1a1200;
+    }
+    .btn-primary:hover { filter: brightness(1.06); }
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border2);
+    }
+    .btn-outline:hover {
+      border-color: var(--border3);
+      background: var(--panel);
+    }
+
+    .features {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 10px;
+      font-size: 13.5px;
+      line-height: 1.5;
+    }
+    .features li {
+      display: flex;
+      gap: 10px;
+      color: var(--text);
+    }
+    .features li::before {
+      content: "✓";
+      color: rgba(var(--green), 0.9);
+      font-weight: 700;
+      flex-shrink: 0;
+      width: 14px;
+    }
+    .features li.dim {
+      color: var(--faint);
+    }
+    .features li.dim::before {
+      content: "—";
+      color: var(--ghost);
+    }
+    .features li strong { color: var(--text); font-weight: 600; }
+    .features li small {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .fine {
+      font-size: 11px;
+      color: var(--faint);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    /* Comparison table */
+    .compare {
+      margin-top: 72px;
+    }
+    .compare h2 {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      text-align: center;
+      margin: 0 0 8px;
+    }
+    .compare .sub {
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      margin: 0 0 32px;
+    }
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      font-size: 14px;
+    }
+    .compare-table th, .compare-table td {
+      padding: 14px 18px;
+      text-align: left;
+      border-bottom: 1px solid var(--hairline);
+    }
+    .compare-table th {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--muted);
+      background: var(--panel);
+    }
+    .compare-table th.col-plan { text-align: center; }
+    .compare-table td.cell {
+      text-align: center;
+      color: var(--text);
+    }
+    .compare-table td.cell.dim { color: var(--ghost); }
+    .compare-table tr:last-child td { border-bottom: 0; }
+    .compare-table .section-row td {
+      background: var(--panel);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 10px 18px;
+    }
+    @media (max-width: 760px) {
+      .compare-table { font-size: 12.5px; }
+      .compare-table th, .compare-table td { padding: 10px 10px; }
+    }
+
+    /* FAQ */
+    .faq {
+      margin-top: 72px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 820px) {
+      .faq { grid-template-columns: 1fr; }
+    }
+    .faq h2 {
+      grid-column: 1 / -1;
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      text-align: center;
+      margin: 0 0 16px;
+    }
+    .faq-item {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+    }
+    .faq-item h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin: 0 0 6px;
+    }
+    .faq-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .bottom-cta {
+      margin-top: 72px;
+      text-align: center;
+      padding: 40px 24px;
+      border-radius: var(--radius-lg);
+      background:
+        radial-gradient(600px 240px at 50% 0%, rgba(var(--amber), 0.14), transparent 65%),
+        var(--surface);
+      border: 1px solid var(--border);
+    }
+    .bottom-cta h2 {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin: 0 0 8px;
+    }
+    .bottom-cta p {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 0 0 20px;
+    }
+    .bottom-cta .btn-row {
+      display: inline-flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+  <main class="price-wrap">
+
+    <section class="price-hero">
+      <h1>Start free. Upgrade when your agency outgrows the sandbox.</h1>
+      <p>
+        Every AO account starts on the free plan — one org, a hundred agent runs a month, no
+        credit card. Step up to Pro for multi-org, integrations, and higher monthly limits, or
+        Team when you bring in operators.
+      </p>
+
+      <div class="billing-toggle" role="tablist" aria-label="Billing period">
+        <button type="button" data-period="monthly" aria-pressed="true">Monthly</button>
+        <button type="button" data-period="annual" aria-pressed="false">
+          Annual<span class="save-chip">save 17%</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ── Plan cards ──────────────────────────────────────── -->
+    <section class="price-grid">
+
+      <!-- Free -->
+      <article class="price-card" data-plan="free">
+        <div class="tier">
+          <h2 class="tier-name">Free</h2>
+          <span class="tier-tag">No credit card</span>
+        </div>
+        <div>
+          <div class="price-figure">
+            <span class="price-amount">$0</span>
+            <span class="price-unit">/forever</span>
+          </div>
+          <p class="price-note" data-monthly="" data-annual="">1 org · 100 agent runs / month</p>
+        </div>
+        <p class="tier-hook">
+          Spin up an autonomous org, run a seven-agent agency on your own projects, and keep
+          working in guest mode as long as you want.
+        </p>
+        <a class="btn btn-outline" href="/ao/account.html?plan=free&amp;next=%2Fao%2Fconfigure.html">Start free →</a>
+        <ul class="features">
+          <li><strong>1 organization</strong><small>Your sandbox, scoped to your account.</small></li>
+          <li><strong>100 agent runs / month</strong><small>Hard cap. Upgrade when you need more.</small></li>
+          <li><strong>All seven agents</strong><small>Marketing, Dev, UXR, QA, Biz Dev, CS, Exec Assistant.</small></li>
+          <li><strong>Flows + queue + tracker</strong><small>Full workspace, same as paid plans.</small></li>
+          <li class="dim">Integrations (Squarespace, WordPress, Shopify, CRM)</li>
+          <li class="dim">Multi-org / org templates</li>
+        </ul>
+      </article>
+
+      <!-- Pro -->
+      <article class="price-card featured" data-plan="pro">
+        <div class="tier">
+          <h2 class="tier-name">Pro</h2>
+          <span class="tier-tag">For solo operators</span>
+        </div>
+        <div>
+          <div class="price-figure">
+            <span class="price-amount" data-monthly="$29" data-annual="$24">$29</span>
+            <span class="price-unit" data-monthly="/month" data-annual="/month, billed annually">/month</span>
+          </div>
+          <p class="price-note visible"
+             data-monthly="$29 billed monthly · cancel anytime"
+             data-annual="$290 billed annually · ~$24/mo effective">
+            $29 billed monthly · cancel anytime
+          </p>
+        </div>
+        <p class="tier-hook">
+          Run multiple orgs in parallel, plug in Squarespace / WordPress / Shopify / your CRM, and
+          let Pro-tier agents handle the volume.
+        </p>
+        <a class="btn btn-primary" href="/ao/account.html?plan=pro&amp;next=%2Fao%2Fconfigure.html">Start Pro →</a>
+        <ul class="features">
+          <li><strong>Unlimited organizations</strong><small>Separate sandboxes per brand or client.</small></li>
+          <li><strong>2,000 agent runs / month</strong><small>Overage metered at $0.02 / run.</small></li>
+          <li><strong>Integrations</strong><small>Squarespace, WordPress, Shopify, CRMs (HubSpot, Pipedrive, Attio).</small></li>
+          <li><strong>Scheduled flows</strong><small>Cron-style triggers for any agent flow.</small></li>
+          <li><strong>Priority queue</strong><small>Your runs jump the shared Free queue.</small></li>
+          <li><strong>Email + chat support</strong><small>Responses within one business day.</small></li>
+        </ul>
+      </article>
+
+      <!-- Team -->
+      <article class="price-card" data-plan="team">
+        <div class="tier">
+          <h2 class="tier-name">Team</h2>
+          <span class="tier-tag">Per seat</span>
+        </div>
+        <div>
+          <div class="price-figure">
+            <span class="price-amount" data-monthly="$49" data-annual="$41">$49</span>
+            <span class="price-unit" data-monthly="/user/month" data-annual="/user/month, billed annually">/user/month</span>
+          </div>
+          <p class="price-note visible"
+             data-monthly="$49 per user · billed monthly"
+             data-annual="$490 per user / year · ~$41/user/mo effective">
+            $49 per user · billed monthly
+          </p>
+        </div>
+        <p class="tier-hook">
+          Bring on operators, share orgs across the team, and keep the audit trail.
+          Each seat gets its own agent sandbox with shared org access.
+        </p>
+        <a class="btn btn-outline" href="/ao/account.html?plan=team&amp;next=%2Fao%2Fconfigure.html">Start Team →</a>
+        <ul class="features">
+          <li><strong>Everything in Pro</strong></li>
+          <li><strong>10,000 agent runs / month / seat</strong><small>Pooled across the team.</small></li>
+          <li><strong>Shared orgs + roles</strong><small>Viewer, Operator, Admin.</small></li>
+          <li><strong>SSO (Google Workspace)</strong><small>Okta / SAML on request.</small></li>
+          <li><strong>Audit log + admin events</strong><small>Every agent action, every operator action.</small></li>
+          <li><strong>Priority support</strong><small>Same-day response during business hours.</small></li>
+        </ul>
+      </article>
+
+    </section>
+
+    <p class="fine" style="text-align:center; max-width: 640px; margin: 20px auto 0;">
+      Prices in USD. Agent runs count any flow execution or scheduled agent tick. Failed and
+      cancelled runs don't count. Overage is optional and can be capped from your org settings.
+    </p>
+
+    <!-- ── Comparison table ───────────────────────────────── -->
+    <section class="compare">
+      <h2>Compare plans</h2>
+      <p class="sub">What changes as you move up.</p>
+
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th style="width:36%">Feature</th>
+            <th class="col-plan">Free</th>
+            <th class="col-plan">Pro</th>
+            <th class="col-plan">Team</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="section-row"><td colspan="4">Agents &amp; runs</td></tr>
+          <tr>
+            <td>Organizations</td>
+            <td class="cell">1</td>
+            <td class="cell">Unlimited</td>
+            <td class="cell">Unlimited</td>
+          </tr>
+          <tr>
+            <td>Agent runs / month</td>
+            <td class="cell">100</td>
+            <td class="cell">2,000</td>
+            <td class="cell">10,000 / seat</td>
+          </tr>
+          <tr>
+            <td>Overage</td>
+            <td class="cell dim">Hard stop</td>
+            <td class="cell">$0.02 / run</td>
+            <td class="cell">$0.02 / run</td>
+          </tr>
+          <tr>
+            <td>All seven agents</td>
+            <td class="cell">✓</td>
+            <td class="cell">✓</td>
+            <td class="cell">✓</td>
+          </tr>
+          <tr>
+            <td>Flows, queue, tracker</td>
+            <td class="cell">✓</td>
+            <td class="cell">✓</td>
+            <td class="cell">✓</td>
+          </tr>
+          <tr>
+            <td>Scheduled flows</td>
+            <td class="cell dim">—</td>
+            <td class="cell">✓</td>
+            <td class="cell">✓</td>
+          </tr>
+
+          <tr class="section-row"><td colspan="4">Integrations</td></tr>
+          <tr>
+            <td>Squarespace, WordPress, Shopify</td>
+            <td class="cell dim">—</td>
+            <td class="cell">✓</td>
+            <td class="cell">✓</td>
+          </tr>
+          <tr>
+            <td>CRM (HubSpot, Pipedrive, Attio)</td>
+            <td class="cell dim">—</td>
+            <td class="cell">✓</td>
+            <td class="cell">✓</td>
+          </tr>
+          <tr>
+            <td>Webhooks + API</td>
+            <td class="cell dim">—</td>
+            <td class="cell">✓</td>
+            <td class="cell">✓</td>
+          </tr>
+
+          <tr class="section-row"><td colspan="4">Team &amp; governance</td></tr>
+          <tr>
+            <td>Team seats</td>
+            <td class="cell dim">—</td>
+            <td class="cell">1</td>
+            <td class="cell">Unlimited</td>
+          </tr>
+          <tr>
+            <td>Roles (Viewer / Operator / Admin)</td>
+            <td class="cell dim">—</td>
+            <td class="cell dim">—</td>
+            <td class="cell">✓</td>
+          </tr>
+          <tr>
+            <td>SSO (Google Workspace)</td>
+            <td class="cell dim">—</td>
+            <td class="cell dim">—</td>
+            <td class="cell">✓</td>
+          </tr>
+          <tr>
+            <td>Audit log + admin events</td>
+            <td class="cell dim">—</td>
+            <td class="cell dim">—</td>
+            <td class="cell">✓</td>
+          </tr>
+
+          <tr class="section-row"><td colspan="4">Support</td></tr>
+          <tr>
+            <td>Community + docs</td>
+            <td class="cell">✓</td>
+            <td class="cell">✓</td>
+            <td class="cell">✓</td>
+          </tr>
+          <tr>
+            <td>Email + chat support</td>
+            <td class="cell dim">—</td>
+            <td class="cell">Next business day</td>
+            <td class="cell">Same-day</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ── FAQ ─────────────────────────────────────────────── -->
+    <section class="faq">
+      <h2>Common questions</h2>
+
+      <div class="faq-item">
+        <h3>What counts as an agent run?</h3>
+        <p>
+          Any flow execution or scheduled agent tick. Starting a flow with six agents counts as
+          six runs, not one. Failed and cancelled runs don't count.
+        </p>
+      </div>
+
+      <div class="faq-item">
+        <h3>What happens when I hit my Free limit?</h3>
+        <p>
+          Free plan runs are hard-capped at 100 / month. New runs return a friendly upgrade
+          prompt until the next billing cycle or until you upgrade to Pro.
+        </p>
+      </div>
+
+      <div class="faq-item">
+        <h3>How does overage work on Pro and Team?</h3>
+        <p>
+          Overage is metered at $0.02 per run past your included allotment and reported to Stripe
+          once per day. You can cap overage in org settings at any time.
+        </p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Can I change plans later?</h3>
+        <p>
+          Yes — upgrade or downgrade any time from your account. Annual billing switches to
+          monthly on the next renewal; upgrades are prorated immediately.
+        </p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Do I need a credit card to start?</h3>
+        <p>
+          No. The Free plan requires no credit card. You can keep using it indefinitely — or even
+          continue in guest mode until you're ready to sign in.
+        </p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Where does my data live?</h3>
+        <p>
+          Your org configuration, flows, and run history are scoped to your account and
+          isolated per org. Your sandbox stays your sandbox — nothing is shared across users.
+        </p>
+      </div>
+    </section>
+
+    <!-- ── Bottom CTA ─────────────────────────────────────── -->
+    <section class="bottom-cta">
+      <h2>Still deciding?</h2>
+      <p>Start in guest mode — no account, no commitment. Your work migrates when you sign in.</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="/ao/configure.html">Configure an org →</a>
+        <a class="btn btn-outline" href="/ao/account.html">Sign in</a>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    (function(){
+      'use strict';
+
+      // Billing period toggle — monthly ↔ annual.
+      var toggleBtns = document.querySelectorAll('.billing-toggle button');
+      function applyPeriod(period) {
+        toggleBtns.forEach(function(btn){
+          btn.setAttribute('aria-pressed', btn.dataset.period === period ? 'true' : 'false');
+        });
+        // Swap out every element that carries data-monthly / data-annual attrs.
+        document.querySelectorAll('[data-monthly][data-annual]').forEach(function(el){
+          var val = el.getAttribute('data-' + period);
+          if (val !== null && val !== '') el.textContent = val;
+        });
+      }
+      toggleBtns.forEach(function(btn){
+        btn.addEventListener('click', function(){
+          applyPeriod(btn.dataset.period);
+          // Preserve choice across pages for the sign-up flow.
+          try { localStorage.setItem('ao_pricing_period', btn.dataset.period); } catch (e) {}
+          // Append ?period=... to the plan CTAs so account.html can pick it up.
+          document.querySelectorAll('.price-card a.btn').forEach(function(a){
+            var href = a.getAttribute('href') || '';
+            href = href.replace(/[?&]period=(monthly|annual)/g, '');
+            var sep = href.indexOf('?') >= 0 ? '&' : '?';
+            a.setAttribute('href', href + sep + 'period=' + btn.dataset.period);
+          });
+        });
+      });
+
+      // Restore previously chosen period.
+      try {
+        var saved = localStorage.getItem('ao_pricing_period');
+        if (saved === 'annual' || saved === 'monthly') applyPeriod(saved);
+      } catch (e) {}
+
+      // For signed-in users, mark the active plan and intercept CTA clicks
+      // to drive Stripe Checkout / Customer Portal directly — no round-trip
+      // through /ao/account.html.
+      //   Upgrade (Free→Pro, Free→Team, Pro→Team):  POST /ao/api/billing/checkout
+      //   Downgrade (Pro/Team→Free, Team→Pro):       POST /ao/api/billing/portal
+      //     (Stripe's portal UI is where cancellations/switches actually happen —
+      //      we don't roll our own downgrade flow.)
+      //   Current plan:                              disabled label
+      try {
+        if (window.AOUser && AOUser.getUser) {
+          var u = AOUser.getUser();
+          if (u.signedIn) {
+            var currentPlan = (u.plan || 'free').toLowerCase();
+            var planRank = { free: 0, pro: 1, team: 2 };
+
+            function currentPeriod() {
+              try {
+                var p = localStorage.getItem('ao_pricing_period');
+                return (p === 'annual' || p === 'monthly') ? p : 'monthly';
+              } catch (e) { return 'monthly'; }
+            }
+
+            function startCheckout(plan) {
+              if (!window.Clerk || !Clerk.session) {
+                // Fallback if Clerk's session isn't live: bounce through account.
+                window.location.assign('/ao/account.html?plan=' + plan +
+                  '&period=' + currentPeriod() + '&next=%2Fao%2Fdashboard.html');
+                return;
+              }
+              Clerk.session.getToken().then(function(token){
+                return fetch('/ao/api/billing/checkout', {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({ plan: plan, period: currentPeriod() })
+                });
+              }).then(function(r){ return r && r.ok ? r.json() : null; })
+              .then(function(body){
+                if (body && body.url) window.location.assign(body.url);
+                else alert('Checkout is wiring up — please try again shortly.');
+              })
+              .catch(function(){
+                alert('Checkout is wiring up — please try again shortly.');
+              });
+            }
+
+            function openPortal() {
+              if (window.Clerk && typeof Clerk.redirectToBillingPortal === 'function') {
+                Clerk.redirectToBillingPortal({ returnUrl: window.location.href });
+                return;
+              }
+              if (!window.Clerk || !Clerk.session) {
+                window.location.assign('/ao/account.html');
+                return;
+              }
+              Clerk.session.getToken().then(function(token){
+                return fetch('/ao/api/billing/portal', {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({ return_url: window.location.href })
+                });
+              }).then(function(r){ return r && r.ok ? r.json() : null; })
+              .then(function(body){
+                if (body && body.url) window.location.assign(body.url);
+                else window.location.assign('/ao/account.html');
+              })
+              .catch(function(){ window.location.assign('/ao/account.html'); });
+            }
+
+            document.querySelectorAll('.price-card').forEach(function(card){
+              var plan = card.getAttribute('data-plan');
+              var cta = card.querySelector('a.btn');
+              if (!cta) return;
+              if (plan === currentPlan) {
+                var tag = card.querySelector('.tier-tag');
+                if (tag) tag.textContent = 'Current plan';
+                cta.textContent = 'You\'re on ' + plan.charAt(0).toUpperCase() + plan.slice(1);
+                cta.setAttribute('aria-disabled', 'true');
+                cta.style.opacity = '0.6';
+                cta.style.pointerEvents = 'none';
+                cta.setAttribute('href', '#');
+                return;
+              }
+              var isUpgrade = (planRank[plan] || 0) > (planRank[currentPlan] || 0);
+              cta.textContent = (isUpgrade ? 'Upgrade to ' : 'Switch to ') +
+                plan.charAt(0).toUpperCase() + plan.slice(1) + ' →';
+              cta.setAttribute('href', '#');
+              cta.addEventListener('click', function(ev){
+                ev.preventDefault();
+                if (typeof gtag === 'function') {
+                  gtag('event', 'pricing_cta_click', {
+                    from_plan: currentPlan, to_plan: plan,
+                    direction: isUpgrade ? 'upgrade' : 'downgrade',
+                    period: currentPeriod()
+                  });
+                }
+                if (plan === 'free') {
+                  // Downgrade-to-free → portal (where cancel lives).
+                  openPortal();
+                } else if (isUpgrade) {
+                  startCheckout(plan);
+                } else {
+                  // Paid-to-paid switch → portal handles it.
+                  openPortal();
+                }
+              });
+            });
+          }
+        }
+      } catch (e) {}
+    })();
+  </script>
+
+  <footer class="ao-footer">
+    <div class="left">
+      Built by <a href="https://deliberateux.com">Jack Satta</a> &middot; <a href="https://deliberateux.com">Deliberate UX</a>
+    </div>
+    <div class="links">
+      <a href="/ao/">Overview</a>
+      <a href="/ao/tour.html">Tour</a>
+      <a href="mailto:ao@deliberateux.com">Contact</a>
+    </div>
+    <span class="badge"><span class="dot"></span>Private Beta</span>
+  </footer>
+
+</body>
+</html>

@@ -7,6 +7,7 @@
 <link rel="icon" href="/assets/favicon.svg">
 <link rel="stylesheet" href="ao-theme.css">
 <script>(function(){var t=localStorage.getItem('ao_theme');if(t)document.documentElement.dataset.theme=t})()</script>
+<script src="ao-user.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
@@ -212,10 +213,11 @@ body{font-family:var(--font);color:var(--text);background:var(--bg);display:flex
   var currentOrg = null;
   var bc = new BroadcastChannel('ao_app');
 
-  // Load org context
+  // Load org context (per-user namespace)
   function loadOrg(){
     try{
-      var orgs = JSON.parse(localStorage.getItem('ao_orgs')||'[]');
+      var orgs = window.AOUser ? AOUser.getJSON('orgs', []) :
+        JSON.parse(localStorage.getItem('ao_orgs')||'[]');
       var slug = new URLSearchParams(location.search).get('org');
       if(slug) currentOrg = orgs.find(function(o){return o.slug===slug});
       if(!currentOrg && orgs.length) currentOrg = orgs[0];
@@ -258,7 +260,7 @@ body{font-family:var(--font);color:var(--text);background:var(--bg);display:flex
       url += (url.indexOf('?')>=0?'&':'?') + 'slug=' + currentOrg.slug;
     }
     // Pass admin flag
-    if(localStorage.getItem('ao_admin')==='1'){
+    if((window.AOUser && AOUser.isAdmin()) || localStorage.getItem('ao_admin')==='1'){
       url += (url.indexOf('?')>=0?'&':'?') + 'admin=1';
     }
 
@@ -337,10 +339,11 @@ body{font-family:var(--font);color:var(--text);background:var(--bg);display:flex
     }
   };
 
-  // ── Org switcher ───────────────────────────────────────
+  // ── Org switcher (per-user namespace) ─────────────────
   document.getElementById('sb-org').addEventListener('click', function(){
     try{
-      var orgs = JSON.parse(localStorage.getItem('ao_orgs')||'[]');
+      var orgs = window.AOUser ? AOUser.getJSON('orgs', []) :
+        JSON.parse(localStorage.getItem('ao_orgs')||'[]');
       if(orgs.length <= 1) return;
       // Cycle to next org
       var idx = orgs.findIndex(function(o){return currentOrg && o.slug === currentOrg.slug});

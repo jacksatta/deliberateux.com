@@ -1,0 +1,1134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-9MSXWF3TX3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-9MSXWF3TX3');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tour — AO</title>
+  <meta name="description" content="A walkthrough of AO — the virtual agency. Three paths: curious, evaluating, or reference." />
+  <link rel="canonical" href="https://deliberateux.com/ao/tour.html" />
+  <link rel="icon" href="/assets/favicon.svg" />
+
+  <!-- Open Graph / share previews -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://deliberateux.com/ao/tour.html" />
+  <meta property="og:title" content="Tour AO — Autonomous Operations" />
+  <meta property="og:description" content="A guided walkthrough of AO. Pick a path: curious (4 min), evaluating (7 min), or reference (5 min)." />
+  <meta property="og:image" content="https://deliberateux.com/ao/og.svg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content="Deliberate UX" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Tour AO — Autonomous Operations" />
+  <meta name="twitter:description" content="A guided walkthrough of AO. Three paths to choose from." />
+  <meta name="twitter:image" content="https://deliberateux.com/ao/og.svg" />
+  <link rel="stylesheet" href="ao-theme.css">
+  <script src="ao-user.js"></script>
+  <script src="ao-nav.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--bg);
+      background-image:
+        radial-gradient(900px 700px at 50% -5%, rgba(var(--amber), 0.10), transparent 60%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      -webkit-font-smoothing: antialiased;
+      min-height: 100%;
+    }
+
+    .tour-wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 40px 28px 120px;
+    }
+
+    /* ── Chooser (entry screen) ─────────────────────────────────── */
+    .chooser-hero {
+      text-align: center;
+      padding: 32px 0 48px;
+    }
+    .chooser-hero h1 {
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin: 0 0 18px;
+    }
+    .chooser-hero .sub {
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.55;
+      max-width: 58ch;
+      margin: 0 auto;
+    }
+    .paths-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    @media (max-width: 820px) {
+      .paths-grid { grid-template-columns: 1fr; }
+    }
+    .path-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px 26px;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+      box-shadow: var(--shadow-soft);
+    }
+    .path-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(var(--amber), 0.35);
+      box-shadow: 0 10px 32px -12px rgba(var(--amber), 0.25), var(--shadow-soft);
+    }
+    .path-card .chip {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgb(var(--amber));
+      background: rgba(var(--amber), 0.12);
+      border: 1px solid rgba(var(--amber), 0.28);
+      padding: 4px 10px;
+      border-radius: 999px;
+      align-self: flex-start;
+    }
+    .path-card h3 {
+      font-size: 22px;
+      font-weight: 600;
+      margin: 4px 0 0;
+      letter-spacing: -0.01em;
+    }
+    .path-card .who {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.5;
+    }
+    .path-card .takeaway {
+      font-size: 13px;
+      color: var(--faint);
+      margin: 0;
+      line-height: 1.5;
+      padding-top: 12px;
+      border-top: 1px solid var(--hairline);
+    }
+    .path-card .time {
+      font-size: 11px;
+      color: var(--faint);
+      font-family: var(--mono);
+      margin-top: auto;
+    }
+
+    /* ── Step view ──────────────────────────────────────────────── */
+    .tour-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 0 24px;
+      border-bottom: 1px solid var(--hairline);
+      margin-bottom: 32px;
+    }
+    .tour-bar .path-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .tour-bar .step-count {
+      font-size: 12px;
+      color: var(--faint);
+      font-family: var(--mono);
+      margin-left: auto;
+    }
+    .tour-bar .exit {
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border2);
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      transition: color 120ms ease, border-color 120ms ease;
+    }
+    .tour-bar .exit:hover { color: var(--text); border-color: var(--border3); }
+
+    .progress {
+      position: relative;
+      height: 4px;
+      background: var(--panel);
+      border-radius: 999px;
+      margin-bottom: 36px;
+      overflow: hidden;
+    }
+    .progress > span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, rgba(var(--amber), 0.7), rgba(var(--amber), 1));
+      transition: width 280ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .step {
+      animation: fadeUp 260ms ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .step h2 {
+      font-size: clamp(28px, 3.4vw, 38px);
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      margin: 0 0 14px;
+      line-height: 1.15;
+    }
+    .step .intro {
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.6;
+      margin: 0 0 28px;
+      max-width: 62ch;
+    }
+    .step .intro strong { color: var(--text); font-weight: 600; }
+
+    .visual {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 22px 24px;
+      margin: 0 0 24px;
+      box-shadow: var(--shadow-soft);
+    }
+    .visual.flush { padding: 0; overflow: hidden; }
+    .visual h4 {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin: 0 0 14px;
+    }
+
+    /* Mock screen frame (for product screenshots / stylized previews) */
+    .mock {
+      background: var(--panel);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    .mock-chrome {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      background: var(--panel2);
+      border-bottom: 1px solid var(--border2);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--faint);
+    }
+    .mock-chrome .dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+    }
+    .mock-chrome .url {
+      margin-left: 12px;
+      padding: 2px 8px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--muted);
+    }
+    .mock-body { padding: 20px 22px; }
+
+    /* Agent roster visual */
+    .agent-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 720px) { .agent-grid { grid-template-columns: repeat(2, 1fr); } }
+    .agent-cell {
+      background: var(--panel);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+    }
+    .agent-cell .name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+    .agent-cell .role {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    /* Queue / pipeline visual */
+    .pipeline {
+      display: grid;
+      gap: 8px;
+    }
+    .pipe-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: var(--panel);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+    }
+    .pipe-row .num {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--faint);
+      width: 22px;
+    }
+    .pipe-row .stage { flex: 1; color: var(--text); }
+    .pipe-row .agent {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .pipe-row .status {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+    .pipe-row .status.done { background: rgba(var(--green, 74, 222, 128), 0.14); color: rgb(var(--green, 74, 222, 128)); }
+    .pipe-row .status.run  { background: rgba(var(--amber), 0.14);  color: rgb(var(--amber)); }
+    .pipe-row .status.wait { background: rgba(255,255,255,0.06); color: var(--muted); }
+
+    /* Plan comparison mini-card */
+    .tier-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 720px) { .tier-row { grid-template-columns: 1fr; } }
+    .tier-cell {
+      background: var(--panel);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+    }
+    .tier-cell.featured { border-color: rgba(var(--amber), 0.45); background: rgba(var(--amber), 0.05); }
+    .tier-cell .t-name {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .tier-cell .t-price {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    .tier-cell .t-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.45;
+    }
+
+    /* Flow diagram (signup → checkout → webhook) */
+    .flow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .flow .node {
+      padding: 8px 12px;
+      background: var(--panel);
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .flow .node.accent {
+      border-color: rgba(var(--amber), 0.45);
+      background: rgba(var(--amber), 0.08);
+      color: rgb(var(--amber));
+    }
+    .flow .arrow {
+      color: var(--faint);
+      font-family: var(--mono);
+    }
+
+    /* Callout for speaker notes / reference tips */
+    .callout {
+      background: var(--panel);
+      border-left: 3px solid rgba(var(--amber), 0.6);
+      border-radius: 4px;
+      padding: 12px 16px;
+      margin: 20px 0 0;
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+    .callout strong { color: var(--text); }
+    .callout code {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgb(var(--amber));
+      background: var(--panel2);
+      padding: 1px 6px;
+      border-radius: 3px;
+    }
+
+    /* Nav buttons */
+    .tour-nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 40px;
+      padding-top: 24px;
+      border-top: 1px solid var(--hairline);
+    }
+    .btn {
+      appearance: none;
+      border: 0;
+      padding: 11px 18px;
+      border-radius: var(--radius-sm);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: filter 120ms ease, transform 120ms ease, background 120ms ease, border-color 120ms ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-primary {
+      background: rgba(var(--amber), 0.92);
+      color: #1a1200;
+      font-weight: 600;
+    }
+    .btn-primary:hover { filter: brightness(1.06); }
+    .btn-primary:active { transform: translateY(1px); }
+    .btn-primary[disabled] { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border2);
+    }
+    .btn-ghost:hover { color: var(--text); border-color: var(--border3); }
+    .btn-ghost[disabled] { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+    .btn-accent {
+      background: transparent;
+      border: 1px solid rgba(var(--amber), 0.4);
+      color: rgb(var(--amber));
+    }
+    .btn-accent:hover { background: rgba(var(--amber), 0.08); border-color: rgba(var(--amber), 0.6); }
+
+    .tour-nav .spacer { flex: 1; }
+
+    .share-pill {
+      font-size: 11px;
+      color: var(--faint);
+      font-family: var(--mono);
+      background: var(--panel);
+      border: 1px solid var(--border2);
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: color 120ms ease;
+    }
+    .share-pill:hover { color: var(--text); }
+    .share-pill.copied { color: rgb(var(--amber)); }
+
+    .hidden { display: none !important; }
+
+    /* Key-cap hint */
+    kbd {
+      font-family: var(--mono);
+      font-size: 11px;
+      background: var(--panel2);
+      border: 1px solid var(--border2);
+      border-bottom-width: 2px;
+      border-radius: 4px;
+      padding: 1px 6px;
+      color: var(--muted);
+    }
+
+    .kbd-hint {
+      position: fixed;
+      bottom: 22px;
+      right: 24px;
+      font-size: 11px;
+      color: var(--faint);
+      background: var(--panel);
+      border: 1px solid var(--border2);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      backdrop-filter: blur(10px);
+    }
+    @media (max-width: 720px) { .kbd-hint { display: none; } }
+  </style>
+</head>
+<body>
+
+  <main class="tour-wrap">
+
+    <!-- ── CHOOSER (entry screen) ──────────────────────────────── -->
+    <section id="chooser" class="hidden">
+      <div class="chooser-hero">
+        <h1>Take a tour of AO.</h1>
+        <p class="sub">
+          AO is a seven-agent virtual agency that runs on your brief. Pick the path
+          that matches where you are — each one is a short, linear walkthrough.
+        </p>
+      </div>
+
+      <div class="paths-grid" id="paths-grid">
+        <!-- Filled by JS from TOURS data -->
+      </div>
+    </section>
+
+    <!-- ── STEP VIEW ───────────────────────────────────────────── -->
+    <section id="step-view" class="hidden">
+      <div class="tour-bar">
+        <span class="path-label" id="bar-label">Tour</span>
+        <span class="step-count" id="bar-count">1 / 1</span>
+        <span class="spacer" style="flex:1"></span>
+        <span class="share-pill" id="share-btn" title="Copy shareable link">share step</span>
+        <a class="exit" id="exit-btn" href="/ao/tour.html">switch path</a>
+      </div>
+
+      <div class="progress"><span id="progress-fill" style="width:0%"></span></div>
+
+      <article class="step" id="step-container">
+        <!-- Rendered from TOURS[path][step] -->
+      </article>
+
+      <nav class="tour-nav">
+        <button class="btn btn-ghost" id="prev-btn" type="button">← Prev</button>
+        <span class="spacer"></span>
+        <button class="btn btn-primary" id="next-btn" type="button">Next →</button>
+      </nav>
+    </section>
+
+  </main>
+
+  <div class="kbd-hint">
+    <kbd>←</kbd><kbd>→</kbd>
+    <span>navigate · </span>
+    <kbd>Esc</kbd>
+    <span>exit</span>
+  </div>
+
+  <script>
+    (function(){
+      'use strict';
+
+      // ── Data ────────────────────────────────────────────────────
+      // Each path is an array of steps. Each step has { title, intro, visual }.
+      // `visual` is inline HTML rendered inside the step container — kept
+      // declarative so content can be edited without touching the renderer.
+
+      var TOURS = {
+        curious: {
+          meta: {
+            label: 'Curious',
+            chip: 'First look',
+            title: 'I\'m just looking',
+            who: 'You\'ve heard of AO and want to know what it actually is.',
+            takeaway: 'You\'ll leave knowing if this is worth trying.',
+            time: '~4 min · 7 steps'
+          },
+          steps: [
+            {
+              title: 'The problem: a small team can\'t afford a real agency.',
+              intro: 'Running marketing, dev, UXR, QA, biz dev, and customer service takes a team of five to ten people — $400K–$1M a year in Portland. For a founder, a designer-of-one, a two-person studio — that\'s not happening. So work slips. Work slips long enough and the business stalls.',
+              visual:
+                '<div class="visual"><h4>What usually happens</h4>' +
+                '<div class="pipeline">' +
+                '<div class="pipe-row"><span class="num">01</span><span class="stage">Landing page copy that never gets rewritten</span><span class="status wait">waiting</span></div>' +
+                '<div class="pipe-row"><span class="num">02</span><span class="stage">Competitor scan that should happen every week</span><span class="status wait">waiting</span></div>' +
+                '<div class="pipe-row"><span class="num">03</span><span class="stage">Accessibility audit before the next launch</span><span class="status wait">waiting</span></div>' +
+                '<div class="pipe-row"><span class="num">04</span><span class="stage">Answering last Tuesday\'s support email</span><span class="status wait">waiting</span></div>' +
+                '</div></div>'
+            },
+            {
+              title: 'The idea: a virtual agency that actually runs.',
+              intro: 'AO is seven specialist AI agents — plus an executive assistant — that work like a real team. They write briefs to each other, escalate blockers, hand off deliverables, and track what\'s in progress. You get the output without hiring anyone.',
+              visual:
+                '<div class="visual"><h4>The roster</h4><div class="agent-grid">' +
+                '<div class="agent-cell"><div class="name">Marketing Lead</div><div class="role">Competitive scans, positioning, launch prep</div></div>' +
+                '<div class="agent-cell"><div class="name">Dev Lead</div><div class="role">Feature implementation, deploys</div></div>' +
+                '<div class="agent-cell"><div class="name">UX Research</div><div class="role">Heuristic evals, accessibility audits</div></div>' +
+                '<div class="agent-cell"><div class="name">Biz Dev</div><div class="role">Distribution, pricing, partnerships</div></div>' +
+                '<div class="agent-cell"><div class="name">Customer Service</div><div class="role">Inbox triage, feedback synthesis</div></div>' +
+                '<div class="agent-cell"><div class="name">QA / Brand</div><div class="role">Visual regression, brand consistency</div></div>' +
+                '<div class="agent-cell"><div class="name">Exec Assistant</div><div class="role">Unblocks agents, routes decisions</div></div>' +
+                '<div class="agent-cell" style="border-color:rgba(var(--amber),0.45);background:rgba(var(--amber),0.06)"><div class="name" style="color:rgb(var(--amber))">You (CEO)</div><div class="role">Set direction · veto · ship</div></div>' +
+                '</div></div>'
+            },
+            {
+              title: 'How they coordinate: briefs, handoffs, queue.',
+              intro: 'Agents don\'t just prompt each other. They write structured briefs to <strong>/briefs/</strong>, hand off work through <strong>/handoffs/</strong>, and track multi-stage tasks in a <strong>/queue/</strong>. The Executive Assistant watches everything, unblocks what it can, and escalates only what you need to decide.',
+              visual:
+                '<div class="visual"><h4>A task moving through the agency</h4>' +
+                '<div class="pipeline">' +
+                '<div class="pipe-row"><span class="num">1</span><span class="stage">Marketing writes competitive scan</span><span class="agent">Marketing</span><span class="status done">done</span></div>' +
+                '<div class="pipe-row"><span class="num">2</span><span class="stage">UXR reviews, scores severity</span><span class="agent">UXR</span><span class="status done">done</span></div>' +
+                '<div class="pipe-row"><span class="num">3</span><span class="stage">Dev implements pricing tweak</span><span class="agent">Dev</span><span class="status run">running</span></div>' +
+                '<div class="pipe-row"><span class="num">4</span><span class="stage">QA validates before ship</span><span class="agent">QA</span><span class="status wait">waiting</span></div>' +
+                '<div class="pipe-row"><span class="num">5</span><span class="stage">EA synthesizes, reports to you</span><span class="agent">EA</span><span class="status wait">waiting</span></div>' +
+                '</div></div>'
+            },
+            {
+              title: 'Your role: set direction, approve, ship.',
+              intro: 'You\'re CEO. You brief, you veto, you decide on pricing / brand / external commitments. Everything else runs without you. The EA generates a morning summary so you see only what needs your attention — usually zero to three decisions a day.',
+              visual:
+                '<div class="visual"><h4>A typical morning</h4>' +
+                '<div class="pipeline">' +
+                '<div class="pipe-row"><span class="num">☕</span><span class="stage">Open your morning email</span><span class="agent">7:02 AM</span><span class="status done">arrived</span></div>' +
+                '<div class="pipe-row"><span class="num">📬</span><span class="stage">3 decisions to approve · 1 launch ready · 2 briefs drafted</span><span class="agent">EA digest</span><span class="status run">open</span></div>' +
+                '<div class="pipe-row"><span class="num">✓</span><span class="stage">Click, approve, add a note, close laptop</span><span class="agent">You</span><span class="status wait">done in 8 min</span></div>' +
+                '</div></div>'
+            },
+            {
+              title: 'What it looks like.',
+              intro: 'You don\'t talk to a chatbot. You watch your agency work. The dashboard shows live agent runs, the queue shows pipelines in progress, and the report shows what shipped since yesterday.',
+              visual:
+                '<div class="visual flush">' +
+                '<div class="mock"><div class="mock-chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">deliberateux.com/ao/dashboard.html</span></div>' +
+                '<div class="mock-body">' +
+                '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
+                '<div class="pipe-row"><span class="num">MA</span><span class="stage">Marketing · competitive scan</span><span class="status run">running</span></div>' +
+                '<div class="pipe-row"><span class="num">DV</span><span class="stage">Dev · pricing CTA wire</span><span class="status done">done</span></div>' +
+                '<div class="pipe-row"><span class="num">UX</span><span class="stage">UXR · a11y audit</span><span class="status run">running</span></div>' +
+                '<div class="pipe-row"><span class="num">BD</span><span class="stage">Biz Dev · channel scout</span><span class="status wait">queued</span></div>' +
+                '<div class="pipe-row"><span class="num">CS</span><span class="stage">CS · inbox triage</span><span class="status done">done</span></div>' +
+                '<div class="pipe-row"><span class="num">QA</span><span class="stage">QA · brand check</span><span class="status done">done</span></div>' +
+                '</div></div></div></div>'
+            },
+            {
+              title: 'What you get, per tier.',
+              intro: 'Start free. Upgrade when you need more runs, more orgs, or integrations. All plans include every agent — the gate is how much they run, not which ones you can hire.',
+              visual:
+                '<div class="visual"><div class="tier-row">' +
+                '<div class="tier-cell"><div class="t-name">Free</div><div class="t-price">$0</div><div class="t-sub">1 org · 100 agent runs / mo · no credit card</div></div>' +
+                '<div class="tier-cell featured"><div class="t-name" style="color:rgb(var(--amber))">Pro</div><div class="t-price">$29<span style="font-size:13px;color:var(--muted);font-weight:400"> / mo</span></div><div class="t-sub">3 orgs · 2,000 runs / mo · 3 integrations · $290 / yr (save 17%)</div></div>' +
+                '<div class="tier-cell"><div class="t-name">Team</div><div class="t-price">$49<span style="font-size:13px;color:var(--muted);font-weight:400"> / user / mo</span></div><div class="t-sub">unlimited orgs · 10,000 runs / seat · everything</div></div>' +
+                '</div></div>'
+            },
+            {
+              title: 'Ready to look inside?',
+              intro: 'Start free — no card, no friction. Your Free org keeps all your briefs, flows, and agent history. When you\'re ready to scale, upgrade in two clicks.',
+              visual:
+                '<div class="visual" style="text-align:center;padding:40px 28px">' +
+                '<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">' +
+                '<a class="btn btn-primary" href="/ao/account.html?plan=free&next=%2Fao%2Fconfigure.html">Start free →</a>' +
+                '<a class="btn btn-accent" href="/ao/pricing.html">See pricing</a>' +
+                '<a class="btn btn-ghost" href="#" data-jump="evaluating/0">Deeper product tour →</a>' +
+                '</div>' +
+                '<p style="color:var(--faint);font-size:12px;margin:18px 0 0">Takes about a minute. You can keep exploring in guest mode in a separate tab.</p>' +
+                '</div>'
+            }
+          ]
+        },
+
+        evaluating: {
+          meta: {
+            label: 'Evaluating',
+            chip: 'Product tour',
+            title: 'I\'m evaluating',
+            who: 'You\'re deciding whether to start a trial or buy a plan.',
+            takeaway: 'You\'ll see every major screen and exactly what each tier unlocks.',
+            time: '~7 min · 10 steps'
+          },
+          steps: [
+            {
+              title: 'The 30-second pitch.',
+              intro: 'AO runs a seven-agent virtual agency on your brief. You pick the direction; they do the work and escalate only what needs your sign-off. Every plan includes every agent — the gate is runs-per-month, not which agents you can use.',
+              visual:
+                '<div class="visual"><h4>What you pay for</h4>' +
+                '<div class="flow">' +
+                '<span class="node">Your brief</span><span class="arrow">→</span>' +
+                '<span class="node accent">Agents run</span><span class="arrow">→</span>' +
+                '<span class="node">You get briefs, drafts, deploys, audits</span>' +
+                '</div>' +
+                '<div class="callout"><strong>Not a chatbot.</strong> You don\'t type into a prompt box. You set up orgs, give agents domains, and they work asynchronously with audit trails you can replay.</div>' +
+                '</div>'
+            },
+            {
+              title: 'Sign up → onboarding.',
+              intro: 'One account gives you every org you build. Sign up with Google or email. The first org starts in onboarding, where you set the name, choose a role profile (solo / small-team / agency), and pick which agents are on by default.',
+              visual:
+                '<div class="visual flush">' +
+                '<div class="mock"><div class="mock-chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">deliberateux.com/ao/onboard.html</span></div>' +
+                '<div class="mock-body">' +
+                '<div style="font-size:14px;color:var(--text);margin-bottom:8px;font-weight:600">Step 2 of 5 · Which agents are on?</div>' +
+                '<div class="agent-grid" style="grid-template-columns:repeat(3,1fr);gap:8px">' +
+                '<div class="agent-cell" style="border-color:rgba(var(--amber),0.45);background:rgba(var(--amber),0.06)"><div class="name">Marketing ✓</div><div class="role">on</div></div>' +
+                '<div class="agent-cell" style="border-color:rgba(var(--amber),0.45);background:rgba(var(--amber),0.06)"><div class="name">Dev ✓</div><div class="role">on</div></div>' +
+                '<div class="agent-cell"><div class="name">UXR</div><div class="role">off</div></div>' +
+                '<div class="agent-cell" style="border-color:rgba(var(--amber),0.45);background:rgba(var(--amber),0.06)"><div class="name">QA ✓</div><div class="role">on</div></div>' +
+                '<div class="agent-cell"><div class="name">Biz Dev</div><div class="role">off</div></div>' +
+                '<div class="agent-cell" style="border-color:rgba(var(--amber),0.45);background:rgba(var(--amber),0.06)"><div class="name">EA ✓</div><div class="role">on</div></div>' +
+                '</div></div></div></div>'
+            },
+            {
+              title: 'Configure your org.',
+              intro: 'Point each agent at the context it needs: brand guidelines for QA, competitor list for Marketing, code repo for Dev. Config persists per org — switch orgs and the whole team\'s context swaps with you.',
+              visual:
+                '<div class="visual flush">' +
+                '<div class="mock"><div class="mock-chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">deliberateux.com/ao/configure.html?org=acme</span></div>' +
+                '<div class="mock-body">' +
+                '<div class="pipeline">' +
+                '<div class="pipe-row"><span class="num">MA</span><span class="stage">Competitors: Figma, Framer, Webflow</span><span class="status done">configured</span></div>' +
+                '<div class="pipe-row"><span class="num">DV</span><span class="stage">Repo: github.com/acme/site</span><span class="status done">configured</span></div>' +
+                '<div class="pipe-row"><span class="num">QA</span><span class="stage">Brand guide: uploaded.pdf</span><span class="status done">configured</span></div>' +
+                '<div class="pipe-row"><span class="num">CS</span><span class="stage">Inbox: support@acme.com</span><span class="status wait">not connected</span></div>' +
+                '</div></div></div></div>'
+            },
+            {
+              title: 'Flows studio.',
+              intro: 'Flows are named pipelines — "ship a landing page," "audit the newsletter," "respond to VIP support." They compose the right agents in the right order. Start with our templates or build your own.',
+              visual:
+                '<div class="visual">' +
+                '<h4>Flow: "Ship a landing page"</h4>' +
+                '<div class="pipeline">' +
+                '<div class="pipe-row"><span class="num">1</span><span class="stage">UXR · heuristic eval of the current page</span><span class="agent">UXR</span><span class="status wait">stage</span></div>' +
+                '<div class="pipe-row"><span class="num">2</span><span class="stage">Marketing · rewrite copy</span><span class="agent">Marketing</span><span class="status wait">stage</span></div>' +
+                '<div class="pipe-row"><span class="num">3</span><span class="stage">Dev · implement + deploy</span><span class="agent">Dev</span><span class="status wait">stage</span></div>' +
+                '<div class="pipe-row"><span class="num">4</span><span class="stage">QA · visual regression + a11y</span><span class="agent">QA</span><span class="status wait">stage</span></div>' +
+                '<div class="pipe-row"><span class="num">5</span><span class="stage">EA · summary report</span><span class="agent">EA</span><span class="status wait">stage</span></div>' +
+                '</div>' +
+                '<div class="callout"><strong>Flows are reusable.</strong> Save one, run it on any org. Edit the template, re-run last week\'s flow on a new landing page.</div>' +
+                '</div>'
+            },
+            {
+              title: 'The queue: live pipeline visibility.',
+              intro: 'Every flow in progress lives in the queue. You see which agent is on which stage, where it\'s stuck, and who wrote the last handoff. This is the nerve center — what the EA reads before generating your morning digest.',
+              visual:
+                '<div class="visual flush">' +
+                '<div class="mock"><div class="mock-chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">deliberateux.com/ao/queue.html</span></div>' +
+                '<div class="mock-body">' +
+                '<div class="pipeline">' +
+                '<div class="pipe-row"><span class="num">T-12</span><span class="stage">Ship the pricing page update</span><span class="agent">Dev · stage 3</span><span class="status run">running</span></div>' +
+                '<div class="pipe-row"><span class="num">T-11</span><span class="stage">Weekly competitive scan</span><span class="agent">Marketing · stage 1</span><span class="status done">complete</span></div>' +
+                '<div class="pipe-row"><span class="num">T-10</span><span class="stage">Respond to 4 support tickets</span><span class="agent">CS</span><span class="status done">complete</span></div>' +
+                '<div class="pipe-row"><span class="num">T-09</span><span class="stage">Figma plugin market deep-dive</span><span class="agent">Biz Dev · stage 2</span><span class="status run">running</span></div>' +
+                '</div></div></div></div>'
+            },
+            {
+              title: 'Usage and limits.',
+              intro: 'One agent stage = one run. The worker enforces your plan\'s monthly cap in real time. Free hard-stops at 100 so you never get surprise-billed. Pro and Team meter overage to Stripe but never block you.',
+              visual:
+                '<div class="visual"><h4>Your usage this month</h4>' +
+                '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px"><span style="font-size:22px;font-weight:600">847</span><span style="color:var(--muted)">of 2,000 runs</span></div>' +
+                '<div style="height:8px;background:var(--panel);border-radius:999px;overflow:hidden"><div style="width:42%;height:100%;background:linear-gradient(90deg,rgba(var(--amber),0.8),rgba(var(--amber),1))"></div></div>' +
+                '<div class="callout"><strong>How runs count:</strong> <code>1 stage = 1 run</code>. A 5-stage flow = 5 runs. EA synthesis is on the house — those don\'t count.</div>' +
+                '</div>'
+            },
+            {
+              title: 'Plan comparison.',
+              intro: 'Every plan ships with every agent. The only lever is how hard they can work and how many orgs they can work across.',
+              visual:
+                '<div class="visual">' +
+                '<div class="tier-row">' +
+                '<div class="tier-cell">' +
+                  '<div class="t-name">Free</div><div class="t-price">$0</div>' +
+                  '<div class="t-sub">1 org · 100 runs/mo<br>0 integrations<br>community support</div>' +
+                '</div>' +
+                '<div class="tier-cell featured">' +
+                  '<div class="t-name" style="color:rgb(var(--amber))">Pro · most popular</div><div class="t-price">$29 / mo</div>' +
+                  '<div class="t-sub">3 orgs · 2,000 runs/mo<br>3 integrations · overage metered<br>email support · $290 / yr</div>' +
+                '</div>' +
+                '<div class="tier-cell">' +
+                  '<div class="t-name">Team</div><div class="t-price">$49 / user / mo</div>' +
+                  '<div class="t-sub">unlimited orgs · 10,000 runs / seat<br>unlimited integrations<br>priority support · $490 / user / yr</div>' +
+                '</div>' +
+                '</div></div>'
+            },
+            {
+              title: 'Upgrading is two clicks.',
+              intro: 'Stripe Checkout handles billing. Your plan promotes the second the webhook fires — usually before the Stripe page redirects back. Manage cards, cancel, switch monthly ↔ annual anytime through the customer portal.',
+              visual:
+                '<div class="visual"><div class="flow">' +
+                '<span class="node">Click Upgrade</span><span class="arrow">→</span>' +
+                '<span class="node">Stripe Checkout</span><span class="arrow">→</span>' +
+                '<span class="node accent">Webhook fires</span><span class="arrow">→</span>' +
+                '<span class="node">Plan active</span>' +
+                '</div>' +
+                '<div class="callout">Downgrades and cancellations run through Stripe\'s portal — <strong>you keep paid access through the end of the billing period</strong>, then drop to Free. Your data stays; nothing is deleted.</div>' +
+                '</div>'
+            },
+            {
+              title: 'What\'s next on the roadmap.',
+              intro: 'The short list: a Zapier-style integrations library, Slack + Teams DM delivery for the EA digest, and a public "watch this agent work" view you can share. Paid users vote on priority from the account page.',
+              visual:
+                '<div class="visual">' +
+                '<div class="pipeline">' +
+                '<div class="pipe-row"><span class="num">Q2</span><span class="stage">Integrations library (Linear, Gmail, GitHub, Notion)</span><span class="status run">building</span></div>' +
+                '<div class="pipe-row"><span class="num">Q2</span><span class="stage">Slack / Teams digest delivery</span><span class="status wait">queued</span></div>' +
+                '<div class="pipe-row"><span class="num">Q3</span><span class="stage">Public shareable agent views</span><span class="status wait">queued</span></div>' +
+                '<div class="pipe-row"><span class="num">Q3</span><span class="stage">Scheduled flows (cron for your agency)</span><span class="status wait">queued</span></div>' +
+                '<div class="pipe-row"><span class="num">Q4</span><span class="stage">Team collaboration — shared orgs, roles</span><span class="status wait">queued</span></div>' +
+                '</div></div>'
+            },
+            {
+              title: 'Start free.',
+              intro: 'No card needed. Your org, flows, and history stay with you if you upgrade later. If AO isn\'t for you, drop it — we\'ll never keep anything you didn\'t ask us to.',
+              visual:
+                '<div class="visual" style="text-align:center;padding:40px 28px">' +
+                '<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">' +
+                '<a class="btn btn-primary" href="/ao/account.html?plan=free&next=%2Fao%2Fconfigure.html">Start free →</a>' +
+                '<a class="btn btn-accent" href="/ao/pricing.html">Compare plans</a>' +
+                '<a class="btn btn-ghost" href="mailto:jack@deliberateux.com?subject=AO%20evaluation">Email Jack with questions</a>' +
+                '</div>' +
+                '<p style="color:var(--faint);font-size:12px;margin:18px 0 0">Free → Pro is a one-click upgrade. Your data migrates automatically.</p>' +
+                '</div>'
+            }
+          ]
+        },
+
+        internal: {
+          meta: {
+            label: 'Internal',
+            chip: 'Reference',
+            title: 'Reference (you)',
+            who: 'You built this. This is your architecture map.',
+            takeaway: 'Handy for recall, handoff, or pitching technical stakeholders.',
+            time: '~5 min · 9 steps'
+          },
+          steps: [
+            {
+              title: 'Stack — locked 2026-04-22.',
+              intro: 'Static site on GitHub Pages, fronted by Cloudflare for DNS + CDN + HTTPS. A Cloudflare Worker sits on <code>deliberateux.com/ao/*</code> to handle auth, plan gating, and billing. Identity is Clerk. Billing is Stripe, routed through Clerk. Data is Supabase (Postgres + RLS).',
+              visual:
+                '<div class="visual"><div class="flow" style="gap:8px">' +
+                '<span class="node">Browser</span><span class="arrow">→</span>' +
+                '<span class="node">Cloudflare</span><span class="arrow">→</span>' +
+                '<span class="node accent">AO Worker</span><span class="arrow">→</span>' +
+                '<span class="node">GH Pages (static)</span>' +
+                '</div>' +
+                '<div class="flow" style="gap:8px;margin-top:14px">' +
+                '<span class="node accent">AO Worker</span><span class="arrow">↔</span>' +
+                '<span class="node">Clerk (JWT)</span><span class="arrow">↔</span>' +
+                '<span class="node">Supabase (RLS)</span><span class="arrow">↔</span>' +
+                '<span class="node">Stripe</span>' +
+                '</div>' +
+                '<div class="callout">Rationale: <code>../../new-brand/ao-account-billing-plan.md</code>. Env vars: <code>ao/backend/wrangler.toml.example</code>.</div>' +
+                '</div>'
+            },
+            {
+              title: 'Agent roster.',
+              intro: 'Seven specialists + Exec Assistant. Agents escalate to the EA, never directly to Jack — EA triages and only routes decisions that require human judgment (pricing, brand, external commitments, budget).',
+              visual:
+                '<div class="visual"><div class="agent-grid">' +
+                '<div class="agent-cell"><div class="name">Marketing</div><div class="role">daily</div></div>' +
+                '<div class="agent-cell"><div class="name">Dev</div><div class="role">on-demand</div></div>' +
+                '<div class="agent-cell"><div class="name">UX Research</div><div class="role">twice weekly</div></div>' +
+                '<div class="agent-cell"><div class="name">Biz Dev</div><div class="role">twice weekly</div></div>' +
+                '<div class="agent-cell"><div class="name">Customer Service</div><div class="role">every 4 hrs</div></div>' +
+                '<div class="agent-cell"><div class="name">QA / Brand</div><div class="role">after every deploy</div></div>' +
+                '<div class="agent-cell"><div class="name">Exec Assistant</div><div class="role">twice daily</div></div>' +
+                '<div class="agent-cell"><div class="name">Jack (CEO)</div><div class="role">veto + direction</div></div>' +
+                '</div></div>'
+            },
+            {
+              title: 'Communication surfaces.',
+              intro: 'All inter-agent comms are file-based and structured. No in-memory state sharing, no prompt chaining — everything is durable and reviewable after the fact.',
+              visual:
+                '<div class="visual"><div class="pipeline">' +
+                '<div class="pipe-row"><span class="num">📨</span><span class="stage">/handoffs/ — outputs from each agent run</span><span class="agent">durable</span><span class="status done">✓</span></div>' +
+                '<div class="pipe-row"><span class="num">📋</span><span class="stage">/briefs/ — cross-agent work requests</span><span class="agent">durable</span><span class="status done">✓</span></div>' +
+                '<div class="pipe-row"><span class="num">📊</span><span class="stage">/queue/ — multi-stage task pipelines</span><span class="agent">durable</span><span class="status done">✓</span></div>' +
+                '<div class="pipe-row"><span class="num">📌</span><span class="stage">/status/STATUS.md — living status board</span><span class="agent">durable</span><span class="status done">✓</span></div>' +
+                '<div class="pipe-row"><span class="num">⚖️</span><span class="stage">/decisions/ — items for Jack + resolved history</span><span class="agent">durable</span><span class="status done">✓</span></div>' +
+                '</div></div>'
+            },
+            {
+              title: 'Plan enforcement at the worker.',
+              intro: 'Every <code>/ao/api/runs</code> POST runs through <code>verifyClerkJWT</code>, looks up <code>users.plan</code>, and checks current-month runs against <code>PLAN_LIMITS[plan]</code>. Free hard-stops at 100 (402 plan_limit_exceeded). Pro/Team allow overage and meter it to Stripe nightly.',
+              visual:
+                '<div class="visual"><div class="flow">' +
+                '<span class="node">POST /ao/api/runs</span><span class="arrow">→</span>' +
+                '<span class="node">verify JWT</span><span class="arrow">→</span>' +
+                '<span class="node">select users.plan</span><span class="arrow">→</span>' +
+                '<span class="node accent">check usage</span><span class="arrow">→</span>' +
+                '<span class="node">insert agent_run</span>' +
+                '</div>' +
+                '<div class="callout"><strong>PLAN_LIMITS:</strong> <code>{ free: 100, pro: 2000, team: 10000 }</code>. Source of truth: <code>ao/backend/worker.js:26</code>.</div>' +
+                '</div>'
+            },
+            {
+              title: 'Signup intent handoff.',
+              intro: 'Client can\'t write Clerk <code>publicMetadata</code>. The plan-selection flow uses <code>unsafeMetadata.signup_plan</code> as the client-writable channel, then the worker\'s Clerk webhook mirrors it to <code>publicMetadata.plan</code> and Supabase <code>users.plan</code>.',
+              visual:
+                '<div class="visual"><div class="flow" style="gap:6px">' +
+                '<span class="node">pricing.html</span><span class="arrow">→</span>' +
+                '<span class="node">account.html?plan=pro</span><span class="arrow">→</span>' +
+                '<span class="node">Clerk signup</span><span class="arrow">→</span>' +
+                '<span class="node">unsafeMetadata</span><span class="arrow">→</span>' +
+                '<span class="node accent">user.created webhook</span><span class="arrow">→</span>' +
+                '<span class="node">publicMetadata.plan</span>' +
+                '</div>' +
+                '<div class="callout">After this, every JWT carries <code>plan</code> as a public claim — worker reads it without a DB round-trip.</div>' +
+                '</div>'
+            },
+            {
+              title: 'Stripe subscription lifecycle.',
+              intro: 'Checkout sessions are server-created at <code>/ao/api/billing/checkout</code> with <code>subscription_data.metadata.clerk_user_id</code>. Subscription events fire at <code>/ao/webhooks/stripe</code>, which maps <code>price.lookup_key</code> (<code>ao_pro_monthly</code>, etc.) → plan → writes Supabase + <code>publicMetadata</code>.',
+              visual:
+                '<div class="visual"><div class="pipeline">' +
+                '<div class="pipe-row"><span class="num">POST</span><span class="stage">/ao/api/billing/checkout { plan, period, seats }</span><span class="agent">worker</span><span class="status done">→ Stripe URL</span></div>' +
+                '<div class="pipe-row"><span class="num">EVT</span><span class="stage">customer.subscription.created</span><span class="agent">Stripe</span><span class="status run">mirrored</span></div>' +
+                '<div class="pipe-row"><span class="num">EVT</span><span class="stage">customer.subscription.updated</span><span class="agent">Stripe</span><span class="status run">mirrored</span></div>' +
+                '<div class="pipe-row"><span class="num">EVT</span><span class="stage">customer.subscription.deleted</span><span class="agent">Stripe</span><span class="status wait">→ free</span></div>' +
+                '<div class="pipe-row"><span class="num">CRON</span><span class="stage">nightly 06:00 UTC — push metered overage</span><span class="agent">worker scheduled</span><span class="status wait">stub</span></div>' +
+                '</div></div>'
+            },
+            {
+              title: 'Data model.',
+              intro: 'Five tables with RLS. <code>users.id</code> is Clerk user id (text, not uuid) so the JWT <code>sub</code> claim is a direct FK everywhere.',
+              visual:
+                '<div class="visual"><div class="pipeline">' +
+                '<div class="pipe-row"><span class="num">T1</span><span class="stage"><strong>users</strong> — id (clerk), email, plan, is_admin, stripe_customer</span><span class="agent">root</span><span class="status done">RLS: self</span></div>' +
+                '<div class="pipe-row"><span class="num">T2</span><span class="stage"><strong>orgs</strong> — id, user_id, slug, name, type, status</span><span class="agent">per user</span><span class="status done">RLS: owner</span></div>' +
+                '<div class="pipe-row"><span class="num">T3</span><span class="stage"><strong>agent_runs</strong> — id, user_id, org_id, agent, flow_name, status, duration_ms</span><span class="agent">billable</span><span class="status done">RLS: owner</span></div>' +
+                '<div class="pipe-row"><span class="num">T4</span><span class="stage"><strong>flow_executions</strong> — pipeline rollups</span><span class="agent">derived</span><span class="status done">RLS: owner</span></div>' +
+                '<div class="pipe-row"><span class="num">T5</span><span class="stage"><strong>admin_events</strong> — audit log</span><span class="agent">admin-only</span><span class="status done">RLS: admin</span></div>' +
+                '<div class="pipe-row"><span class="num">VW</span><span class="stage"><strong>usage_current_month</strong> — view, per-user run count</span><span class="agent">cached</span><span class="status done">—</span></div>' +
+                '</div></div>'
+            },
+            {
+              title: 'Frontend surface.',
+              intro: 'Static HTML pages under <code>/ao/</code>. Every page loads <code>ao-user.js</code> (auth + localStorage namespacing) then <code>ao-nav.js</code> (shared chrome). No build step — edit, commit, push, live.',
+              visual:
+                '<div class="visual"><div class="pipeline">' +
+                '<div class="pipe-row"><span class="num">/</span><span class="stage">index.html — marketing landing</span><span class="agent">public</span><span class="status done">✓</span></div>' +
+                '<div class="pipe-row"><span class="num">/</span><span class="stage">pricing.html — tiers + signed-in checkout</span><span class="agent">public</span><span class="status done">✓</span></div>' +
+                '<div class="pipe-row"><span class="num">/</span><span class="stage">account.html — sign-in + console + billing</span><span class="agent">both</span><span class="status done">✓</span></div>' +
+                '<div class="pipe-row"><span class="num">/</span><span class="stage">onboard.html — org setup wizard</span><span class="agent">auth</span><span class="status done">✓</span></div>' +
+                '<div class="pipe-row"><span class="num">/</span><span class="stage">configure.html — per-org config</span><span class="agent">auth</span><span class="status done">✓</span></div>' +
+                '<div class="pipe-row"><span class="num">/</span><span class="stage">flows.html / queue.html / dashboard.html</span><span class="agent">auth</span><span class="status done">✓</span></div>' +
+                '<div class="pipe-row"><span class="num">/</span><span class="stage">tour.html — this file</span><span class="agent">public</span><span class="status run">running</span></div>' +
+                '</div></div>'
+            },
+            {
+              title: 'Wiring order (what\'s left).',
+              intro: 'Backend scaffolding is locked. To go from static demo to live SaaS, the remaining path is ordered — each step unblocks the next.',
+              visual:
+                '<div class="visual"><div class="pipeline">' +
+                '<div class="pipe-row"><span class="num">1</span><span class="stage">Create Supabase project, run <code>schema.sql</code>, capture URL + service key</span><span class="status wait">todo</span></div>' +
+                '<div class="pipe-row"><span class="num">2</span><span class="stage">Create Clerk app, enable Stripe billing integration, define <code>plan</code> + <code>is_admin</code> metadata keys</span><span class="status wait">todo</span></div>' +
+                '<div class="pipe-row"><span class="num">3</span><span class="stage">Load Clerk SDK on every AO page (before ao-user.js)</span><span class="status wait">todo</span></div>' +
+                '<div class="pipe-row"><span class="num">4</span><span class="stage"><code>wrangler deploy</code> the worker, route <code>/ao/*</code> through it</span><span class="status wait">todo</span></div>' +
+                '<div class="pipe-row"><span class="num">5</span><span class="stage">Create Stripe products + set <code>lookup_key</code>s to <code>ao_pro_monthly</code>, etc.</span><span class="status wait">todo</span></div>' +
+                '<div class="pipe-row"><span class="num">6</span><span class="stage">Agent-run proxy to Jack\'s Mac (compute ceiling is the real constraint)</span><span class="status wait">later</span></div>' +
+                '</div>' +
+                '<div class="callout">Reference: <code>ao/backend/README.md</code> → "Wiring order."</div>' +
+                '</div>'
+            }
+          ]
+        }
+      };
+
+      // ── Router ──────────────────────────────────────────────────
+      var QS = new URLSearchParams(location.search);
+      var PATH = QS.get('path');
+      var STEP = parseInt(QS.get('step'), 10);
+      if (isNaN(STEP)) STEP = 0;
+
+      var $ = function(id){ return document.getElementById(id); };
+
+      function renderChooser() {
+        $('step-view').classList.add('hidden');
+        $('chooser').classList.remove('hidden');
+        var grid = $('paths-grid');
+        grid.innerHTML = '';
+        Object.keys(TOURS).forEach(function(key){
+          var t = TOURS[key];
+          var card = document.createElement('a');
+          card.className = 'path-card';
+          card.href = '?path=' + key + '&step=0';
+          card.addEventListener('click', function(ev){
+            ev.preventDefault();
+            gtag('event', 'tour_path_start', { path: key });
+            go(key, 0);
+          });
+          card.innerHTML =
+            '<span class="chip">' + escapeHtml(t.meta.chip) + '</span>' +
+            '<h3>' + escapeHtml(t.meta.title) + '</h3>' +
+            '<p class="who">' + escapeHtml(t.meta.who) + '</p>' +
+            '<p class="takeaway">' + escapeHtml(t.meta.takeaway) + '</p>' +
+            '<span class="time">' + escapeHtml(t.meta.time) + '</span>';
+          grid.appendChild(card);
+        });
+      }
+
+      function renderStep(pathKey, stepIdx) {
+        var tour = TOURS[pathKey];
+        if (!tour) { renderChooser(); return; }
+        var steps = tour.steps;
+        if (stepIdx < 0) stepIdx = 0;
+        if (stepIdx >= steps.length) stepIdx = steps.length - 1;
+        var step = steps[stepIdx];
+
+        $('chooser').classList.add('hidden');
+        $('step-view').classList.remove('hidden');
+
+        $('bar-label').textContent = tour.meta.label;
+        $('bar-count').textContent = (stepIdx + 1) + ' / ' + steps.length;
+        $('progress-fill').style.width = ((stepIdx + 1) / steps.length * 100) + '%';
+
+        $('step-container').innerHTML =
+          '<h2>' + step.title + '</h2>' +
+          '<p class="intro">' + step.intro + '</p>' +
+          (step.visual || '');
+
+        $('prev-btn').disabled = stepIdx === 0;
+        var nextBtn = $('next-btn');
+        if (stepIdx === steps.length - 1) {
+          nextBtn.textContent = 'Finish ✓';
+        } else {
+          nextBtn.textContent = 'Next →';
+        }
+
+        // Wire any data-jump="path/step" anchors inside step content.
+        $('step-container').querySelectorAll('[data-jump]').forEach(function(el){
+          el.addEventListener('click', function(ev){
+            ev.preventDefault();
+            var parts = el.getAttribute('data-jump').split('/');
+            go(parts[0], parseInt(parts[1], 10) || 0);
+          });
+        });
+
+        // GA: track per-step for tour engagement depth.
+        gtag('event', 'tour_step_view', {
+          path: pathKey,
+          step: stepIdx,
+          step_title: step.title.replace(/<[^>]+>/g, '').slice(0, 80)
+        });
+      }
+
+      function go(pathKey, stepIdx) {
+        PATH = pathKey; STEP = stepIdx;
+        var url = '?path=' + encodeURIComponent(pathKey) + '&step=' + stepIdx;
+        history.pushState({ path: pathKey, step: stepIdx }, '', url);
+        render();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function render() {
+        if (!PATH || !TOURS[PATH]) renderChooser();
+        else renderStep(PATH, STEP);
+      }
+
+      function escapeHtml(s) {
+        return String(s || '').replace(/[&<>"']/g, function(c){
+          return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+        });
+      }
+
+      // ── Controls ────────────────────────────────────────────────
+      $('prev-btn').addEventListener('click', function(){
+        if (!PATH) return;
+        if (STEP > 0) go(PATH, STEP - 1);
+      });
+      $('next-btn').addEventListener('click', function(){
+        if (!PATH) return;
+        var max = TOURS[PATH].steps.length - 1;
+        if (STEP < max) {
+          go(PATH, STEP + 1);
+        } else {
+          // Finish: return to chooser, fire completion event.
+          gtag('event', 'tour_complete', { path: PATH, steps: max + 1 });
+          PATH = null; STEP = 0;
+          history.pushState({}, '', '/ao/tour.html');
+          render();
+        }
+      });
+      $('exit-btn').addEventListener('click', function(ev){
+        ev.preventDefault();
+        PATH = null; STEP = 0;
+        history.pushState({}, '', '/ao/tour.html');
+        render();
+      });
+      $('share-btn').addEventListener('click', function(){
+        var url = location.origin + location.pathname + location.search;
+        var btn = $('share-btn');
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(function(){
+            btn.textContent = 'copied ✓';
+            btn.classList.add('copied');
+            setTimeout(function(){
+              btn.textContent = 'share step';
+              btn.classList.remove('copied');
+            }, 1800);
+          });
+        } else {
+          // Fallback: prompt
+          window.prompt('Shareable link:', url);
+        }
+        gtag('event', 'tour_step_share', { path: PATH, step: STEP });
+      });
+
+      // Keyboard nav
+      document.addEventListener('keydown', function(ev){
+        if (ev.target && /^(INPUT|TEXTAREA|SELECT)$/.test(ev.target.tagName)) return;
+        if (ev.key === 'ArrowRight' && PATH) { $('next-btn').click(); }
+        else if (ev.key === 'ArrowLeft' && PATH) { $('prev-btn').click(); }
+        else if (ev.key === 'Escape' && PATH) { $('exit-btn').click(); }
+      });
+
+      // Back/forward
+      window.addEventListener('popstate', function(){
+        var q = new URLSearchParams(location.search);
+        PATH = q.get('path');
+        STEP = parseInt(q.get('step'), 10) || 0;
+        render();
+      });
+
+      render();
+    })();
+  </script>
+
+  <footer class="ao-footer">
+    <div class="left">
+      Built by <a href="https://deliberateux.com">Jack Satta</a> &middot; <a href="https://deliberateux.com">Deliberate UX</a>
+    </div>
+    <div class="links">
+      <a href="/ao/">Overview</a>
+      <a href="/ao/pricing.html">Pricing</a>
+      <a href="mailto:ao@deliberateux.com">Contact</a>
+    </div>
+    <span class="badge"><span class="dot"></span>Private Beta</span>
+  </footer>
+
+</body>
+</html>

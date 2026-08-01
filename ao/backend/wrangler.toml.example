@@ -1,0 +1,34 @@
+# Copy to wrangler.toml, fill in account_id, then set secrets with `wrangler secret put ...`.
+# Never commit wrangler.toml with real secrets.
+
+name = "ao-gateway"
+main = "worker.js"
+compatibility_date = "2026-04-01"
+account_id = "REPLACE_WITH_CLOUDFLARE_ACCOUNT_ID"
+
+# Public vars — safe to commit in wrangler.toml
+[vars]
+CLERK_JWT_ISSUER = "https://REPLACE-YOUR-CLERK-FRONTEND-API.clerk.accounts.dev"
+SUPABASE_URL     = "https://REPLACE-YOUR-PROJECT-REF.supabase.co"
+# TWENTY_URL    = "https://twenty.deliberateux.com"   # uncomment when Twenty is up
+# LEAD_WEBHOOK_URL = "https://hooks.zapier.com/..."   # optional generic destination
+
+# Secrets — do NOT put values here. Use `wrangler secret put NAME` for each:
+#   CLERK_SECRET_KEY
+#   CLERK_WEBHOOK_SECRET
+#   SUPABASE_SERVICE_ROLE_KEY
+#   STRIPE_SECRET_KEY
+#   STRIPE_WEBHOOK_SECRET
+#
+# Optional lead-fanout secrets (set if/when configuring those destinations):
+#   TWENTY_API_KEY         — Twenty CRM workspace API key
+#   LEAD_WEBHOOK_SECRET    — shared secret echoed in X-AO-Signature
+
+# Routes — attach the worker to the AO origin (Pages or custom domain).
+# [[routes]]
+# pattern = "deliberateux.com/ao/*"
+# zone_name = "deliberateux.com"
+
+# Nightly trigger for Stripe metered usage reporting.
+[triggers]
+crons = ["0 6 * * *"]   # 06:00 UTC daily

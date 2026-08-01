@@ -7,6 +7,8 @@
   <meta name="description" content="Live work queue for AO agent operations. Watch tasks flow through agents with auto-heal on failures." />
   <link rel="icon" href="/assets/favicon.svg" />
   <link rel="stylesheet" href="ao-theme.css">
+  <script src="ao-user.js"></script>
+  <script src="ao-seed.js"></script>
   <script src="ao-nav.js"></script>
   <style>
     :root {
@@ -102,8 +104,13 @@
   <div class="container">
 
     <div class="page-header">
-      <h1>Work queue</h1>
-      <p>Tasks flowing through your AO agents. Blocked tasks auto-heal.</p>
+      <h1>Your live queue</h1>
+      <p>Every task moving through your agents, in real time. Blocked work auto-heals; long-running flows surface their progress here.</p>
+    </div>
+
+    <div id="welcome-demo-banner" style="display:none;margin:4px 0 20px;padding:10px 14px;background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.2);border-radius:10px;font-size:0.82rem;color:var(--muted);display:flex;align-items:center;justify-content:space-between;gap:12px">
+      <span>This is a welcome demo so you can see the queue in motion. Start your own by configuring an org.</span>
+      <button id="dismiss-demo-btn" style="font-family:var(--font);font-size:0.78rem;padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer">Dismiss demo</button>
     </div>
 
     <div class="q-stats" id="q-stats">
@@ -202,23 +209,36 @@
   }
 
   // ── Seed initial tasks ───────────────────────────────
+  // Welcome demo: new users (empty queue + demo not dismissed) see a curated
+  // set from ao-seed.js so the product shows motion on first visit. Users who
+  // dismiss see an empty queue until their agents produce work.
   function seedTasks() {
-    // 4 done, 2 in progress, 1 blocked (CS), 1 queued
-    addTask('done', -180);
-    addTask('done', -140);
-    addTask('done', -100);
-    addTask('done', -65);
-    addTask('progress', -30);
-    addTask('progress', -15);
-    // Force a CS blocked task — with blockedAt so auto-heal fires
-    var csTask = { agent:'cs', task:'Process inbound beta request — inbox API timeout' };
-    tasks.push({
-      id: nextId++, agent: csTask.agent, task: csTask.task,
-      status: 'blocked', born: Date.now() - 25000,
-      healState: null, healReason: HEAL_REASONS[0],
-      blockedAt: Date.now() - 6000
-    });
-    addTask('queued', -3);
+    var demoDismissed = window.AOSeed && window.AOSeed.isDismissed();
+    if (demoDismissed) return; // respect dismissal — start empty
+
+    if (window.AOSeed && typeof window.AOSeed.welcomeTasks === 'function') {
+      // Pull welcome demo from the shared seed module
+      var seeded = window.AOSeed.welcomeTasks(function(){ return nextId++; });
+      seeded.forEach(function(t) { tasks.push(t); });
+
+      // Add a blocked task so the auto-heal UI has something to show (keyed
+      // with blockedAt so queue.html's auto-heal kicks in on first tick).
+      tasks.push({
+        id: nextId++, agent: 'cs', task: 'Process inbound beta request — inbox API timeout',
+        status: 'blocked', born: Date.now() - 25000,
+        healState: null, healReason: HEAL_REASONS[0],
+        blockedAt: Date.now() - 6000, demo: true
+      });
+
+      // Show the welcome banner
+      var banner = document.getElementById('welcome-demo-banner');
+      if (banner) banner.style.display = 'flex';
+      return;
+    }
+
+    // Fallback if ao-seed.js didn't load for some reason — legacy seed path
+    addTask('done', -180); addTask('done', -140); addTask('done', -100); addTask('done', -65);
+    addTask('progress', -30); addTask('progress', -15); addTask('queued', -3);
   }
 
   function addTask(status, ageSeconds) {
@@ -442,13 +462,29 @@
   window.__qTasks = tasks;
   window.__qRender = render;
 
+  // Welcome demo — dismiss handler. Clears demo-tagged tasks and hides the banner.
+  var dismissBtn = document.getElementById('dismiss-demo-btn');
+  if (dismissBtn) {
+    dismissBtn.addEventListener('click', function() {
+      if (window.AOSeed) window.AOSeed.dismissDemo();
+      // Remove every task marked demo:true
+      for (var i = tasks.length - 1; i >= 0; i--) {
+        if (tasks[i].demo) tasks.splice(i, 1);
+      }
+      var banner = document.getElementById('welcome-demo-banner');
+      if (banner) banner.style.display = 'none';
+      render();
+    });
+  }
+
 })();
 </script>
 <script>
-  // Admin gate
+  // Admin gate (delegated to AOUser)
   function isAdmin() {
-    return new URLSearchParams(window.location.search).has('admin') ||
-           localStorage.getItem('ao_admin') === '1';
+    return window.AOUser ? AOUser.isAdmin() :
+      (new URLSearchParams(window.location.search).has('admin') ||
+       localStorage.getItem('ao_admin') === '1');
   }
   if (isAdmin()) {
     var pill = document.getElementById('admin-pill');
@@ -492,9 +528,10 @@
       }
     });
 
-    // Also check localStorage for flow tasks on page load
+    // Also check per-user namespace for flow tasks on page load
     try {
-      var pending = JSON.parse(localStorage.getItem('ao_flow_tasks') || '[]');
+      var pending = window.AOUser ? AOUser.getJSON('flow_tasks', []) :
+        JSON.parse(localStorage.getItem('ao_flow_tasks') || '[]');
       var shown = JSON.parse(sessionStorage.getItem('ao_flow_shown') || '[]');
       pending.forEach(function(ft){
         if(shown.indexOf(ft.id) >= 0) return;

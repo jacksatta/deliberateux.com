@@ -15,6 +15,7 @@
   <meta name="description" content="Organization home — AO Agent Operations." />
   <link rel="icon" href="/assets/favicon.svg" />
   <link rel="stylesheet" href="ao-theme.css">
+  <script src="ao-user.js"></script>
   <script src="ao-nav.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -287,8 +288,9 @@
   <script>
     // ── Helpers ──────────────────────────────────────────
     function isAdmin() {
-      return new URLSearchParams(window.location.search).has('admin') ||
-             localStorage.getItem('ao_admin') === '1';
+      return window.AOUser ? AOUser.isAdmin() :
+        (new URLSearchParams(window.location.search).has('admin') ||
+         localStorage.getItem('ao_admin') === '1');
     }
     function escHtml(s) {
       return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -333,9 +335,8 @@
       var slug = params.get('slug');
       var main = document.getElementById('main');
 
-      // Admin mode
+      // Admin mode (AOUser.isAdmin persists ?admin automatically)
       if (isAdmin()) {
-        localStorage.setItem('ao_admin', '1');
         document.getElementById('admin-pill').classList.add('visible');
       }
 
@@ -348,8 +349,9 @@
         return;
       }
 
-      // Load org from localStorage
-      var orgs = JSON.parse(localStorage.getItem('ao_orgs') || '[]');
+      // Load org from per-user namespace
+      var orgs = window.AOUser ? AOUser.getJSON('orgs', []) :
+        JSON.parse(localStorage.getItem('ao_orgs') || '[]');
       var org = null;
       for (var i = 0; i < orgs.length; i++) {
         if (orgs[i].slug === slug) { org = orgs[i]; break; }

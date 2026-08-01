@@ -435,7 +435,7 @@
     <button class="tb-btn tpl" id="btn-tpl">Templates</button>
     <button class="tb-btn" id="btn-clear">Clear</button>
     <button class="tb-btn save" id="btn-save">Save</button>
-    <button class="tb-btn run" id="btn-run">Run ▶ <span class="beta-pill">BETA</span></button>
+    <button class="tb-btn run" id="btn-run" title="Animate the canvas with fake data. No engine, no persistence, no external calls.">Simulate ▶</button>
   </div>
   <!-- Theme customizer panel -->
   <div class="theme-cust" id="theme-cust">
@@ -577,8 +577,8 @@
 <script>
 (function(){
   var CRM_BASE='https://openclaw-vps.tailc8723d.ts.net:18800';
-  function isAdmin(){return new URLSearchParams(location.search).has('admin')||localStorage.getItem('ao_admin')==='1'}
-  if(isAdmin()){localStorage.setItem('ao_admin','1');document.getElementById('admin-pill').classList.add('v')}
+  function isAdmin(){return window.AOUser?AOUser.isAdmin():(new URLSearchParams(location.search).has('admin')||localStorage.getItem('ao_admin')==='1')}
+  if(isAdmin()){document.getElementById('admin-pill').classList.add('v')}
   var params=new URLSearchParams(location.search),slug=params.get('slug')||'';
   function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
@@ -1591,18 +1591,33 @@
   document.getElementById('btn-save').addEventListener('click',function(){closeInspector();savePanel.classList.toggle('v');if(savePanel.classList.contains('v')){viewingSlug=slug;renderFH();renderSaves()}});
   document.getElementById('sp-close').addEventListener('click',function(){savePanel.classList.remove('v')});
   function getFlowData(){return{nodes:nodes.map(function(n){return{itemId:n.itemId,type:n.type,x:n.x,y:n.y}}),conns:conns.map(function(c){var fi=nodes.findIndex(function(n){return n.id===c.fromId}),ti=nodes.findIndex(function(n){return n.id===c.toId});return[fi,c.fromPort,ti,c.toPort,JSON.stringify(c.logic)]}),title:ftInput.value||'Untitled',nodeConfigs:nodeConfigs}}
+  /* getSK returns the raw key used historically: ao_flows[_<slug>]. When AOUser
+   * is present, we route reads/writes through it so the actual storage becomes
+   * ao_<uid>_flows[_<slug>]. All call sites below still pass getSK(...) into
+   * localStorage, so we keep the raw key for the non-AOUser fallback. */
   function getSK(s){return(s||viewingSlug)?'ao_flows_'+(s||viewingSlug):'ao_flows'}
-  function ldS(s){try{return JSON.parse(localStorage.getItem(getSK(s))||'[]')}catch(e){return[]}}
-  function allOrgs(){try{return JSON.parse(localStorage.getItem('ao_orgs')||'[]')}catch(e){return[]}}
+  function _suffixFor(s){return(s||viewingSlug)?'flows_'+(s||viewingSlug):'flows'}
+  function ldS(s){
+    if(window.AOUser) return AOUser.getJSON(_suffixFor(s), []);
+    try{return JSON.parse(localStorage.getItem(getSK(s))||'[]')}catch(e){return[]}
+  }
+  function svS(s, arr){
+    if(window.AOUser){AOUser.setJSON(_suffixFor(s), arr);return;}
+    localStorage.setItem(getSK(s), JSON.stringify(arr));
+  }
+  function allOrgs(){
+    if(window.AOUser) return AOUser.getJSON('orgs', []);
+    try{return JSON.parse(localStorage.getItem('ao_orgs')||'[]')}catch(e){return[]}
+  }
   function renderFH(){var orgs=allOrgs(),org=orgs.find(function(o){return o.slug===viewingSlug}),n=org?org.name:(viewingSlug||'Default'),c=ldS().length;document.getElementById('sp-folder-name').textContent=n;document.getElementById('sp-folder-count').textContent=c+' flow'+(c!==1?'s':'');var sw=document.getElementById('sp-folder-switch');sw.style.display=isAdmin()&&orgs.length>1?'':'none';document.getElementById('sp-actions').style.display=(viewingSlug===slug)?'flex':'none'}
   function closeFD(){document.getElementById('sp-folder').classList.remove('expanded')}
   document.getElementById('sp-folder-switch').addEventListener('click',function(e){e.stopPropagation();var f=document.getElementById('sp-folder');if(f.classList.contains('expanded')){closeFD();return}var dd=document.getElementById('sp-folder-dropdown');dd.innerHTML='';allOrgs().forEach(function(o){var c=ldS(o.slug).length,opt=document.createElement('div');opt.className='sp-folder-opt'+(o.slug===viewingSlug?' active':'');opt.innerHTML='<span class="sp-folder-opt-name">'+escH(o.name)+'</span><span class="sp-folder-opt-count">'+c+'</span>';opt.addEventListener('click',function(){viewingSlug=o.slug;closeFD();renderFH();renderSaves()});dd.appendChild(opt)});f.classList.add('expanded')});
   document.addEventListener('click',function(e){if(!e.target.closest('.sp-folder'))closeFD()});
-  document.getElementById('sp-save').addEventListener('click',function(){var saves=ldS(slug),data=getFlowData();if(currentFlowId!==null){var en=saves.find(function(s){return s.id===currentFlowId});if(en){if(!en.versions)en.versions=[];en.versions.push({data:JSON.parse(JSON.stringify(en.data)),savedAt:en.savedAt});if(en.versions.length>10)en.versions=en.versions.slice(-10);en.data=data;en.savedAt=new Date().toISOString();en.title=data.title}}else{var en={id:Date.now(),title:data.title,data:data,savedAt:new Date().toISOString(),versions:[]};saves.push(en);currentFlowId=en.id}localStorage.setItem(getSK(slug),JSON.stringify(saves));viewingSlug=slug;renderFH();renderSaves();var b=document.getElementById('sp-save');b.textContent='Saved!';setTimeout(function(){b.textContent='Save current'},1200)});
-  document.getElementById('sp-save-as').addEventListener('click',function(){var n=prompt('Flow name:',getFlowData().title);if(!n)return;var saves=ldS(slug),data=getFlowData();data.title=n;var en={id:Date.now(),title:n,data:data,savedAt:new Date().toISOString(),versions:[]};saves.push(en);currentFlowId=en.id;localStorage.setItem(getSK(slug),JSON.stringify(saves));ftInput.value=n;document.getElementById('tb-title').textContent='/ '+n;viewingSlug=slug;renderFH();renderSaves()});
+  document.getElementById('sp-save').addEventListener('click',function(){var saves=ldS(slug),data=getFlowData();if(currentFlowId!==null){var en=saves.find(function(s){return s.id===currentFlowId});if(en){if(!en.versions)en.versions=[];en.versions.push({data:JSON.parse(JSON.stringify(en.data)),savedAt:en.savedAt});if(en.versions.length>10)en.versions=en.versions.slice(-10);en.data=data;en.savedAt=new Date().toISOString();en.title=data.title}}else{var en={id:Date.now(),title:data.title,data:data,savedAt:new Date().toISOString(),versions:[]};saves.push(en);currentFlowId=en.id}svS(slug,saves);viewingSlug=slug;renderFH();renderSaves();var b=document.getElementById('sp-save');b.textContent='Saved!';setTimeout(function(){b.textContent='Save current'},1200)});
+  document.getElementById('sp-save-as').addEventListener('click',function(){var n=prompt('Flow name:',getFlowData().title);if(!n)return;var saves=ldS(slug),data=getFlowData();data.title=n;var en={id:Date.now(),title:n,data:data,savedAt:new Date().toISOString(),versions:[]};saves.push(en);currentFlowId=en.id;svS(slug,saves);ftInput.value=n;document.getElementById('tb-title').textContent='/ '+n;viewingSlug=slug;renderFH();renderSaves()});
 
   function renderSaves(){var list=document.getElementById('sp-list'),saves=ldS();list.innerHTML='';var isOwn=viewingSlug===slug;if(!saves.length){list.innerHTML='<div class="sp-empty">'+(isOwn?'No saved flows yet':'No flows in this org')+'</div>';return}saves.slice().reverse().forEach(function(s){var isCur=isOwn&&s.id===currentFlowId,item=document.createElement('div');item.className='sp-item'+(isCur?' current':'');var vC=(s.versions||[]).length,time=s.savedAt?new Date(s.savedAt).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'—',nc=s.data&&s.data.nodes?s.data.nodes.length:0;var acts=isOwn?'<div class="sp-item-actions"><button class="sp-item-btn" data-action="load" data-sid="'+s.id+'">Load</button>'+(vC>0?'<button class="sp-item-btn revert" data-action="revert" data-sid="'+s.id+'">Revert</button>':'')+'<button class="sp-item-btn delete" data-action="delete" data-sid="'+s.id+'">Del</button></div>':'<div class="sp-item-actions"><button class="sp-item-btn" data-action="copy" data-sid="'+s.id+'">Copy here</button></div>';item.innerHTML='<div class="sp-item-thumb"><canvas></canvas></div><div class="sp-item-info"><div class="sp-item-name">'+escH(s.title||'Untitled')+'</div><div class="sp-item-meta">'+time+' · '+nc+' nodes'+(vC>0?' · '+vC+' ver':'')+'</div></div>'+acts;var pop=document.createElement('div');pop.className='sp-preview-popup';var pc=document.createElement('canvas');pop.appendChild(pc);item.appendChild(pop);list.appendChild(item);var tc=item.querySelector('.sp-item-thumb canvas');requestAnimationFrame(function(){drawThumb(tc,s.data);drawThumb(pc,s.data)})});
-  list.onclick=function(e){var btn=e.target.closest('.sp-item-btn');if(!btn)return;var action=btn.dataset.action,sid=parseInt(btn.dataset.sid);if(action==='copy'){var src=ldS(),en=src.find(function(s){return s.id===sid});if(!en)return;var my=ldS(slug);my.push({id:Date.now(),title:en.title+' (copy)',data:JSON.parse(JSON.stringify(en.data)),savedAt:new Date().toISOString(),versions:[]});localStorage.setItem(getSK(slug),JSON.stringify(my));viewingSlug=slug;renderFH();renderSaves();return}var saves=ldS(),entry=saves.find(function(s){return s.id===sid});if(action==='load'&&entry){loadFlowData(entry.data);currentFlowId=entry.id;ftInput.value=entry.title||'';document.getElementById('tb-title').textContent='/ '+(entry.title||'Untitled');renderSaves();setTimeout(fitView,100)}else if(action==='revert'&&entry&&entry.versions&&entry.versions.length>0){var prev=entry.versions.pop();entry.data=prev.data;entry.savedAt=prev.savedAt;localStorage.setItem(getSK(),JSON.stringify(saves));if(entry.id===currentFlowId)loadFlowData(entry.data);renderSaves()}else if(action==='delete'){if(!confirm('Delete "'+escH(entry?entry.title:'flow')+'"?'))return;saves=saves.filter(function(s){return s.id!==sid});localStorage.setItem(getSK(),JSON.stringify(saves));if(currentFlowId===sid)currentFlowId=null;renderFH();renderSaves()}}}
+  list.onclick=function(e){var btn=e.target.closest('.sp-item-btn');if(!btn)return;var action=btn.dataset.action,sid=parseInt(btn.dataset.sid);if(action==='copy'){var src=ldS(),en=src.find(function(s){return s.id===sid});if(!en)return;var my=ldS(slug);my.push({id:Date.now(),title:en.title+' (copy)',data:JSON.parse(JSON.stringify(en.data)),savedAt:new Date().toISOString(),versions:[]});svS(slug,my);viewingSlug=slug;renderFH();renderSaves();return}var saves=ldS(),entry=saves.find(function(s){return s.id===sid});if(action==='load'&&entry){loadFlowData(entry.data);currentFlowId=entry.id;ftInput.value=entry.title||'';document.getElementById('tb-title').textContent='/ '+(entry.title||'Untitled');renderSaves();setTimeout(fitView,100)}else if(action==='revert'&&entry&&entry.versions&&entry.versions.length>0){var prev=entry.versions.pop();entry.data=prev.data;entry.savedAt=prev.savedAt;svS(undefined,saves);if(entry.id===currentFlowId)loadFlowData(entry.data);renderSaves()}else if(action==='delete'){if(!confirm('Delete "'+escH(entry?entry.title:'flow')+'"?'))return;saves=saves.filter(function(s){return s.id!==sid});svS(undefined,saves);if(currentFlowId===sid)currentFlowId=null;renderFH();renderSaves()}}}
 
   function drawThumb(cvs,fd){if(!cvs||!fd||!fd.nodes||!fd.nodes.length)return;var ctx=cvs.getContext('2d'),w=cvs.width=cvs.offsetWidth*2,h=cvs.height=cvs.offsetHeight*2;ctx.clearRect(0,0,w,h);var ns=fd.nodes,mx=1e9,my=1e9,MX=-1e9,MY=-1e9;ns.forEach(function(n){if(n.x<mx)mx=n.x;if(n.y<my)my=n.y;if(n.x+185>MX)MX=n.x+185;if(n.y+70>MY)MY=n.y+70});var rX=MX-mx||1,rY=MY-my||1,pad=8,sc=Math.min((w-pad*2)/rX,(h-pad*2)/rY,2),ox=pad+(w-pad*2-rX*sc)/2,oy=pad+(h-pad*2-rY*sc)/2;function tx(x){return ox+(x-mx)*sc}function ty(y){return oy+(y-my)*sc}var _thPr=getComputedStyle(document.documentElement).getPropertyValue('--purple').trim();if(fd.conns){ctx.strokeStyle='rgba('+_thPr+',0.25)';ctx.lineWidth=1.5;fd.conns.forEach(function(c){var fn=ns[c[0]],tn=ns[c[2]];if(!fn||!tn)return;ctx.beginPath();ctx.moveTo(tx(fn.x+90),ty(fn.y+35));ctx.lineTo(tx(tn.x+90),ty(tn.y+35));ctx.stroke()})}ns.forEach(function(n){var nx=tx(n.x),ny=ty(n.y),nw=Math.max(12,130*sc),nh=Math.max(8,50*sc),item=lookupItem(n.itemId,n.type),rgb=item&&item.rgb?item.rgb:'168,139,250';ctx.fillStyle='rgba('+rgb+',0.2)';ctx.strokeStyle='rgba('+rgb+',0.35)';ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(nx,ny,nw,nh,Math.min(4,3*sc));ctx.fill();ctx.stroke()})}
 
@@ -1875,6 +1890,327 @@
     radiusInput.value=14;document.getElementById('tc-radius-val').textContent='14px';
     opacityInput.value=94;document.getElementById('tc-opacity-val').textContent='94%';
   });
+
+  // ── Expose canvas state so the pre-flight validator (separate script) can
+  //    read nodes / connections / per-node config without re-implementing storage.
+  window.AOFlow = {
+    state: function () { return { nodes: nodes, conns: conns, nodeConfigs: nodeConfigs }; },
+    openInspector: function (nodeId) {
+      // Defensive — the existing inspector opens via clicking a node. We synthesize a click.
+      var n = nodes.find(function (x) { return x.id === nodeId; });
+      if (n && n.el) n.el.click();
+    },
+    markNeedsConfig: function (nodeId, missing) {
+      var n = nodes.find(function (x) { return x.id === nodeId; });
+      if (!n || !n.el) return;
+      if (missing && missing.length) {
+        n.el.classList.add('needs-config');
+        n.el.setAttribute('data-missing', missing.join(', '));
+        n.el.setAttribute('title', 'Needs setup: ' + missing.join(', '));
+      } else {
+        n.el.classList.remove('needs-config');
+        n.el.removeAttribute('data-missing');
+        n.el.removeAttribute('title');
+      }
+    }
+  };
+})();
+</script>
+<style>
+  /* Pre-flight: nodes missing required config get an amber ring + a corner badge */
+  .canvas-node.needs-config {
+    box-shadow: 0 0 0 2px rgba(var(--amber, 245,166,35), 0.85), 0 6px 18px rgba(0,0,0,0.35) !important;
+    position: relative;
+  }
+  .canvas-node.needs-config::after {
+    content: "!";
+    position: absolute;
+    top: -7px; right: -7px;
+    width: 18px; height: 18px;
+    background: rgb(var(--amber, 245,166,35));
+    color: #000;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 18px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    z-index: 5;
+    pointer-events: none;
+  }
+  /* Pre-flight modal */
+  #preflight-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.62);
+    z-index: 400;
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  #preflight-modal {
+    background: var(--surface, #1a1816);
+    border: 1px solid var(--border2, rgba(255,255,255,0.13));
+    border-radius: 14px;
+    padding: 22px 24px;
+    width: 540px; max-width: 92vw; max-height: 80vh; overflow-y: auto;
+    color: var(--text, #f5ece8);
+  }
+  #preflight-modal h3 {
+    margin: 0 0 4px;
+    font-size: 15px;
+    color: rgb(var(--amber, 245,166,35));
+  }
+  #preflight-modal .pf-sub {
+    margin: 0 0 14px;
+    font-size: 12px;
+    color: var(--muted, rgba(245,236,216,0.6));
+  }
+  #preflight-modal .pf-issue {
+    padding: 10px 12px;
+    background: rgba(var(--amber, 245,166,35), 0.06);
+    border: 1px solid rgba(var(--amber, 245,166,35), 0.22);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 12px;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  #preflight-modal .pf-issue .pf-node {
+    font-weight: 600;
+    color: rgb(var(--amber, 245,166,35));
+    min-width: 110px;
+  }
+  #preflight-modal .pf-issue .pf-fields {
+    color: var(--text, #f5ece8);
+    flex: 1;
+  }
+  #preflight-modal .pf-issue button {
+    background: none;
+    border: 1px solid var(--border2, rgba(255,255,255,0.18));
+    color: var(--muted);
+    border-radius: 6px;
+    padding: 3px 9px;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  #preflight-modal .pf-issue button:hover {
+    color: var(--text);
+    border-color: rgb(var(--amber, 245,166,35));
+  }
+  #preflight-modal .pf-actions {
+    display: flex; gap: 10px; justify-content: flex-end;
+    margin-top: 14px; padding-top: 14px;
+    border-top: 1px solid var(--border, rgba(255,255,255,0.08));
+  }
+  #preflight-modal .pf-actions button {
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px; font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border2, rgba(255,255,255,0.18));
+    background: var(--panel);
+    color: var(--text);
+  }
+  #preflight-modal .pf-actions .pf-fix {
+    background: rgb(var(--amber, 245,166,35));
+    color: #000;
+    border-color: rgb(var(--amber, 245,166,35));
+  }
+  #preflight-modal .pf-actions .pf-anyway {
+    color: var(--muted);
+  }
+</style>
+<script>
+/* ──────────────────────────────────────────────────────────────────────────
+   Flow pre-flight validator — reads canvas state via window.AOFlow.state(),
+   walks each node, looks up known required-config fields per node type, and
+   surfaces what's missing BEFORE Run/Run Live executes. Highlights nodes
+   visually so users see what needs setup at a glance, and shows a modal that
+   lists every issue with a "Open inspector" jump for each.
+   ────────────────────────────────────────────────────────────────────────── */
+(function () {
+  if (!window.AOFlow) return; // main flows IIFE didn't expose state — bail safely
+
+  // Required fields per node type. Keys are nodeConfig.fields keys (matches
+  // the data-ncfield attributes the inspector writes to). Empty string or
+  // unset means "needs definition."
+  var REQUIRED = {
+    // Triggers — flow has to start somewhere
+    'tr-schedule': ['cron'],
+    'tr-webhook':  ['url'],
+    'tr-form':     ['formId'],
+    'tr-event':    ['event'],
+    // Operations — the engine reads these to make decisions
+    'op-if':       ['condition'],
+    'op-loop':     ['loopCond'],
+    'op-delay':    ['delay'],
+    'op-gate':     ['approver'],
+    'op-filter':   ['filter'],
+    'op-transform':['transform'],
+    // Integrations — endpoints / channels / templates
+    'int-email':   ['template'],
+    'int-slack':   ['channel'],
+    'int-crm':     ['endpoint'],
+    'int-api':     ['url']
+    // Agent nodes (cs, biz, mkt, dev, uxr, qa, ea) and start/end deliberately
+    // omitted — they have built-in logic and don't strictly require user setup.
+  };
+
+  function isEmpty(v) { return v === undefined || v === null || String(v).trim() === ''; }
+
+  // Returns array of { nodeId, label, type, missing: [...] } — empty array means flow is ready.
+  function validateFlow() {
+    var st = window.AOFlow.state();
+    var issues = [];
+    if (!st.nodes || !st.nodes.length) {
+      return [{ nodeId: null, label: 'Empty canvas', type: 'flow', missing: ['add at least one node'] }];
+    }
+    // Flow-level checks
+    var hasTrigger = st.nodes.some(function (n) {
+      return /^(ep-start|tr-)/.test(n.itemId || n.type);
+    });
+    if (!hasTrigger) {
+      issues.push({ nodeId: null, label: 'Flow start', type: 'flow', missing: ['add a Start or Trigger node'] });
+    }
+    // Per-node checks
+    st.nodes.forEach(function (node) {
+      var typeKey = node.itemId || node.type;
+      var required = REQUIRED[typeKey] || [];
+      if (!required.length) return;
+      var nc = (st.nodeConfigs[node.id] || {}).fields || {};
+      var missing = required.filter(function (f) { return isEmpty(nc[f]); });
+      if (missing.length) {
+        // Try to grab a friendly label from the DOM
+        var labelEl = node.el && node.el.querySelector('.cn-label');
+        var label = (labelEl && labelEl.textContent) || typeKey;
+        issues.push({ nodeId: node.id, label: label, type: typeKey, missing: missing });
+      }
+    });
+    return issues;
+  }
+
+  function clearAllNodeBadges() {
+    var st = window.AOFlow.state();
+    st.nodes.forEach(function (n) { window.AOFlow.markNeedsConfig(n.id, []); });
+  }
+
+  function applyNodeBadges(issues) {
+    clearAllNodeBadges();
+    issues.forEach(function (iss) {
+      if (iss.nodeId) window.AOFlow.markNeedsConfig(iss.nodeId, iss.missing);
+    });
+  }
+
+  // Field-name → human label so the modal isn't all jargon
+  var FIELD_LABELS = {
+    cron: 'cron schedule', url: 'URL', formId: 'form ID', event: 'event name',
+    condition: 'branch condition', loopCond: 'loop condition', delay: 'delay duration',
+    approver: 'approver', filter: 'filter expression', transform: 'transform expression',
+    template: 'email template', channel: 'Slack channel', endpoint: 'CRM endpoint'
+  };
+
+  function showPreflightModal(issues, onContinueAnyway) {
+    var existing = document.getElementById('preflight-overlay');
+    if (existing) existing.remove();
+    var overlay = document.createElement('div');
+    overlay.id = 'preflight-overlay';
+    var modal = document.createElement('div');
+    modal.id = 'preflight-modal';
+
+    var label = issues.length === 1 ? '1 thing needs setup before this flow can run' :
+      issues.length + ' things need setup before this flow can run';
+
+    var list = '';
+    issues.forEach(function (iss, i) {
+      var fieldsHtml = iss.missing.map(function (f) {
+        return '<code style="background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:3px;font-size:11px">' + (FIELD_LABELS[f] || f) + '</code>';
+      }).join(' ');
+      var jumpBtn = iss.nodeId ? '<button data-jump="' + iss.nodeId + '">Open inspector →</button>' : '';
+      list += '<div class="pf-issue"><span class="pf-node">' + iss.label + '</span><span class="pf-fields">missing: ' + fieldsHtml + '</span>' + jumpBtn + '</div>';
+    });
+
+    modal.innerHTML =
+      '<h3>Flow needs setup</h3>' +
+      '<p class="pf-sub">' + label + '. The engine will skip nodes with missing config — fix them or run anyway with defaults.</p>' +
+      list +
+      '<div class="pf-actions">' +
+      '<button class="pf-anyway">Run anyway</button>' +
+      '<button class="pf-fix">Fix first issue</button>' +
+      '</div>';
+
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) overlay.remove();
+    });
+    modal.querySelectorAll('[data-jump]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var nid = btn.getAttribute('data-jump');
+        overlay.remove();
+        window.AOFlow.openInspector(nid);
+      });
+    });
+    modal.querySelector('.pf-anyway').addEventListener('click', function () {
+      overlay.remove();
+      if (typeof onContinueAnyway === 'function') onContinueAnyway();
+    });
+    modal.querySelector('.pf-fix').addEventListener('click', function () {
+      var firstWithNode = issues.find(function (i) { return i.nodeId; });
+      overlay.remove();
+      if (firstWithNode) window.AOFlow.openInspector(firstWithNode.nodeId);
+    });
+  }
+
+  // Wrap a click handler so it pre-flights first
+  function withPreflight(handler) {
+    return function (e) {
+      var issues = validateFlow();
+      applyNodeBadges(issues);
+      if (!issues.length) { return handler.call(this, e); }
+      e && e.stopImmediatePropagation && e.stopImmediatePropagation();
+      e && e.preventDefault && e.preventDefault();
+      showPreflightModal(issues, function () { handler.call(this, e); });
+      return false;
+    };
+  }
+
+  // Hook the existing Run buttons. We attach in capture phase so we beat the
+  // existing click handlers. If preflight passes, we let the click bubble; if
+  // it doesn't, we stop propagation and show the modal.
+  function hook() {
+    ['btn-run', 'btn-run-real'].forEach(function (id) {
+      var btn = document.getElementById(id);
+      if (!btn || btn._preflightHooked) return;
+      btn._preflightHooked = true;
+      btn.addEventListener('click', function (e) {
+        var issues = validateFlow();
+        applyNodeBadges(issues);
+        if (!issues.length) return; // let through
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        showPreflightModal(issues, function () {
+          // User chose "run anyway" — re-fire the click without our handler
+          btn._preflightHooked = false;
+          btn.click();
+          btn._preflightHooked = true;
+        });
+      }, true); // capture phase
+    });
+  }
+
+  // Run hook now and again after any "Run Live" injection finishes
+  hook();
+  setTimeout(hook, 500);
+
+  // Re-validate (just to update badges) when the inspector closes — that's
+  // when the user has likely made config changes worth re-checking.
+  document.addEventListener('click', function (e) {
+    if (e.target && (e.target.id === 'insp-close' || e.target.classList.contains('insp-close'))) {
+      setTimeout(function () { applyNodeBadges(validateFlow()); }, 100);
+    }
+  });
+
+  // Expose for debugging from console
+  window.AOFlow.validate = validateFlow;
 })();
 </script>
 <script src="flow-engine.js"></script>
@@ -1890,8 +2226,18 @@
   realBtn.className = 'tb-btn run';
   realBtn.id = 'btn-run-real';
   realBtn.innerHTML = 'Run Live ⚡';
+  realBtn.title = 'Execute the flow engine with real scoring + persistence to Queue. Currently wired for Lead Qualification only — other templates fall back to Simulate.';
   realBtn.style.cssText = 'background:rgba(var(--green),0.15);border-color:rgba(var(--green),0.3);margin-left:6px';
   runBtn.parentNode.insertBefore(realBtn, runBtn.nextSibling);
+
+  // Template-aware gate: Run Live only has an executor for Lead Qualification today.
+  function getLoadedTemplateName(){
+    var el = document.getElementById('ft-input') || document.querySelector('#ft-input, input[id*="ft"]');
+    return el ? (el.value || '').trim() : '';
+  }
+  function isLeadQualLoaded(){
+    return /lead\s*qual/i.test(getLoadedTemplateName());
+  }
 
   // Execution log panel
   var logPanel = document.createElement('div');
@@ -1997,6 +2343,18 @@
   }
 
   realBtn.addEventListener('click', function(){
+    // Pre-flight: warn if the user is about to run Lead Qualification's executor
+    // on top of a template that isn't Lead Qualification.
+    var loaded = getLoadedTemplateName();
+    if (loaded && !isLeadQualLoaded()) {
+      var ok = confirm(
+        'Heads up: the live engine is only wired for the Lead Qualification template today.\n\n' +
+        'You have "' + loaded + '" loaded. Clicking OK will still run the Lead Qualification engine (ignoring what\'s on canvas). ' +
+        'For other templates, use Simulate ▶ to animate the canvas with sample data.\n\n' +
+        'Continue with Lead Qualification?'
+      );
+      if (!ok) return;
+    }
     showLeadPicker(function(lead){
       // Show log panel
       logPanel.style.display = 'block';
@@ -2029,5 +2387,7 @@
   });
 })();
 </script>
+<script src="ao-user.js"></script>
+<script src="ao-nav.js"></script>
 </body>
 </html>

@@ -7,6 +7,7 @@
   <meta name="description" content="Spin up your AI-powered organization in under a minute. Choose your structure, pick your focus, and AO configures the right agents for you." />
   <link rel="icon" href="/assets/favicon.svg" />
   <link rel="stylesheet" href="ao-theme.css">
+  <script src="ao-user.js"></script>
   <script src="ao-nav.js"></script>
   <style>
     /* ── Reset & base ─────────────────────────────────────── */
@@ -727,7 +728,8 @@
 
       // Save org to localStorage
       var slug = state.orgName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-      var orgs = JSON.parse(localStorage.getItem('ao_orgs') || '[]');
+      var orgs = window.AOUser ? AOUser.getJSON('orgs', []) :
+        JSON.parse(localStorage.getItem('ao_orgs') || '[]');
       var existing = orgs.findIndex(function(o) { return o.slug === slug; });
       var entry = {
         slug: slug,
@@ -741,7 +743,8 @@
         status: 'draft'
       };
       if (existing > -1) orgs[existing] = entry; else orgs.push(entry);
-      localStorage.setItem('ao_orgs', JSON.stringify(orgs));
+      if (window.AOUser) AOUser.setJSON('orgs', orgs);
+      else localStorage.setItem('ao_orgs', JSON.stringify(orgs));
 
       // Redirect to boot-up sequence
       setTimeout(function () {
@@ -758,6 +761,18 @@
 
 })();
 </script>
+
+<footer class="ao-footer">
+  <div class="left">
+    Built by <a href="https://deliberateux.com">Jack Satta</a> &middot; <a href="https://deliberateux.com">Deliberate UX</a>
+  </div>
+  <div class="links">
+    <a href="/ao/">Overview</a>
+    <a href="/ao/tour.html">Tour</a>
+    <a href="/ao/pricing.html">Pricing</a>
+  </div>
+  <span class="badge"><span class="dot"></span>Private Beta</span>
+</footer>
 
 </body>
 </html>

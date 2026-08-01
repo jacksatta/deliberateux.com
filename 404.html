@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Page not found — Deliberate UX</title>
+  <meta name="description" content="That page doesn't exist on deliberateux.com. Here's where you might be looking." />
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="/assets/favicon.svg" />
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-9MSXWF3TX3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-9MSXWF3TX3');
+    // Log the bad URL so we can spot patterns (typos in cover letters, etc.)
+    try { gtag('event', '404', { page_path: location.pathname + location.search, referrer: document.referrer }); } catch(_) {}
+  </script>
+
+  <style>
+    *,*::before,*::after { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: ui-serif, Georgia, "Source Serif Pro", "Times New Roman", serif;
+      color: #f5ecd8;
+      background:
+        radial-gradient(900px 700px at 22% 8%, rgba(245,166,35,0.16), transparent 55%),
+        radial-gradient(800px 600px at 88% 12%, rgba(96,165,250,0.10), transparent 55%),
+        linear-gradient(180deg, #1a1410, #0f0e0c);
+      background-attachment: fixed;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+    }
+    main {
+      max-width: 620px;
+      width: 100%;
+    }
+    .brand {
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #a89e8e;
+      margin-bottom: 36px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #f5a623;
+      box-shadow: 0 0 12px rgba(245,166,35,0.5);
+    }
+    h1 {
+      font-size: clamp(2.4rem, 6vw, 3.8rem);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin: 0 0 16px;
+      color: #f5ecd8;
+    }
+    h1 em {
+      font-style: italic;
+      color: #f5a623;
+    }
+    .lede {
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: #a89e8e;
+      margin: 0 0 36px;
+      max-width: 520px;
+    }
+    .lede code {
+      font-family: ui-monospace, "JetBrains Mono", "SF Mono", Consolas, monospace;
+      font-size: 0.9em;
+      background: rgba(245,166,35,0.08);
+      border: 1px solid rgba(245,166,35,0.18);
+      padding: 1px 6px;
+      border-radius: 4px;
+      color: #f5a623;
+    }
+    .links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      border-top: 1px solid rgba(245,236,216,0.08);
+    }
+    .links li {
+      border-bottom: 1px solid rgba(245,236,216,0.08);
+    }
+    .links a {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      padding: 16px 0;
+      text-decoration: none;
+      color: #f5ecd8;
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      transition: color 0.15s ease, padding-left 0.2s ease;
+    }
+    .links a:hover {
+      color: #f5a623;
+      padding-left: 8px;
+    }
+    .links .num {
+      font-family: ui-monospace, monospace;
+      font-size: 0.72rem;
+      color: #6e6557;
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+      width: 24px;
+    }
+    .links .label {
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    .links .desc {
+      font-size: 0.85rem;
+      color: #8a7e6f;
+      margin-left: auto;
+      text-align: right;
+    }
+    .footnote {
+      margin-top: 40px;
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.78rem;
+      color: #6e6557;
+      line-height: 1.6;
+    }
+    .footnote a {
+      color: #a89e8e;
+      text-decoration: underline;
+      text-decoration-color: rgba(168,158,142,0.3);
+      text-underline-offset: 2px;
+    }
+    .footnote a:hover { color: #f5a623; }
+    @media (max-width: 520px) {
+      .links a { flex-wrap: wrap; gap: 8px; }
+      .links .desc { width: 100%; text-align: left; margin-left: 38px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="brand"><span class="dot"></span>Deliberate UX</div>
+
+    <h1>Off the <em>map</em>.</h1>
+
+    <p class="lede">
+      Nothing lives at <code id="bad-path">/this-path</code> — it may have moved,
+      been retired, or never existed. A few places worth heading instead:
+    </p>
+
+    <ul class="links">
+      <li>
+        <a href="/">
+          <span class="num">01</span>
+          <span class="label">Home</span>
+          <span class="desc">Selected work + practice notes</span>
+        </a>
+      </li>
+      <li>
+        <a href="/ao/">
+          <span class="num">02</span>
+          <span class="label">AO — Autonomous Operations</span>
+          <span class="desc">A virtual agency that actually runs</span>
+        </a>
+      </li>
+      <li>
+        <a href="/ao/tour.html">
+          <span class="num">03</span>
+          <span class="label">Take the AO tour</span>
+          <span class="desc">~4 min walkthrough</span>
+        </a>
+      </li>
+      <li>
+        <a href="/work/">
+          <span class="num">04</span>
+          <span class="label">Work</span>
+          <span class="desc">Case studies</span>
+        </a>
+      </li>
+      <li>
+        <a href="mailto:jack@deliberateux.com">
+          <span class="num">05</span>
+          <span class="label">Email Jack</span>
+          <span class="desc">jack@deliberateux.com</span>
+        </a>
+      </li>
+    </ul>
+
+    <p class="footnote">
+      404 · Built by <a href="/">Jack Satta</a>. If you got here from a link
+      somewhere, I'd appreciate a heads-up so I can fix it.
+    </p>
+  </main>
+
+  <script>
+    // Show the actual broken path in the lede so visitors can see what was tried.
+    (function () {
+      try {
+        var path = location.pathname + (location.search || '');
+        if (path && path !== '/') {
+          var el = document.getElementById('bad-path');
+          if (el) el.textContent = path.length > 60 ? path.slice(0, 57) + '…' : path;
+        }
+      } catch (e) {}
+    })();
+  </script>
+</body>
+</html>
