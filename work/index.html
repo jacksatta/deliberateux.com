@@ -167,6 +167,18 @@
       <section class="section">
         <div class="work-grid">
 
+          <div class="work-card" id="catalyze" data-case="catalyze" data-work-modal="catalyze" style="--hue:180">
+            <div class="work-card-image work-card-slideshow">
+              <img class="slide slide-1" src="/assets/work/catalyze-pathway.svg" alt="Catalyze Social Growth Pathway" />
+              <img class="slide slide-2" src="/assets/work/catalyze-assessment.svg" alt="Catalyze Social assessment summary" />
+            </div>
+            <div class="work-card-content">
+              <div class="work-card-tag">Catalyze Social · 2026</div>
+              <h2 class="work-card-title">Growth Agency Site &amp; Client Toolkit</h2>
+              <p class="work-card-excerpt">A website, interactive assessment, and email system for a strategy agency serving nonprofits and small organizations.</p>
+            </div>
+          </div>
+
           <div class="work-card" id="technology" data-case="technology" data-work-modal="technology" style="--hue:265">
             <div class="work-card-image work-card-slideshow">
               <img class="slide slide-1" src="/assets/work/technology-hero.png" alt="Enterprise Service Orchestration" />
@@ -302,6 +314,20 @@
 
   <script>
   const CASES = {
+    catalyze: {
+      tag: 'Catalyze Social · Agency · Website, Assessment, Email',
+      title: 'Growth Agency Site &amp; Client Toolkit',
+      imgs: [
+        '/assets/work/catalyze-pathway.svg',
+        '/assets/work/catalyze-assessment.svg',
+        '/assets/work/catalyze-email.svg'
+      ],
+      hue: 180,
+      challenge: 'Catalyze sells a way of working, not a list of services. The strategy was strong, but the site read like a menu, and every new client engagement meant rebuilding intake forms, reports, and email templates from scratch.',
+      approach: 'Reframed the site around the Growth Pathway (Clarify, Design, Engage, Grow) and three clear ways to work together. Built an interactive Growth and Visibility Assessment that gives the client a one-page spider graph summary while a fuller PDF goes to the team. Set up a modular email design system so each new campaign starts from tested blocks, not a blank page.',
+      outcome: 'The assessment and email system are in use on a live nonprofit engagement, with the site structure and brand foundations shared by the whole team. Intake, reporting, and first campaigns now start from one toolkit.',
+      role: 'Design &amp; digital lead, with the Catalyze team', duration: 'Ongoing', year: '2026'
+    },
     technology: {
       tag: 'Lumen Technologies · Enterprise · ITSM',
       title: 'Enterprise Service Orchestration',
