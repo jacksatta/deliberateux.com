@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-label="Growth and Visibility Assessment radar summary">
+<rect width="1600" height="1000" fill="#F5F1E7"/><circle cx="-60" cy="1040" r="380" fill="#3EE0D2" opacity=".16"/><g font-family="Cormorant Garamond, Georgia, Times New Roman, serif">
+<text x="96" y="150" font-size="22" letter-spacing="3.5" fill="#4f6a6d" font-family="Menlo, monospace">GROWTH &amp; VISIBILITY ASSESSMENT</text>
+<text x="96" y="240" font-size="84" font-weight="700" letter-spacing="-2" fill="#08282C">A client sees</text>
+<text x="96" y="330" font-size="84" font-weight="700" letter-spacing="-2" fill="#08282C">where they stand.</text></g><g transform="translate(1090 540)" fill="none" stroke="#08282C" stroke-opacity=".22" stroke-width="2">
+<polygon points="0,-300 260,-150 260,150 0,300 -260,150 -260,-150"/>
+<polygon points="0,-225 195,-112 195,112 0,225 -195,112 -195,-112"/>
+<polygon points="0,-150 130,-75 130,75 0,150 -130,75 -130,-75"/>
+<polygon points="0,-75 65,-37 65,37 0,75 -65,37 -65,-37"/>
+<line x1="0" y1="-300" x2="0" y2="300"/><line x1="-260" y1="-150" x2="260" y2="150"/><line x1="260" y1="-150" x2="-260" y2="150"/>
+<polygon points="0,-210 170,-98 130,92 0,170 -190,120 -120,-80" fill="#3EE0D2" fill-opacity=".34" stroke="#08282C" stroke-opacity="1" stroke-width="5" stroke-linejoin="round"/>
+<g fill="#C5614A" stroke="none"><circle cx="0" cy="-210" r="10"/><circle cx="170" cy="-98" r="10"/><circle cx="130" cy="92" r="10"/><circle cx="0" cy="170" r="10"/><circle cx="-190" cy="120" r="10"/><circle cx="-120" cy="-80" r="10"/></g></g>
+<g font-size="20" letter-spacing="2.5" fill="#4f6a6d" font-family="Menlo, monospace" text-anchor="middle">
+<text x="1090" y="214">STORY</text><text x="1400" y="372">WEB</text><text x="1400" y="716">EMAIL</text><text x="1090" y="880">DONORS</text><text x="780" y="716">SOCIAL</text><text x="780" y="372">DATA</text></g>
+<rect x="96" y="700" width="520" height="150" fill="none" stroke="#08282C" stroke-opacity=".28" stroke-width="2" rx="6"/>
+<text x="124" y="752" font-size="18" letter-spacing="2.5" fill="#4f6a6d" font-family="Menlo, monospace">DELIVERED</text>
+<text x="124" y="808" font-size="44" font-weight="700" letter-spacing="-1" fill="#08282C" font-family="Cormorant Garamond, Georgia, Times New Roman, serif">Summary + full PDF</text></svg>
