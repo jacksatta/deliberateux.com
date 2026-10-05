@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-label="Modular email design system">
+<rect width="1600" height="1000" fill="#F5F1E7"/><circle cx="1500" cy="1040" r="340" fill="#3EE0D2" opacity=".16"/><g font-family="Cormorant Garamond, Georgia, Times New Roman, serif">
+<text x="96" y="150" font-size="22" letter-spacing="3.5" fill="#4f6a6d" font-family="Menlo, monospace">EMAIL SYSTEM</text>
+<text x="96" y="240" font-size="84" font-weight="700" letter-spacing="-2" fill="#08282C">Build the next one</text>
+<text x="96" y="330" font-size="84" font-weight="700" letter-spacing="-2" fill="#08282C">in minutes.</text></g><g transform="translate(900 120)" stroke="#08282C" stroke-opacity=".28" stroke-width="2" fill="#fff">
+<rect width="560" height="780" rx="8"/>
+<rect x="28" y="28" width="504" height="150" rx="6" fill="#3EE0D2" fill-opacity=".30" stroke="#08282C" stroke-opacity=".6"/>
+<rect x="28" y="204" width="300" height="26" rx="4" fill="#08282C" stroke="none"/>
+<rect x="28" y="248" width="504" height="14" rx="4" fill="#08282C" fill-opacity=".18" stroke="none"/>
+<rect x="28" y="274" width="470" height="14" rx="4" fill="#08282C" fill-opacity=".18" stroke="none"/>
+<rect x="28" y="300" width="400" height="14" rx="4" fill="#08282C" fill-opacity=".18" stroke="none"/>
+<rect x="28" y="352" width="240" height="190" rx="6" fill="#F5F1E7"/><rect x="292" y="352" width="240" height="190" rx="6" fill="#F5F1E7"/>
+<rect x="28" y="574" width="170" height="48" rx="6" fill="#C5614A" stroke="none"/>
+<rect x="28" y="670" width="504" height="2" fill="#08282C" fill-opacity=".28" stroke="none"/>
+<rect x="28" y="696" width="220" height="12" rx="4" fill="#08282C" fill-opacity=".18" stroke="none"/>
+<rect x="28" y="720" width="160" height="12" rx="4" fill="#08282C" fill-opacity=".18" stroke="none"/></g>
+<g font-size="20" letter-spacing="2.5" fill="#4f6a6d" font-family="Menlo, monospace">
+<text x="96" y="700">HEADER</text><text x="96" y="748">STORY BLOCK</text><text x="96" y="796">TWO-UP</text><text x="96" y="844">CALL TO ACTION</text><text x="96" y="892">FOOTER</text></g></svg>

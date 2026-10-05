@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-label="Growth Pathway: Clarify, Design, Engage, Grow">
+<rect width="1600" height="1000" fill="#F5F1E7"/><circle cx="1480" cy="-40" r="360" fill="#3EE0D2" opacity=".16"/><g font-family="Cormorant Garamond, Georgia, Times New Roman, serif">
+<text x="96" y="150" font-size="22" letter-spacing="3.5" fill="#4f6a6d" font-family="Menlo, monospace">GROWTH PATHWAY</text>
+<text x="96" y="240" font-size="84" font-weight="700" letter-spacing="-2" fill="#08282C">A process,</text>
+<text x="96" y="330" font-size="84" font-weight="700" letter-spacing="-2" fill="#08282C">not a menu.</text></g><line x1="96" y1="800" x2="1504" y2="800" stroke="#08282C" stroke-opacity=".28" stroke-width="2"/>
+<path d="M96 800 C 420 800, 520 700, 640 640 S 960 520, 1100 440 S 1380 260, 1504 200" fill="none" stroke="#08282C" stroke-width="6" stroke-linecap="round"/>
+<circle cx="260" cy="778" r="22" fill="#fff" stroke="#08282C" stroke-width="5"/>
+<circle cx="640" cy="640" r="22" fill="#fff" stroke="#08282C" stroke-width="5"/>
+<circle cx="1020" cy="470" r="22" fill="#fff" stroke="#08282C" stroke-width="5"/>
+<circle cx="1400" cy="250" r="26" fill="#C5614A"/>
+<g font-family="Cormorant Garamond, Georgia, Times New Roman, serif" font-size="46" font-weight="700" letter-spacing="-1" fill="#08282C">
+<text x="200" y="880">Clarify</text><text x="590" y="880">Design</text><text x="960" y="880">Engage</text><text x="1350" y="880">Grow</text></g>
+<g font-size="18" letter-spacing="2.5" fill="#4f6a6d" font-family="Menlo, monospace">
+<text x="200" y="918">01</text><text x="590" y="918">02</text><text x="960" y="918">03</text><text x="1350" y="918">04</text></g></svg>
