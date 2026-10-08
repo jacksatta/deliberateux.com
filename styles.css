@@ -2633,7 +2633,7 @@ html[data-theme="light"] .panel--work .section-kicker {
   background-image: url('/assets/work/telecom-hero.png');
 }
 .card--has-thumb[data-thumb="fintech"]::before {
-  background-image: url('/assets/work/Account Record Page - CS trailblazers.png');
+  background-image: url('/assets/work/Account-Record-Page-CS-trailblazers.png');
 }
 /* === END EXPERIMENT === */
 
