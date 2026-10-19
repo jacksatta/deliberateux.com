@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Theme Studio Pro — DeliberateUX</title>
+  <meta name="description" content="Generate accessible brand palettes and export design tokens in seconds. DTCG JSON, Figma Variables, dark/light mode output." />
+  <link rel="icon" href="/assets/favicon.svg" />
+  <link rel="stylesheet" href="../../styles.css" />
+  <style>
+    .ts-hero {
+      text-align: center;
+      padding: 80px 0 48px;
+    }
+    .ts-hero .kicker {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .ts-hero h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .ts-hero .subtitle {
+      color: var(--muted);
+      font-size: 1.125rem;
+      max-width: 520px;
+      margin: 0 auto 36px;
+      line-height: 1.6;
+    }
+    .ts-cta-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-ts-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 12px 28px;
+      border-radius: 10px;
+      transition: opacity 0.2s;
+    }
+    .btn-ts-primary:hover { opacity: 0.88; color: #fff; }
+    .ts-coming-soon {
+      font-size: 0.82rem;
+      color: var(--faint);
+      font-family: var(--mono);
+    }
+    .ts-features {
+      padding: 20px 0 64px;
+    }
+    .ts-features h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .feature-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+    @media (min-width: 600px) {
+      .feature-list { grid-template-columns: 1fr 1fr; }
+    }
+    .feature-item {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+    }
+    .feature-item .feature-icon {
+      font-size: 1.25rem;
+      margin-bottom: 8px;
+    }
+    .feature-item strong {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .feature-item p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.5;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="container">
+
+      <section class="ts-hero">
+        <span class="kicker">Figma Plugin</span>
+        <h1>Theme Studio Pro</h1>
+        <p class="subtitle">Generate accessible brand palettes and export design tokens in seconds.</p>
+        <div class="ts-cta-group">
+          <a href="https://openclaw-vps.tailc8723d.ts.net/theme-studio.html" class="btn-ts-primary">
+            Try Theme Studio →
+          </a>
+          <span class="ts-coming-soon">Pro features coming soon · Stripe not yet wired</span>
+        </div>
+      </section>
+
+      <section class="ts-features">
+        <h2>What it does</h2>
+        <div class="feature-list">
+          <div class="feature-item">
+            <div class="feature-icon">🎨</div>
+            <strong>Palette from seed color</strong>
+            <p>Perceptually uniform scales generated from a single brand color using OKLCH.</p>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🌗</div>
+            <strong>Dark &amp; light mode output</strong>
+            <p>Both modes generated simultaneously with WCAG contrast automatically validated.</p>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">📦</div>
+            <strong>DTCG JSON export</strong>
+            <p>Design tokens in W3C DTCG format, ready to import into Tokens Studio.</p>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🔗</div>
+            <strong>Figma Variables integration</strong>
+            <p>Push tokens directly to your Figma file as native Variables with one click.</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script src="../../app.js"></script>
+</body>
+</html>
